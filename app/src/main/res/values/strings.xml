@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Mocklation</string>
+    <string name="error_missing_location_to_start_service">Please select a location</string>
+</resources>
