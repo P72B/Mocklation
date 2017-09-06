@@ -1,11 +1,17 @@
 package de.p72b.mocklation.map;
 
 import android.Manifest;
+import java.util.Calendar;
+
+import android.graphics.Point;
 import android.location.Location;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,10 +25,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import de.p72b.mocklation.BaseActivity;
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.dagger.MocklationApp;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.location.ILocationService;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.AppUtil;
 
 public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyCallback,
         View.OnClickListener, LocationSource, LocationSource.OnLocationChangedListener,
@@ -37,6 +43,11 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private ILocationService mLocationService;
     private ISetting mSetting;
     private Marker mLocationMarker;
+    private FloatingActionButton mFabActionSave;
+    private BottomSheetBehavior<View> mBottomSheetBehavior;
+    private TextView mCoordinates;
+    private TextView mTstamp;
+    private View mBottomSheet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +127,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 mPresenter.onMarkerClicked(marker);
                 return true;
             }
@@ -123,7 +135,22 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
+                mCoordinates.setText(AppUtil.getFormattedCoordinates(latLng));
+                mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
                 mPresenter.onMapLongClicked(latLng);
+
+                if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
+                    return;
+                }
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (BottomSheetBehavior.STATE_HIDDEN != mBottomSheetBehavior.getState()) {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
         });
 
@@ -150,20 +177,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMapLocationListener = null;
     }
 
-    private boolean hasLocationPermission() {
-        return mPermissionService.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    private void initViews() {
-        setContentView(R.layout.activity_maps);
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        FloatingActionButton mMock = (FloatingActionButton) findViewById(R.id.location);
-        mMock.setOnClickListener(this);
-    }
-
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged:" + location.getLatitude() + "/" + location.getLongitude());
@@ -186,6 +199,55 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             mMap.clear();
         }
         mLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom < 0 ? mMap.getCameraPosition().zoom : zoom));
+
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getAdjustedLocation(latLng), getAdjustedMapZoom(zoom)));
+    }
+
+    private LatLng getAdjustedLocation(LatLng latLng) {
+        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+            return latLng;
+        }
+
+        int height = mBottomSheet.getLayoutParams().height;
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        Log.d(TAG, "Display: " +  size.x + " x " + size.y + "\n" + "Height: " + height);
+
+        LatLng adjustedLocation = mMap.getProjection().fromScreenLocation(new Point(size.x / 2, height));
+
+        return adjustedLocation;
+    }
+
+    private float getAdjustedMapZoom(float zoom) {
+        return zoom < 0 ? mMap.getCameraPosition().zoom : zoom;
+    }
+
+    private boolean hasLocationPermission() {
+        return mPermissionService.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    private void initViews() {
+        setContentView(R.layout.activity_maps);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        mFabActionSave = (FloatingActionButton) findViewById(R.id.location);
+        mFabActionSave.setOnClickListener(this);
+
+        initBottomSheet();
+    }
+
+    private void initBottomSheet() {
+        mBottomSheet = findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheetBehavior.setHideable(true);
+        mBottomSheetBehavior.setPeekHeight(300);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        mCoordinates = (TextView) findViewById(R.id.coordinates);
+        mTstamp = (TextView) findViewById(R.id.tstamp);
     }
 }
