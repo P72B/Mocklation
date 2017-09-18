@@ -119,8 +119,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap = googleMap;
 
         mMap.setLocationSource(this);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         if (hasLocationPermission()) {
-            mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.setMyLocationEnabled(true);
         }
 
