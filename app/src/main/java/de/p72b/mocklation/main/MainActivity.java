@@ -1,5 +1,6 @@
 package de.p72b.mocklation.main;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,7 @@ import android.view.ViewTreeObserver;
 import java.util.List;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.database.LocationItem;
 
 public class MainActivity extends AppCompatActivity implements IMainView{
@@ -46,11 +48,11 @@ public class MainActivity extends AppCompatActivity implements IMainView{
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final Intent intent = new Intent(this, MapsActivity.class);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(intent);
             }
         });
 

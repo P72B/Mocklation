@@ -26,8 +26,8 @@
         <activity
             android:name=".main.MainActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +37,11 @@
 
         <activity
             android:name=".map.MapsActivity"
+            android:parentActivityName=".main.MainActivity"
             android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".main.MainActivity" />
         </activity>
 
         <service
