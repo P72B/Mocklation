@@ -2,24 +2,24 @@ package de.p72b.mocklation.util;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import de.p72b.mocklation.service.database.LocationItem;
 
 public class AppUtil {
     private static final String COORDINATE_DECIMAL_FORMAT = "%.6f";
 
+    public static final String LOCATION_ITEMS_QUERY = "SELECT * FROM " + LocationItem.TABLE;
+
     public static final String LOCATION_ITEM_QUERY = "SELECT * FROM "
             + LocationItem.TABLE
             + " WHERE "
             + LocationItem.COLUMN_CODE
             + " = ? ";
+
 
     public static final String createLocationItemCode(LatLng latLng) {
         return latLng.latitude + "_" + latLng.longitude + "_" + Calendar.getInstance().getTimeInMillis();

@@ -285,7 +285,6 @@ public class MapsPresenter implements IMapsPresenter {
                     default:
                         // do nothing
                 }
-                mDisposables.remove(this);
             }
         }
 
@@ -297,6 +296,7 @@ public class MapsPresenter implements IMapsPresenter {
         @Override
         public void onComplete() {
             Log.d(TAG, " onComplete");
+            mDisposables.remove(this);
         }
     }
 }

@@ -13,21 +13,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.service.database.LocationItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IMainView{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private LocationListAdapter mAdapter;
+    private LocationListAdapter mAdapter = new LocationListAdapter();
+    private IMainPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initViews();
+
+        mPresenter = new MainPresenter(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mPresenter.onDestroy();
+        super.onDestroy();
+    }
+
+    private void initViews() {
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,14 +59,6 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        // TODO: add data
-        List<String> data = new ArrayList<>();
-        data.add("Test");
-        data.add("World");
-        data.add("Test");
-        data.add("World");
-        mAdapter = new LocationListAdapter(data);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -79,5 +84,10 @@ public class MainActivity extends AppCompatActivity {
                 mRecyclerView.setLayoutParams(params);
             }
         });
+    }
+
+    @Override
+    public void showSavedLocations(List<LocationItem> locationItems) {
+        mAdapter.setData(locationItems);
     }
 }

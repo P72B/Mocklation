@@ -7,12 +7,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.service.database.LocationItem;
 
 public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapter.ViewHolder> {
-    private List<String> mDataset;
+    private List<LocationItem> mDataset;
 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -24,8 +26,8 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
         }
     }
 
-    public LocationListAdapter(List<String> myDataset) {
-        mDataset = myDataset;
+    public LocationListAdapter() {
+        mDataset = new ArrayList<>();
     }
 
     @Override
@@ -36,11 +38,18 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.mTextView.setText(mDataset.get(position));
+        LocationItem locationItem = mDataset.get(position);
+
+        holder.mTextView.setText(locationItem.code());
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    public void setData(List<LocationItem> items) {
+        mDataset = items;
+        notifyDataSetChanged();
     }
 }
