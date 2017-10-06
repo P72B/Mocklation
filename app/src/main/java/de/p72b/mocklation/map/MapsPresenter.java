@@ -47,7 +47,8 @@ public class MapsPresenter implements IMapsPresenter {
     private Context mContext;
     private Activity mActivity;
     private List<Class<?>> mRunningServices;
-    @Inject BriteDatabase db;
+    @Inject
+    BriteDatabase db;
     private Pair<String, ContentValues> mOnTheMapItemPair;
     private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -105,7 +106,7 @@ public class MapsPresenter implements IMapsPresenter {
     public void setLastKnownLocation(Location location) {
         Log.d(TAG, "setLastKnownLocation location:" + location.getProvider() + " "
                 + location.getLatitude() + " / " + location.getLongitude() + " isMocked: "
-                +location.isFromMockProvider());
+                + location.isFromMockProvider());
     }
 
     @Override
@@ -212,7 +213,7 @@ public class MapsPresenter implements IMapsPresenter {
             //if marshmallow
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 AppOpsManager opsManager = (AppOpsManager) mContext.getSystemService(Context.APP_OPS_SERVICE);
-                isMockLocation = (opsManager.checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID)== AppOpsManager.MODE_ALLOWED);
+                isMockLocation = (opsManager.checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID) == AppOpsManager.MODE_ALLOWED);
             } else {
                 // in marshmallow this will always return true
                 isMockLocation = !android.provider.Settings.Secure.getString(mContext.getContentResolver(), "mock_location").equals("0");
@@ -225,12 +226,12 @@ public class MapsPresenter implements IMapsPresenter {
 
     private void startMockLocation() {
         Log.d(TAG, "checkPermissions");
-        String[] permissionsToBeRequired = new String[] {
+        String[] permissionsToBeRequired = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION
         };
         boolean shouldRequestPermission = false;
 
-        for (String permission: permissionsToBeRequired) {
+        for (String permission : permissionsToBeRequired) {
             if (!hasPermission(permission)) {
                 Log.d(TAG, permission + " not granted.");
                 shouldRequestPermission = true;
