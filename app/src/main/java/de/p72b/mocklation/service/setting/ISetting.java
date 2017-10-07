@@ -22,5 +22,9 @@ public interface ISetting {
 
     void setMockLocationItemCode(String code);
 
+    void saveLastPressedLocation(String code);
+
+    String getLastPressedLocationCode();
+
     String getMockLocationItemCode();
 }

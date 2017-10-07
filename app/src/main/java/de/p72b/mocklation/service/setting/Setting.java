@@ -16,6 +16,7 @@ public class Setting implements ISetting{
     private static final String LAST_POSITION_LAT = "LAST_POSITION_LAT";
     private static final String LAST_POSITION_LNG = "LAST_POSITION_LNG";
     private static final String ACTIVE_MOCK_LOCATION_CODE = "ACTIVE_MOCK_LOCATION_CODE";
+    private static final String LAST_SELECTED_LOCATION_CODE = "LAST_SELECTED_LOCATION_CODE";
 
     private SharedPreferences mPreferences;
 
@@ -71,6 +72,26 @@ public class Setting implements ISetting{
         SharedPreferences.Editor edit = mPreferences.edit();
         edit.putString(ACTIVE_MOCK_LOCATION_CODE, code);
         edit.commit();
+    }
+
+    @Override
+    public void saveLastPressedLocation(String code) {
+        Log.d(TAG, "saveLastPressedLocation: " + code);
+        if (mPreferences == null) {
+            return;
+        }
+        SharedPreferences.Editor edit = mPreferences.edit();
+        edit.putString(LAST_SELECTED_LOCATION_CODE, code);
+        edit.commit();
+    }
+
+    @Override
+    public String getLastPressedLocationCode() {
+        Log.d(TAG, "getLastPressedLocationCode mPreferences is null: " + (mPreferences != null));
+        if (mPreferences == null) {
+            return null;
+        }
+        return mPreferences.getString(LAST_SELECTED_LOCATION_CODE, null);
     }
 
     @Override
