@@ -7,4 +7,6 @@
     <string name="selected_location_title">Selected location</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
+    <string name="stop">Stop</string>
+    <string name="error_1001">Service is running.</string>
 </resources>

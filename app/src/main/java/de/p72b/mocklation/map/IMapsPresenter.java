@@ -22,7 +22,5 @@ public interface IMapsPresenter {
 
     void onClick(View view);
 
-    void onMockPermissionsResult(int[] grantedResults);
-
     void onMapReady();
 }

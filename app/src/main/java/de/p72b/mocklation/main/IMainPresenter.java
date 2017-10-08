@@ -7,4 +7,8 @@ public interface IMainPresenter {
     void onDestroy();
 
     void locationItemPressed(LocationItem item);
+
+    void onMockPermissionsResult(int[] grantedResults);
+
+    void onPlayClicked();
 }

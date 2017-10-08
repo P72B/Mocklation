@@ -102,6 +102,7 @@
                     android:padding="10dp">
 
                     <ImageButton
+                        android:id="@+id/play_stop"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"

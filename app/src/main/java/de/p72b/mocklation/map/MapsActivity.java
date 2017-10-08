@@ -35,7 +35,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         ILocationService.OnLocationChanged {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
-    public static final int PERMISSIONS_MOCKING = 115;
 
     private IMapsPresenter mPresenter;
     private OnLocationChangedListener mMapLocationListener = null;
@@ -97,19 +96,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mPresenter.onDestroy();
         mLocationService.onDestroyCommand();
         super.onDestroy();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult requestCode: " + requestCode);
-        switch (requestCode) {
-            case PERMISSIONS_MOCKING: {
-                mPresenter.onMockPermissionsResult(grantResults);
-                return;
-            }
-            default:
-                // do nothing
-        }
     }
 
     @SuppressWarnings("MissingPermission")

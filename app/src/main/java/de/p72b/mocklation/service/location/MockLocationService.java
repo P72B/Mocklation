@@ -1,7 +1,6 @@
 package de.p72b.mocklation.service.location;
 
 import android.Manifest;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,7 +11,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -36,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import de.p72b.mocklation.dagger.MocklationApp;
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.map.MapsActivity;
+import de.p72b.mocklation.main.MainActivity;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.database.LocationItem;
 import de.p72b.mocklation.service.permission.IPermissionService;
@@ -71,8 +69,6 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private List<LatLng> mLatLngList = new ArrayList<>();
     @Inject BriteDatabase db;
-
-    private String mLocationItemCode;
 
     public MockLocationService() {
     }
@@ -217,12 +213,12 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private void createNotification() {
         mNumMessages = 0;
         mNotifyBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.common_full_open_on_phone)
+                .setSmallIcon(R.drawable.ic_location_on_black_24dp)
                 .setContentTitle(getApplicationName());
 
-        Intent resultIntent = new Intent(this, MapsActivity.class);
+        Intent resultIntent = new Intent(this, MainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MapsActivity.class);
+        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
