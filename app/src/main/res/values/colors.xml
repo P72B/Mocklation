@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="background_light_grey">#f2f2f2</color>
+    <color name="colorPrimary">#CF4141</color>
+    <color name="colorPrimaryDark">#541D1B</color>
+    <color name="colorAccent">#C2823F</color>
+
+    <color name="face">#FEFEFD</color>
+    <color name="eye">#584E45</color>
+    <color name="collar">#FEFEF3</color>
+    <color name="mouth">#F45324</color>
+    <color name="head">#0F1012</color>
+    <color name="dress">#CF4141</color>
+    <color name="dress_dark">#541D1B</color>
+    <color name="dress_flower">#C2823F</color>
 </resources>

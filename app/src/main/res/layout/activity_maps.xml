@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:clipToPadding="true"
-        android:background="@android:color/holo_orange_dark"
+        android:background="@color/face"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
         <LinearLayout
@@ -28,9 +28,10 @@
                 android:id="@+id/coordinates"
                 android:layout_width="match_parent"
                 android:layout_height="300px"
-                android:background="@android:color/holo_blue_dark"
+                android:background="@color/colorPrimary"
                 tools:text="52.386240 / 13.615689"
                 android:textSize="16sp"
+                android:textColor="@color/face"
                 android:padding="16dp"/>
 
             <TextView
@@ -51,5 +52,6 @@
         android:layout_margin="16dp"
         android:clickable="true"
         app:layout_anchor="@id/bottom_sheet"
-        app:layout_anchorGravity="top|end"/>
+        app:layout_anchorGravity="top|end"
+        app:srcCompat="@drawable/ic_save_black_24dp"/>
 </android.support.design.widget.CoordinatorLayout>

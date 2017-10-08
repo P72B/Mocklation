@@ -13,13 +13,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_light_grey"
+        android:background="@color/face"
         android:orientation="vertical">
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_view_selected_location"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
@@ -28,65 +28,85 @@
             card_view:cardCornerRadius="4dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <TextView
-                    android:id="@+id/card_view_selected_location_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dp"
-                    android:text="@string/selected_location_title" />
-
-                <TextView
-                    android:id="@+id/card_view_selected_location_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:textSize="@dimen/text_size_large"
-                    tools:text="Name" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
 
-                    <android.support.design.widget.TextInputLayout
+                    <TextView
+                        android:id="@+id/card_view_selected_location_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="true"
+                        android:layout_marginBottom="6dp"
+                        android:text="@string/selected_location_title" />
+
+                    <TextView
+                        android:id="@+id/card_view_selected_location_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:textSize="@dimen/text_size_large"
+                        tools:text="Name" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                        android:orientation="horizontal">
 
-                        <android.support.design.widget.TextInputEditText
-                            android:id="@+id/card_view_selected_location_latitude"
+                        <android.support.design.widget.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:editable="false"
-                            android:focusable="false"
-                            android:hint="@string/latitude"
-                            android:inputType="none"
-                            tools:text="13.123456" />
-                    </android.support.design.widget.TextInputLayout>
+                            android:layout_weight="1">
 
-                    <android.support.design.widget.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1">
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/card_view_selected_location_latitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@android:color/transparent"
+                                android:editable="false"
+                                android:focusable="false"
+                                android:hint="@string/latitude"
+                                android:inputType="none"
+                                tools:text="13.123456" />
+                        </android.support.design.widget.TextInputLayout>
 
-                        <android.support.design.widget.TextInputEditText
-                            android:id="@+id/card_view_selected_location_longitude"
+                        <android.support.design.widget.TextInputLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/transparent"
-                            android:editable="false"
-                            android:focusable="false"
-                            android:hint="@string/longitude"
-                            android:inputType="none"
-                            tools:text="52.123456" />
-                    </android.support.design.widget.TextInputLayout>
+                            android:layout_weight="1">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/card_view_selected_location_longitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@android:color/transparent"
+                                android:editable="false"
+                                android:focusable="false"
+                                android:hint="@string/longitude"
+                                android:inputType="none"
+                                tools:text="52.123456" />
+                        </android.support.design.widget.TextInputLayout>
+                    </LinearLayout>
                 </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/eye"
+                    android:padding="10dp">
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:background="@drawable/ic_play_arrow_black_24dp" />
+                </RelativeLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -98,6 +118,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
             android:layout_marginStart="15dp"
+            android:textAllCaps="true"
             android:layout_marginTop="15dp"
             android:paddingLeft="10dp"
             android:text="@string/location_list_title" />
