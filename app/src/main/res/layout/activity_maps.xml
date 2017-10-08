@@ -1,46 +1,57 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                 xmlns:tools="http://schemas.android.com/tools"
-                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                 android:layout_width="match_parent"
-                                                 android:layout_height="match_parent"
-                                                 tools:context="de.p72b.mocklation.map.MapsActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="de.p72b.mocklation.map.MapsActivity">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-              android:name="com.google.android.gms.maps.SupportMapFragment"
-              android:id="@+id/map"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent" />
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:clipToPadding="true"
+        android:elevation="6dp"
         android:background="@color/face"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+        android:clipToPadding="true"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/coordinates"
+            <LinearLayout
+                android:id="@+id/bottom_sheet_header"
                 android:layout_width="match_parent"
                 android:layout_height="300px"
-                android:background="@color/colorPrimary"
-                tools:text="52.386240 / 13.615689"
-                android:textSize="16sp"
-                android:textColor="@color/face"
-                android:padding="16dp"/>
+                android:orientation="vertical"
+                android:background="@color/face"
+                tools:background="@color/colorPrimary">
+
+                <TextView
+                    android:id="@+id/bottom_sheet_header_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textColor="@color/eye"
+                    android:textSize="16sp"
+                    tools:text="52.386240 / 13.615689"
+                    tools:textColor="@color/face"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tstamp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:text="2017 Sep. 11 19:43"
                 android:padding="16dp"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                tools:text="2017 Sep. 11 19:43" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
@@ -53,5 +64,5 @@
         android:clickable="true"
         app:layout_anchor="@id/bottom_sheet"
         app:layout_anchorGravity="top|end"
-        app:srcCompat="@drawable/ic_save_black_24dp"/>
+        app:srcCompat="@drawable/ic_save_black_24dp" />
 </android.support.design.widget.CoordinatorLayout>

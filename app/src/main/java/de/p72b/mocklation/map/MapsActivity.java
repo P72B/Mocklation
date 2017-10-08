@@ -1,10 +1,16 @@
 package de.p72b.mocklation.map;
 
 import android.Manifest;
+
 import java.util.Calendar;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.TransitionDrawable;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
@@ -44,9 +50,11 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private Marker mLocationMarker;
     private FloatingActionButton mFabActionSave;
     private BottomSheetBehavior<View> mBottomSheetBehavior;
-    private TextView mCoordinates;
     private TextView mTstamp;
     private View mBottomSheet;
+    private View mBottomSheetHeader;
+    private boolean mIsDark;
+    private TextView mBottomSheetTitleText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +129,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                mCoordinates.setText(AppUtil.getFormattedCoordinates(latLng));
+                mBottomSheetTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
                 mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
                 mPresenter.onMapLongClicked(latLng);
 
@@ -200,7 +208,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         Point size = new Point();
         display.getSize(size);
 
-        Log.d(TAG, "Display: " +  size.x + " x " + size.y + "\n" + "Height: " + height);
+        Log.d(TAG, "Display: " + size.x + " x " + size.y + "\n" + "Height: " + height);
 
         LatLng adjustedLocation = mMap.getProjection().fromScreenLocation(new Point(size.x / 2, height));
 
@@ -229,11 +237,96 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     private void initBottomSheet() {
         mBottomSheet = findViewById(R.id.bottom_sheet);
+        mBottomSheetHeader = findViewById(R.id.bottom_sheet_header);
+        mBottomSheetTitleText = (TextView) findViewById(R.id.bottom_sheet_header_title);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
         mBottomSheetBehavior.setHideable(true);
         mBottomSheetBehavior.setPeekHeight(300);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        mCoordinates = (TextView) findViewById(R.id.coordinates);
         mTstamp = (TextView) findViewById(R.id.tstamp);
+
+        initBottomSheetColorAnimations();
     }
+
+    private void initBottomSheetColorAnimations() {
+        int primaryColor;
+        int faceColor;
+        int eyeColor;
+        int duration = 150;
+        mIsDark = false;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            primaryColor = getColor(R.color.colorPrimary);
+            faceColor = getColor(R.color.face);
+            eyeColor = getColor(R.color.eye);
+        } else {
+            primaryColor = getResources().getColor(R.color.colorPrimary);
+            faceColor = getResources().getColor(R.color.face);
+            eyeColor = getResources().getColor(R.color.eye);
+        }
+
+        final ValueAnimator colorAnimationFaceToPrimary = ValueAnimator.ofObject(new ArgbEvaluator(), faceColor, primaryColor);
+        colorAnimationFaceToPrimary.setDuration(duration);
+        colorAnimationFaceToPrimary.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                mBottomSheetHeader.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        final ValueAnimator colorAnimationPrimaryToFace = ValueAnimator.ofObject(new ArgbEvaluator(), primaryColor, faceColor);
+        colorAnimationPrimaryToFace.setDuration(duration);
+        colorAnimationPrimaryToFace.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                mBottomSheetHeader.setBackgroundColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        final ValueAnimator colorAnimationEyeToFace = ValueAnimator.ofObject(new ArgbEvaluator(), eyeColor, faceColor);
+        colorAnimationEyeToFace.setDuration(duration);
+        colorAnimationEyeToFace.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                mBottomSheetTitleText.setTextColor((int) animator.getAnimatedValue());
+            }
+
+        });
+        final ValueAnimator colorAnimationFaceToEye = ValueAnimator.ofObject(new ArgbEvaluator(), faceColor, eyeColor);
+        colorAnimationFaceToEye.setDuration(duration);
+        colorAnimationFaceToEye.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animator) {
+                mBottomSheetTitleText.setTextColor((int) animator.getAnimatedValue());
+            }
+
+        });
+
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {}
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                if (slideOffset > 0) {
+                    if (!mIsDark) {
+                        mIsDark = true;
+                        colorAnimationFaceToPrimary.start();
+                        colorAnimationEyeToFace.start();
+                    }
+                } else {
+                    if (mIsDark) {
+                        mIsDark = false;
+                        colorAnimationPrimaryToFace.start();
+                        colorAnimationFaceToEye.start();
+                    }
+                }
+            }
+        });
+    }
+
 }
