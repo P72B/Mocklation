@@ -90,9 +90,12 @@ public class MapsPresenter implements IMapsPresenter {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.location:
+            case R.id.save:
                 // new item was created, not restored from mSettings
                 db.insert(LocationItem.TABLE, mOnTheMapItemPair.second);
+                break;
+            case R.id.location:
+                mView.showMyLocation();
                 break;
             default:
                 // do nothing;

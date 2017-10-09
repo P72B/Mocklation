@@ -7,4 +7,6 @@ public interface IMapsView {
     void showMessage(String message);
 
     void selectLocation(LatLng latLng, String id, float zoom);
+
+    void showMyLocation();
 }

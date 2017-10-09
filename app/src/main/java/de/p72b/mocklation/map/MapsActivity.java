@@ -6,16 +6,17 @@ import java.util.Calendar;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.TransitionDrawable;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +50,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private ISetting mSetting;
     private Marker mLocationMarker;
     private FloatingActionButton mFabActionSave;
+    private FloatingActionButton mFabActionLocation;
     private BottomSheetBehavior<View> mBottomSheetBehavior;
     private TextView mTstamp;
     private View mBottomSheet;
@@ -57,6 +59,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private TextView mBottomSheetTitleText;
     private boolean mInitCameraPositionSet = false;
     private boolean mOnInitialLocationDetermined = false;
+    private int mMyLocatioNotCenterColor;
+    private int mMyLocatioCenterColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,6 +226,23 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getAdjustedLocation(latLng), getAdjustedMapZoom(zoom)));
     }
 
+    @Override
+    public void showMyLocation() {
+        Location location = mLocationService.getLastKnownLocation();
+        if (mMap == null || location == null) {
+            return;
+        }
+        LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                lastKnowLocation, mMap.getCameraPosition().zoom));
+        setFollowGps(true);
+    }
+
+    private void setFollowGps(boolean followGps) {
+        int color = followGps ? mMyLocatioCenterColor : mMyLocatioNotCenterColor;
+        DrawableCompat.setTint(mFabActionLocation.getDrawable(), color);
+    }
+
     private LatLng getAdjustedLocation(LatLng latLng) {
         if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
             return latLng;
@@ -253,8 +274,21 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mFabActionSave = (FloatingActionButton) findViewById(R.id.location);
+        mFabActionSave = (FloatingActionButton) findViewById(R.id.save);
         mFabActionSave.setOnClickListener(this);
+        mFabActionLocation = (FloatingActionButton) findViewById(R.id.location);
+        mFabActionLocation.setOnClickListener(this);
+
+        mMyLocatioNotCenterColor = ContextCompat.getColor(this, R.color.eye);
+        mMyLocatioCenterColor = ContextCompat.getColor(this, R.color.colorAccent);
+
+        findViewById(R.id.touch_overlay).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                setFollowGps(false);
+                return false;
+            }
+        });
 
         initBottomSheet();
     }

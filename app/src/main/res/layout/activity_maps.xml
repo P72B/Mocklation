@@ -1,6 +1,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="de.p72b.mocklation.map.MapsActivity">
@@ -11,15 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <View
+        android:id="@+id/touch_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:elevation="6dp"
         android:background="@color/face"
         android:clipToPadding="true"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
-        >
+        android:elevation="6dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,8 +35,8 @@
                 android:id="@+id/bottom_sheet_header"
                 android:layout_width="match_parent"
                 android:layout_height="300px"
-                android:orientation="vertical"
                 android:background="@color/face"
+                android:orientation="vertical"
                 tools:background="@color/colorPrimary">
 
                 <TextView
@@ -42,7 +47,7 @@
                     android:textColor="@color/eye"
                     android:textSize="16sp"
                     tools:text="52.386240 / 13.615689"
-                    tools:textColor="@color/face"/>
+                    tools:textColor="@color/face" />
             </LinearLayout>
 
             <TextView
@@ -55,14 +60,38 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/location"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:clickable="true"
+        android:elevation="10dp"
+        android:orientation="horizontal"
         app:layout_anchor="@id/bottom_sheet"
-        app:layout_anchorGravity="top|end"
-        app:srcCompat="@drawable/ic_save_black_24dp" />
+        app:layout_anchorGravity="end">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin_right"
+            android:layout_marginLeft="@dimen/fab_margin_right"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginStart="@dimen/fab_margin_right"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:clickable="true"
+            app:backgroundTint="@color/face"
+            app:srcCompat="@drawable/ic_my_location_black_24dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:layout_marginEnd="@dimen/fab_margin_right"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:clickable="true"
+            app:srcCompat="@drawable/ic_save_black_24dp" />
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
