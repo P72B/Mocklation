@@ -9,4 +9,5 @@
     <string name="longitude">Longitude</string>
     <string name="stop">Stop</string>
     <string name="error_1001">Service is running.</string>
+    <string name="error_1002">Please long press somewhere inside the map first.</string>
 </resources>

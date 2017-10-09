@@ -6,20 +6,18 @@ import java.util.Calendar;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
-import android.graphics.Point;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -211,11 +209,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public void selectLocation(LatLng latLng, String id, float zoom) {
         if (mLocationMarker != null) {
             mMap.clear();
@@ -235,30 +228,18 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         setFollowGps(true);
     }
 
+    @Override
+    public void showSnackbar(int message, int action, View.OnClickListener listener, int duration) {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.touch_overlay), message, duration);
+        if (action != -1) {
+            snackbar.setAction(action, listener);
+        }
+        snackbar.show();
+    }
+
     private void setFollowGps(boolean followGps) {
         int color = followGps ? mMyLocatioCenterColor : mMyLocatioNotCenterColor;
         DrawableCompat.setTint(mFabActionLocation.getDrawable(), color);
-    }
-
-    private LatLng getAdjustedLocation(LatLng latLng) {
-        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
-            return latLng;
-        }
-
-        int height = mBottomSheet.getLayoutParams().height;
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-
-        Log.d(TAG, "Display: " + size.x + " x " + size.y + "\n" + "Height: " + height);
-
-        LatLng adjustedLocation = mMap.getProjection().fromScreenLocation(new Point(size.x / 2, height));
-
-        return adjustedLocation;
-    }
-
-    private float getAdjustedMapZoom(float zoom) {
-        return zoom < 0 ? mMap.getCameraPosition().zoom : zoom;
     }
 
     private boolean hasLocationPermission() {

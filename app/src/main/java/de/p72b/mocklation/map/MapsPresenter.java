@@ -3,6 +3,7 @@ package de.p72b.mocklation.map;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.location.Location;
+import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.View;
@@ -91,6 +92,11 @@ public class MapsPresenter implements IMapsPresenter {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save:
+                if (mOnTheMapItemPair == null) {
+                    mView.showSnackbar(R.string.error_1002, -1, null, Snackbar.LENGTH_LONG);
+                    return;
+                }
+
                 // new item was created, not restored from mSettings
                 db.insert(LocationItem.TABLE, mOnTheMapItemPair.second);
                 break;
