@@ -74,5 +74,12 @@ public interface ILocationService {
          */
         void onLocationChanged(Location location);
 
+        /**
+         * Emit when the first location of GoogleApiClient FusedLocation was found.
+         *
+         * @param location
+         */
+        void onInitialLocationDetermined(Location location);
+
     }
 }

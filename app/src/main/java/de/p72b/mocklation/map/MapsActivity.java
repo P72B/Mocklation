@@ -55,6 +55,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mBottomSheetHeader;
     private boolean mIsDark;
     private TextView mBottomSheetTitleText;
+    private boolean mInitCameraPositionSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,11 +149,23 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             }
         });
 
-        // Add a marker in Sydney and move the camera
-        LatLng berlin = new LatLng(52.4, 13.5);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(berlin, 12.0f));
+        tryToInitCameraPostion();
 
         mPresenter.onMapReady();
+    }
+
+    private void tryToInitCameraPostion() {
+        Log.d(TAG, "tryToInitCameraPostion mInitCameraPositionSet: " + mInitCameraPositionSet);
+        if (mInitCameraPositionSet) {
+            return;
+        }
+
+        Location location = mLocationService.getLastKnownLocation();
+        if (location != null) {
+            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 15.0f));
+            mInitCameraPositionSet = true;
+        }
     }
 
     @Override
@@ -180,6 +193,12 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         }
 
         mPresenter.setLastKnownLocation(location);
+    }
+
+    @Override
+    public void onInitialLocationDetermined(Location location) {
+        Log.d(TAG, "onInitialLocationDetermined:" + location.getLatitude() + "/" + location.getLongitude());
+        tryToInitCameraPostion();
     }
 
     @Override

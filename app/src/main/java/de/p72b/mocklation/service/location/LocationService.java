@@ -138,7 +138,8 @@ public class LocationService implements ILocationService, LocationListener, Goog
     }
 
     @Override
-    public void onStartCommand(FragmentActivity activity, IPermissionService permissions, ISetting setting) {
+    public void onStartCommand(FragmentActivity activity, IPermissionService permissions,
+                               ISetting setting) {
         Log.d(TAG, "onStartCommand");
 
         mFragmentActivity = activity;
@@ -206,6 +207,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
             mSettings.saveLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
             mInitLocationRetry = true;
+            dispatchInitialLocation(mLastKnownLocation);
         } else {
             // from time to time on second retry a last known location can be found
             Log.d(TAG, "retry initial last known location set");
@@ -260,6 +262,12 @@ public class LocationService implements ILocationService, LocationListener, Goog
     private void dispatch(Location location) {
         for (ILocationService.OnLocationChanged subscriber : mSubscribers) {
             subscriber.onLocationChanged(location);
+        }
+    }
+
+    private void dispatchInitialLocation(Location location) {
+        for (ILocationService.OnLocationChanged subscriber : mSubscribers) {
+            subscriber.onInitialLocationDetermined(location);
         }
     }
 
