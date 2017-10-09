@@ -221,9 +221,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             mMap.clear();
         }
         mLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng));
-
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(getAdjustedLocation(latLng), getAdjustedMapZoom(zoom)));
     }
 
     @Override
