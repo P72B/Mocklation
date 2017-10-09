@@ -56,6 +56,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private boolean mIsDark;
     private TextView mBottomSheetTitleText;
     private boolean mInitCameraPositionSet = false;
+    private boolean mOnInitialLocationDetermined = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,19 +150,22 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             }
         });
 
-        tryToInitCameraPostion();
+        if (mOnInitialLocationDetermined) {
+            tryToInitCameraPostion();
+        }
 
         mPresenter.onMapReady();
     }
 
     private void tryToInitCameraPostion() {
         Log.d(TAG, "tryToInitCameraPostion mInitCameraPositionSet: " + mInitCameraPositionSet);
-        if (mInitCameraPositionSet) {
+        if (mInitCameraPositionSet || mMap == null) {
             return;
         }
 
         Location location = mLocationService.getLastKnownLocation();
         if (location != null) {
+            Log.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
             LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 15.0f));
             mInitCameraPositionSet = true;
@@ -198,6 +202,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void onInitialLocationDetermined(Location location) {
         Log.d(TAG, "onInitialLocationDetermined:" + location.getLatitude() + "/" + location.getLongitude());
+        mOnInitialLocationDetermined = true;
         tryToInitCameraPostion();
     }
 
