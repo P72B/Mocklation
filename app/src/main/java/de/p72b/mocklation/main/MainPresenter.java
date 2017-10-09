@@ -75,6 +75,7 @@ public class MainPresenter implements IMainPresenter {
 
     @Override
     public void locationItemPressed(final LocationItem item) {
+        mSelectedItem = item;
         if (mMockServiceInteractor.isServiceRunning()) {
             mView.showSnackbar(R.string.error_1001, R.string.stop, new View.OnClickListener() {
                 @Override
