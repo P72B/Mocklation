@@ -252,9 +252,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mFabActionSave = (FloatingActionButton) findViewById(R.id.save);
+        mFabActionSave = findViewById(R.id.save);
         mFabActionSave.setOnClickListener(this);
-        mFabActionLocation = (FloatingActionButton) findViewById(R.id.location);
+        mFabActionLocation = findViewById(R.id.location);
         mFabActionLocation.setOnClickListener(this);
 
         mMyLocatioNotCenterColor = ContextCompat.getColor(this, R.color.eye);
@@ -274,12 +274,12 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private void initBottomSheet() {
         mBottomSheet = findViewById(R.id.bottom_sheet);
         mBottomSheetHeader = findViewById(R.id.bottom_sheet_header);
-        mBottomSheetTitleText = (TextView) findViewById(R.id.bottom_sheet_header_title);
+        mBottomSheetTitleText = findViewById(R.id.bottom_sheet_header_title);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
         mBottomSheetBehavior.setHideable(true);
         mBottomSheetBehavior.setPeekHeight(300);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        mTstamp = (TextView) findViewById(R.id.tstamp);
+        mTstamp = findViewById(R.id.tstamp);
 
         initBottomSheetColorAnimations();
     }

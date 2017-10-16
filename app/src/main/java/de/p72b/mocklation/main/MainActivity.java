@@ -131,10 +131,10 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     private void initViews() {
         setContentView(R.layout.activity_main);
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         final Intent intent = new Intent(this, MapsActivity.class);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,18 +143,18 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
             }
         });
 
-        mSelectedLocationName = (TextView) findViewById(R.id.card_view_selected_location_name);
-        mSelectedLocationLatidude = (EditText) findViewById(R.id.card_view_selected_location_latitude);
-        mSelectedLocationLongitude = (EditText) findViewById(R.id.card_view_selected_location_longitude);
+        mSelectedLocationName = findViewById(R.id.card_view_selected_location_name);
+        mSelectedLocationLatidude = findViewById(R.id.card_view_selected_location_latitude);
+        mSelectedLocationLongitude = findViewById(R.id.card_view_selected_location_longitude);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.location_list);
+        mRecyclerView = findViewById(R.id.location_list);
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mButtonPlayStop = (ImageButton) findViewById(R.id.play_stop);
+        mButtonPlayStop = findViewById(R.id.play_stop);
         mButtonPlayStop.setOnClickListener(this);
 
 
