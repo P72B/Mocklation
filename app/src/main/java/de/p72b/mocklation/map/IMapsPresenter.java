@@ -23,4 +23,6 @@ public interface IMapsPresenter {
     void onClick(View view);
 
     void onMapReady();
+
+    void removeMarker();
 }

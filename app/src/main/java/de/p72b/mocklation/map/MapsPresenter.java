@@ -136,4 +136,9 @@ public class MapsPresenter implements IMapsPresenter {
     @Override
     public void onMapReady() {
     }
+
+    @Override
+    public void removeMarker() {
+        mOnTheMapItemPair = null;
+    }
 }

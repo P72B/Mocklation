@@ -1,6 +1,10 @@
 package de.p72b.mocklation.util;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,5 +48,40 @@ public class AppUtil {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.getDefault());
         String   timeZone = new SimpleDateFormat("Z").format(calendar.getTime());
         return timeZone.substring(0, 3) + ":"+ timeZone.substring(3, 5);
+    }
+
+    public static void removeMarkerAnimated(final Marker marker, final long duration, long delay) {
+        // Animate marker
+        ValueAnimator valueAnimator = new ValueAnimator();
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float value = valueAnimator.getAnimatedFraction();
+                marker.setAlpha(1f - value);
+            }
+        });
+
+        valueAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                marker.remove();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+        valueAnimator.setFloatValues(0, 1); // Ignored.
+        valueAnimator.setDuration(duration);
+        valueAnimator.setStartDelay(delay);
+        valueAnimator.start();
     }
 }

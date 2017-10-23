@@ -40,6 +40,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         ILocationService.OnLocationChanged {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final long MARKER_REMOVE_MILLISECONDS = 300;
 
     private IMapsPresenter mPresenter;
     private OnLocationChangedListener mMapLocationListener = null;
@@ -54,6 +55,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mBottomSheet;
     private View mBottomSheetHeader;
     private boolean mIsDark;
+    private boolean mIsGone;
     private TextView mBottomSheetTitleText;
     private boolean mInitCameraPositionSet = false;
     private boolean mOnInitialLocationDetermined = false;
@@ -146,9 +148,12 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                if (BottomSheetBehavior.STATE_HIDDEN != mBottomSheetBehavior.getState()) {
+                if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    return;
                 }
+
+                hideComponents();
             }
         });
 
@@ -157,6 +162,19 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         }
 
         mPresenter.onMapReady();
+    }
+
+    private void hideComponents() {
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        removeMarker();
+    }
+
+    private void removeMarker() {
+        mPresenter.removeMarker();
+        if (mLocationMarker != null) {
+            AppUtil.removeMarkerAnimated(mLocationMarker, MARKER_REMOVE_MILLISECONDS, 0);
+            mLocationMarker = null;
+        }
     }
 
     private void tryToInitCameraPostion() {
@@ -211,7 +229,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void selectLocation(LatLng latLng, String id, float zoom) {
         if (mLocationMarker != null) {
-            mMap.clear();
+            mLocationMarker.remove();
         }
         mLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng));
     }
@@ -290,6 +308,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         int eyeColor;
         int duration = 150;
         mIsDark = false;
+        mIsGone = true;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             primaryColor = getColor(R.color.colorPrimary);
@@ -348,7 +367,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                Log.d(TAG, "slideOffset: " + slideOffset);
                 if (slideOffset > 0) {
+                    mIsGone = false;
                     if (!mIsDark) {
                         mIsDark = true;
                         colorAnimationFaceToPrimary.start();
@@ -359,6 +380,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                         mIsDark = false;
                         colorAnimationPrimaryToFace.start();
                         colorAnimationFaceToEye.start();
+                    } else if (!mIsGone) {
+                        removeMarker();
+                        mIsGone = true;
                     }
                 }
             }
