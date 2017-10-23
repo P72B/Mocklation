@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -25,29 +26,27 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.geojson.GeoJsonPoint;
-import com.squareup.sqlbrite2.BriteDatabase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import de.p72b.mocklation.dagger.MocklationApp;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.main.MainActivity;
 import de.p72b.mocklation.service.AppServices;
-import de.p72b.mocklation.service.database.LocationItem;
 import de.p72b.mocklation.service.permission.IPermissionService;
+import de.p72b.mocklation.service.room.AppDatabase;
+import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.service.setting.Setting;
-import de.p72b.mocklation.util.AppUtil;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-
-import javax.inject.Inject;
 
 public class MockLocationService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, IPermissionService.OnPermissionChanged {
@@ -68,7 +67,8 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private int mNumMessages;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private List<LatLng> mLatLngList = new ArrayList<>();
-    @Inject BriteDatabase db;
+    private AppDatabase mDb;
+    private Disposable mDisposableFindByCode;
 
     public MockLocationService() {
     }
@@ -76,13 +76,12 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     @Override
     public void onCreate() {
         super.onCreate();
-        MocklationApp.getComponent(getApplicationContext()).inject(this);
-
-        mPermissions =  (IPermissionService) AppServices.getService(AppServices.PERMISSIONS);
+        mPermissions = (IPermissionService) AppServices.getService(AppServices.PERMISSIONS);
         mPermissions.subscribeToPermissionChanges(this);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mSetting = (Setting) AppServices.getService(AppServices.SETTINGS);
+        mDb = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -172,11 +171,11 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     private void requestLocationItem(String code) {
         Log.d(TAG, "requestLocationItem");
-        mDisposables.add(db.createQuery(LocationItem.TABLE, AppUtil.LOCATION_ITEM_QUERY, code)
-                .mapToList(LocationItem.MAPPER)
+        mDisposableFindByCode = mDb.locationItemDao().findByCode(code)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new LocationItemObserver())
-        );
+                .subscribe(new LocationItemObserver());
+        mDisposables.add(mDisposableFindByCode);
     }
 
     private void reset() {
@@ -274,43 +273,34 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         }
     }
 
-    private class LocationItemObserver extends DisposableObserver<List<LocationItem>> {
+    private class LocationItemObserver implements Consumer<LocationItem> {
         @Override
-        public void onNext(@io.reactivex.annotations.NonNull List<LocationItem> locationItems) {
-            Log.d(TAG, "onNext : value list size: " + locationItems.size());
-            if (locationItems.size() > 0) {
-                LocationItem item = locationItems.get(0);
-                Log.d(TAG, " item[0]: " + item.code() + "\n" + item.geojosn());
+        public void accept(LocationItem locationItem) throws Exception {
+            mDisposables.remove(mDisposableFindByCode);
 
-                // parse geojson feature
-                LocationItemFeature feature = item.deserialize();
-
-                switch (feature.getGeoJsonFeature().getGeometry().getType()) {
-                    case "Point":
-                        GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
-                        mLatLngList.add(point.getCoordinates());
-                        break;
-                    default:
-                        // do nothing
-                }
-
-                if (mLatLngList.size() > 0) {
-                    processLocationItem();
-                } else {
-                    // TODO: no locations found
-                }
-                mDisposables.remove(this);
+            if (locationItem == null) {
+                return;
             }
-        }
 
-        @Override
-        public void onError(@io.reactivex.annotations.NonNull Throwable e) {
-            Log.d(TAG, " onError : " + e.getMessage());
-        }
+            Log.d(TAG, " item: " + locationItem.getCode() + "\n" + locationItem.getGeoJson());
 
-        @Override
-        public void onComplete() {
-            Log.d(TAG, " onComplete");
+            // parse geojson feature
+            LocationItemFeature feature = locationItem.deserialize();
+
+            switch (feature.getGeoJsonFeature().getGeometry().getType()) {
+                case "Point":
+                    GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
+                    mLatLngList.add(point.getCoordinates());
+                    break;
+                default:
+                    // do nothing
+            }
+
+            if (mLatLngList.size() > 0) {
+                processLocationItem();
+            } else {
+                // TODO: no locations found
+            }
         }
     }
 

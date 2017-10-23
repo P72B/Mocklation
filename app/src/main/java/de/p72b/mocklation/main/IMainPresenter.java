@@ -1,8 +1,11 @@
 package de.p72b.mocklation.main;
 
-import de.p72b.mocklation.service.database.LocationItem;
+
+import de.p72b.mocklation.service.room.LocationItem;
 
 public interface IMainPresenter {
+
+    void onResume();
 
     void onDestroy();
 

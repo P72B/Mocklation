@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.service.database.LocationItem;
+import de.p72b.mocklation.service.room.LocationItem;
 
 public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapter.ViewHolder> {
     private static final String TAG = LocationListAdapter.class.getSimpleName();
@@ -54,8 +54,8 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         LocationItem locationItem = mDataset.get(position);
 
-        holder.mTextView.setText(locationItem.code());
-        if (mSelectedItem != null && locationItem.code().equals(mSelectedItem.code())) {
+        holder.mTextView.setText(locationItem.getCode());
+        if (mSelectedItem != null && locationItem.getCode().equals(mSelectedItem.getCode())) {
             holder.flagVisibility(View.VISIBLE);
         } else {
             holder.flagVisibility(View.INVISIBLE);

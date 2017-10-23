@@ -39,17 +39,12 @@ dependencies {
     compile "com.google.android.gms:play-services-maps:${playServicesVersion}"
     compile "com.google.android.gms:play-services-location:${playServicesVersion}"
     compile "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
-    compile "com.google.auto.value:auto-value:${autoValueVersion}"
     compile "com.google.code.gson:gson:${gsonVersion}"
     compile "com.google.dagger:dagger:${daggerVersion}"
     annotationProcessor rootProject.ext.daggerCompiler
 
-    compile "com.ryanharter.auto.value:auto-value-parcel:${autoValueParcelVersion}"
-
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
     compile "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
-
-    compile "com.squareup.sqlbrite2:sqlbrite:${sqlBriteVersion}"
 
     testCompile 'junit:junit:4.12'
 }

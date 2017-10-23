@@ -1,38 +1,42 @@
 package de.p72b.mocklation.map;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.arch.persistence.room.Room;
 import android.location.Location;
 import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.squareup.sqlbrite2.BriteDatabase;
-
-import javax.inject.Inject;
 
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.dagger.MocklationApp;
-import de.p72b.mocklation.service.database.LocationItem;
 import de.p72b.mocklation.service.permission.IPermissionService;
+import de.p72b.mocklation.service.room.AppDatabase;
+import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
 
 public class MapsPresenter implements IMapsPresenter {
 
     private static final String TAG = MapsPresenter.class.getSimpleName();
     private final IPermissionService mPermissionService;
+    private final AppDatabase mDb;
     private IMapsView mView;
     private Activity mActivity;
-    @Inject
-    BriteDatabase db;
-    private Pair<String, ContentValues> mOnTheMapItemPair;
+    private Pair<String, LocationItem> mOnTheMapItemPair;
     private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
+    private Disposable mDisposableInsertAll;
 
     MapsPresenter(Activity activity, IPermissionService permissionService, ISetting setting) {
         Log.d(TAG, "new MapsPresenter");
@@ -40,7 +44,7 @@ public class MapsPresenter implements IMapsPresenter {
         mView = (IMapsView) activity;
         mPermissionService = permissionService;
         mSetting = setting;
-        MocklationApp.getComponent(mActivity).inject(this);
+        mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
     }
 
     @Override
@@ -65,13 +69,9 @@ public class MapsPresenter implements IMapsPresenter {
         Log.d(TAG, "onMapLongClicked LatLng: " + roundedLatLng.latitude + " / " + roundedLatLng.longitude);
 
         String code = AppUtil.createLocationItemCode(roundedLatLng);
-        mOnTheMapItemPair = new Pair<>(code, new LocationItem.Builder()
-                .code(code)
-                .geojson("{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}")
-                .accuracy(6)
-                .speed(0)
-                .build()
-        );
+        String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}";
+        LocationItem item = new LocationItem(code, code, geoJson, 6, 0);
+        mOnTheMapItemPair = new Pair<>(code, item);
 
         mView.selectLocation(roundedLatLng, code, -1);
     }
@@ -98,7 +98,32 @@ public class MapsPresenter implements IMapsPresenter {
                 }
 
                 // new item was created, not restored from mSettings
-                db.insert(LocationItem.TABLE, mOnTheMapItemPair.second);
+                Completable.fromAction(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        mDb.locationItemDao().insertAll(mOnTheMapItemPair.second);
+                    }
+                })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(new CompletableObserver() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+                                mDisposableInsertAll = disposable;
+                                mDisposables.add(mDisposableInsertAll);
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                mDisposables.remove(mDisposableInsertAll);
+                                // TODO: finish map
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                // TODO: show error
+                            }
+                        });
                 break;
             case R.id.location:
                 mView.showMyLocation();

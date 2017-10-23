@@ -6,11 +6,9 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import de.p72b.mocklation.service.database.DbModule;
 
 @Module(
         includes = {
-                DbModule.class,
         }
 )
 public final class MocklationModule {

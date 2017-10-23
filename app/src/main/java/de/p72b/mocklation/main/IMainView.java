@@ -5,7 +5,7 @@ import android.view.View;
 
 import java.util.List;
 
-import de.p72b.mocklation.service.database.LocationItem;
+import de.p72b.mocklation.service.room.LocationItem;
 
 public interface IMainView {
 

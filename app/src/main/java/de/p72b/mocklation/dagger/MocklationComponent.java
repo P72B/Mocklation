@@ -11,9 +11,4 @@ import de.p72b.mocklation.service.location.MockLocationService;
 @Component(modules = MocklationModule.class)
 public interface MocklationComponent {
 
-    void inject(MockLocationService mockLocationService);
-
-    void inject(MapsPresenter mapsPresenter);
-
-    void inject(MainPresenter mainPresenter);
 }

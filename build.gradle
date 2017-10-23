@@ -31,14 +31,9 @@ ext {
     playServicesVersion = "11.0.4"
     gsonVersion = "2.8.1"
     mapsUtilsVersion = "0.4.3"
-    autoValueVersion = "1.3"
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
     roomVersion = '1.0.0-beta2'
-
-    autoValueParcelVersion = "0.2.5"
-
-    sqlBriteVersion = "2.0.0"
 
     rxjavaVersion = "2.1.2"
     rxandroidVersion = "2.0.1"

@@ -26,8 +26,8 @@ import java.util.List;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.AppServices;
-import de.p72b.mocklation.service.database.LocationItem;
 import de.p72b.mocklation.service.location.LocationItemFeature;
+import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 
 public class MainActivity extends AppCompatActivity implements IMainView, View.OnClickListener{
@@ -49,6 +49,12 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         ISetting setting = (ISetting) AppServices.getService(AppServices.SETTINGS);
         mPresenter = new MainPresenter(this, setting);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPresenter.onResume();
     }
 
     @Override
@@ -77,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     @Override
     public void selectLocation(LocationItem item) {
-        mSelectedLocationName.setText(item.code());
+        mSelectedLocationName.setText(item.getCode());
         LocationItemFeature feature = item.deserialize();
 
         switch (feature.getGeoJsonFeature().getGeometry().getType()) {
@@ -188,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         public void onClick(View view) {
             int position = mRecyclerView.getChildLayoutPosition(view);
             LocationItem item = mAdapter.getItemAt(position);
-            Log.d(TAG, "onClick item: " + item.code());
+            Log.d(TAG, "onClick item: " + item.getCode());
             mPresenter.locationItemPressed(item);
         }
     }

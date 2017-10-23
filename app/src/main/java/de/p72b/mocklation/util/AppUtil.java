@@ -7,18 +7,8 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import de.p72b.mocklation.service.database.LocationItem;
-
 public class AppUtil {
     private static final String COORDINATE_DECIMAL_FORMAT = "%.6f";
-
-    public static final String LOCATION_ITEMS_QUERY = "SELECT * FROM " + LocationItem.TABLE;
-
-    public static final String LOCATION_ITEM_QUERY = "SELECT * FROM "
-            + LocationItem.TABLE
-            + " WHERE "
-            + LocationItem.COLUMN_CODE
-            + " = ? ";
 
 
     public static final String createLocationItemCode(LatLng latLng) {

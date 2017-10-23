@@ -1,42 +1,41 @@
 package de.p72b.mocklation.main;
 
 import android.app.Activity;
+import android.arch.persistence.room.Room;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
-import com.squareup.sqlbrite2.BriteDatabase;
-
 import java.util.List;
 
-import javax.inject.Inject;
-
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.dagger.MocklationApp;
-import de.p72b.mocklation.service.database.LocationItem;
+import de.p72b.mocklation.service.room.AppDatabase;
+import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
-import de.p72b.mocklation.util.AppUtil;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainPresenter implements IMainPresenter {
 
     private static final String TAG = MainPresenter.class.getSimpleName();
-    private final IMainView mView;
+    private IMainView mView;
+    private AppDatabase mDb;
     private Activity mActivity;
     private ISetting mSetting;
-    @Inject
-    BriteDatabase db;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private IMockServiceInteractor mMockServiceInteractor;
     private LocationItem mSelectedItem;
+    private Disposable mDisposableGetAll;
 
     MainPresenter(Activity activity, ISetting setting) {
         Log.d(TAG, "new MainPresenter");
         mActivity = activity;
         mView = (IMainView) activity;
         mSetting = setting;
+        mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
         mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting, new MockServiceInteractor.MockServiceListener() {
             @Override
             public void onStart() {
@@ -56,15 +55,17 @@ public class MainPresenter implements IMainPresenter {
 
             }
         });
-        MocklationApp.getComponent(mActivity).inject(this);
-
-        mDisposables.add(db.createQuery(LocationItem.TABLE, AppUtil.LOCATION_ITEMS_QUERY)
-                .mapToList(LocationItem.MAPPER)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new MainPresenter.LocationItemObserver())
-        );
 
         mView.setPlayStopStatus(mMockServiceInteractor.getState());
+    }
+
+    @Override
+    public void onResume() {
+        mDisposableGetAll = mDb.locationItemDao().getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new LocationItemObserver());
+        mDisposables.add(mDisposableGetAll);
     }
 
     @Override
@@ -81,14 +82,14 @@ public class MainPresenter implements IMainPresenter {
                 @Override
                 public void onClick(View view) {
                     mMockServiceInteractor.stopMockLocationService();
-                    mSetting.saveLastPressedLocation(item.code());
+                    mSetting.saveLastPressedLocation(item.getCode());
                     mView.selectLocation(item);
                 }
             }, Snackbar.LENGTH_LONG);
             return;
         }
 
-        mSetting.saveLastPressedLocation(item.code());
+        mSetting.saveLastPressedLocation(item.getCode());
         mView.selectLocation(item);
     }
 
@@ -102,7 +103,7 @@ public class MainPresenter implements IMainPresenter {
         if (mSetting.getMockLocationItemCode() != null) {
             mMockServiceInteractor.stopMockLocationService();
         } else {
-            mMockServiceInteractor.startMockLocation(mSelectedItem.code());
+            mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
         }
     }
 
@@ -111,9 +112,9 @@ public class MainPresenter implements IMainPresenter {
         mMockServiceInteractor.onMockPermissionsResult(grantedResults);
     }
 
-    private class LocationItemObserver extends DisposableObserver<List<LocationItem>> {
+    private class LocationItemObserver implements Consumer<List<LocationItem>> {
         @Override
-        public void onNext(@io.reactivex.annotations.NonNull List<LocationItem> locationItems) {
+        public void accept(List<LocationItem> locationItems) throws Exception {
             if (locationItems.size() == 0) {
                 mView.showEmptyPlaceholder();
                 return;
@@ -123,7 +124,7 @@ public class MainPresenter implements IMainPresenter {
             mSelectedItem = null;
             if (lastSelectedItemCode != null) {
                 for (LocationItem item : locationItems) {
-                    if (lastSelectedItemCode.equals(item.code())) {
+                    if (lastSelectedItemCode.equals(item.getCode())) {
                         mSelectedItem = item;
                         break;
                     }
@@ -137,17 +138,8 @@ public class MainPresenter implements IMainPresenter {
 
             mView.showSavedLocations(locationItems);
             mView.selectLocation(mSelectedItem);
-        }
 
-        @Override
-        public void onError(@io.reactivex.annotations.NonNull Throwable e) {
-            Log.d(TAG, " onError : " + e.getMessage());
-        }
-
-        @Override
-        public void onComplete() {
-            Log.d(TAG, " onComplete");
-            mDisposables.remove(this);
+            mDisposables.remove(mDisposableGetAll);
         }
     }
 }
