@@ -2,17 +2,26 @@ package de.p72b.mocklation.map;
 
 import android.app.Activity;
 import android.arch.persistence.room.Room;
+import android.content.Intent;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.os.ResultReceiver;
 import android.support.v4.util.Pair;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.service.geocoder.Constants;
+import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
@@ -37,6 +46,9 @@ public class MapsPresenter implements IMapsPresenter {
     private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private Disposable mDisposableInsertAll;
+    private boolean mAddressRequested;
+    private String mAddressOutput;
+    private AddressResultReceiver mResultReceiver;
 
     MapsPresenter(Activity activity, IPermissionService permissionService, ISetting setting) {
         Log.d(TAG, "new MapsPresenter");
@@ -45,6 +57,11 @@ public class MapsPresenter implements IMapsPresenter {
         mPermissionService = permissionService;
         mSetting = setting;
         mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
+        mAddressRequested = false;
+        mAddressOutput = "";
+        mResultReceiver = new AddressResultReceiver(new Handler());
+
+        updateUIWidgets();
     }
 
     @Override
@@ -72,6 +89,8 @@ public class MapsPresenter implements IMapsPresenter {
         String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}";
         LocationItem item = new LocationItem(code, code, geoJson, 6, 0);
         mOnTheMapItemPair = new Pair<>(code, item);
+
+        resolveAddressFromLocation(latLng);
 
         mView.selectLocation(roundedLatLng, code, -1);
     }
@@ -140,5 +159,58 @@ public class MapsPresenter implements IMapsPresenter {
     @Override
     public void removeMarker() {
         mOnTheMapItemPair = null;
+    }
+
+    private void resolveAddressFromLocation(@Nullable LatLng latLng) {
+        if (!Geocoder.isPresent()) {
+            mView.showSnackbar(R.string.error_1007, -1, null, Snackbar.LENGTH_LONG);
+            return;
+        }
+
+        if (mAddressRequested) {
+            return;
+        }
+
+        if (latLng == null) {
+            return;
+        }
+
+        Location location = new Location("");
+        location.setLatitude(latLng.latitude);
+        location.setLongitude(latLng.longitude);
+        startGeocoderIntentService(location);
+    }
+
+    private void startGeocoderIntentService(@NonNull Location location) {
+        mAddressRequested = true;
+        updateUIWidgets();
+
+        Intent intent = new Intent(mActivity, GeocoderIntentService.class);
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, location);
+
+        mActivity.getApplication().startService(intent);
+    }
+
+    private void updateUIWidgets() {
+        mView.setAddressProgressbarVisibility(mAddressRequested ? ProgressBar.VISIBLE : ProgressBar.GONE);
+    }
+
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        /**
+         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            mView.setAddress(mAddressOutput);
+
+            mAddressRequested = false;
+            updateUIWidgets();
+        }
     }
 }

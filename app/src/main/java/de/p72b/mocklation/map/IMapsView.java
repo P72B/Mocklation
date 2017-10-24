@@ -12,4 +12,8 @@ public interface IMapsView {
     void showMyLocation();
 
     void showSnackbar(int message, int action, View.OnClickListener listener, int duration);
+
+    void setAddress(String formattedAddress);
+
+    void setAddressProgressbarVisibility(int visibility);
 }

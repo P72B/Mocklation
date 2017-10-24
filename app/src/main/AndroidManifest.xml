@@ -47,6 +47,10 @@
         <service
             android:name=".service.location.MockLocationService"
             android:enabled="true" />
+
+        <service
+            android:name=".service.geocoder.GeocoderIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>

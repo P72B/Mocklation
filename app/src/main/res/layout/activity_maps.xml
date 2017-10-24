@@ -16,6 +16,7 @@
         android:id="@+id/touch_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
@@ -36,17 +37,38 @@
                 android:layout_height="300px"
                 android:background="@color/face"
                 android:orientation="vertical"
+                android:padding="12dp"
                 tools:background="@color/colorPrimary">
+
+                <TextView
+                    android:id="@+id/bottom_sheet_subheader_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:maxLines="1"
+                    android:textColor="@color/eye"
+                    android:textSize="12sp"
+                    tools:text="52.386240 / 13.615689"
+                    tools:textColor="@color/face" />
+
+                <ProgressBar
+                    android:id="@+id/bottom_sheet_header_title_progress_bar"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    tools:visibility="gone" />
 
                 <TextView
                     android:id="@+id/bottom_sheet_header_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
+                    android:maxLines="1"
                     android:textColor="@color/eye"
                     android:textSize="16sp"
-                    tools:text="52.386240 / 13.615689"
-                    tools:textColor="@color/face" />
+                    tools:text="Wilhelmshavener Straße 9, DE-10551 Berlin"
+                    tools:textColor="@color/face"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
             </LinearLayout>
 
             <TextView

@@ -10,4 +10,9 @@
     <string name="stop">Stop</string>
     <string name="error_1001">Service is running.</string>
     <string name="error_1002">Please long press somewhere inside the map first.</string>
+    <string name="error_1003">No location data provided.</string>
+    <string name="error_1004">Service not available.</string>
+    <string name="error_1005">Invalid latitude and/or longitude used.</string>
+    <string name="error_1006">No address found.</string>
+    <string name="error_1007">No Geocoder available.</string>
 </resources>

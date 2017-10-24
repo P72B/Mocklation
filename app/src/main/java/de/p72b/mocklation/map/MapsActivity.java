@@ -17,6 +17,8 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,11 +58,15 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mBottomSheetHeader;
     private boolean mIsDark;
     private boolean mIsGone;
+    private TextView mBottomSheetSubTitleText;
     private TextView mBottomSheetTitleText;
     private boolean mInitCameraPositionSet = false;
     private boolean mOnInitialLocationDetermined = false;
     private int mMyLocatioNotCenterColor;
     private int mMyLocatioCenterColor;
+    private View mBottomSheetTitleTextProgressBar;
+    private Animation mFadeInAnimation;
+    private Animation mFadeOutAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
         mLocationService = (ILocationService) AppServices.getService(AppServices.LOCATION);
         mSetting = (ISetting) AppServices.getService(AppServices.SETTINGS);
+
+        mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
+        mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
 
         mPresenter = new MapsPresenter(this, mPermissionService, mSetting);
     }
@@ -135,7 +144,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                mBottomSheetTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
+                mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
                 mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
                 mPresenter.onMapLongClicked(latLng);
 
@@ -255,6 +264,29 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         snackbar.show();
     }
 
+    @Override
+    public void setAddress(String formattedAddress) {
+        mBottomSheetTitleText.setText(formattedAddress);
+    }
+
+    @Override
+    public void setAddressProgressbarVisibility(int visibility) {
+        if (View.VISIBLE == visibility) {
+            mBottomSheetTitleTextProgressBar.setVisibility(View.VISIBLE);
+            mBottomSheetTitleText.setVisibility(View.GONE);
+
+            mBottomSheetTitleTextProgressBar.startAnimation(mFadeInAnimation);
+            mBottomSheetTitleText.startAnimation(mFadeOutAnimation);
+
+        } else {
+            mBottomSheetTitleTextProgressBar.setVisibility(View.GONE);
+            mBottomSheetTitleText.setVisibility(View.VISIBLE);
+
+            mBottomSheetTitleTextProgressBar.startAnimation(mFadeOutAnimation);
+            mBottomSheetTitleText.startAnimation(mFadeInAnimation);
+        }
+    }
+
     private void setFollowGps(boolean followGps) {
         int color = followGps ? mMyLocatioCenterColor : mMyLocatioNotCenterColor;
         DrawableCompat.setTint(mFabActionLocation.getDrawable(), color);
@@ -293,6 +325,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mBottomSheet = findViewById(R.id.bottom_sheet);
         mBottomSheetHeader = findViewById(R.id.bottom_sheet_header);
         mBottomSheetTitleText = findViewById(R.id.bottom_sheet_header_title);
+        mBottomSheetTitleTextProgressBar = findViewById(R.id.bottom_sheet_header_title_progress_bar);
+        mBottomSheetSubTitleText = findViewById(R.id.bottom_sheet_subheader_title);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
         mBottomSheetBehavior.setHideable(true);
         mBottomSheetBehavior.setPeekHeight(300);
@@ -347,6 +381,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
                 mBottomSheetTitleText.setTextColor((int) animator.getAnimatedValue());
+                mBottomSheetSubTitleText.setTextColor((int) animator.getAnimatedValue());
             }
 
         });
@@ -357,6 +392,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             @Override
             public void onAnimationUpdate(ValueAnimator animator) {
                 mBottomSheetTitleText.setTextColor((int) animator.getAnimatedValue());
+                mBottomSheetSubTitleText.setTextColor((int) animator.getAnimatedValue());
             }
 
         });
@@ -367,7 +403,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                Log.d(TAG, "slideOffset: " + slideOffset);
                 if (slideOffset > 0) {
                     mIsGone = false;
                     if (!mIsDark) {
