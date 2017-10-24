@@ -26,6 +26,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -57,7 +61,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mBottomSheet;
     private View mBottomSheetHeader;
     private boolean mIsDark;
-    private boolean mIsGone;
+    private boolean mShouldMarkerDisapperOnHideBottomSheet;
     private TextView mBottomSheetSubTitleText;
     private TextView mBottomSheetTitleText;
     private boolean mInitCameraPositionSet = false;
@@ -240,7 +244,13 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         if (mLocationMarker != null) {
             mLocationMarker.remove();
         }
-        mLocationMarker = mMap.addMarker(new MarkerOptions().position(latLng));
+
+        mLocationMarker = mMap.addMarker(
+                new MarkerOptions()
+                        .position(latLng)
+                        .icon(BitmapDescriptorFactory.fromResource(
+                                R.drawable.ic_new_location))
+        );
     }
 
     @Override
@@ -342,7 +352,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         int eyeColor;
         int duration = 150;
         mIsDark = false;
-        mIsGone = true;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             primaryColor = getColor(R.color.colorPrimary);
@@ -404,7 +413,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 if (slideOffset > 0) {
-                    mIsGone = false;
                     if (!mIsDark) {
                         mIsDark = true;
                         colorAnimationFaceToPrimary.start();
@@ -415,9 +423,17 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                         mIsDark = false;
                         colorAnimationPrimaryToFace.start();
                         colorAnimationFaceToEye.start();
-                    } else if (!mIsGone) {
+                    }
+                }
+
+                if (slideOffset >= 0) {
+                    mShouldMarkerDisapperOnHideBottomSheet = true;
+                }
+
+                if (slideOffset < 0) {
+                    if (mShouldMarkerDisapperOnHideBottomSheet) {
                         removeMarker();
-                        mIsGone = true;
+                        mShouldMarkerDisapperOnHideBottomSheet = false;
                     }
                 }
             }
