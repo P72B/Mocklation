@@ -2,7 +2,7 @@
 
 buildscript {
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.0'
     }
 }
 
@@ -27,13 +27,13 @@ ext {
     appCompileSdk = 26
     appBuildTools = "25.0.2"
 
-    supportLibVersion = "26.1.0"
-    playServicesVersion = "11.0.4"
+    supportLibVersion = "27.0.0"
+    playServicesVersion = "11.4.2"
     gsonVersion = "2.8.1"
     mapsUtilsVersion = "0.4.3"
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
-    roomVersion = '1.0.0-beta2'
+    roomVersion = '1.0.0-rc1'
 
     rxjavaVersion = "2.1.2"
     rxandroidVersion = "2.0.1"
