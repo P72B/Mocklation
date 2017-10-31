@@ -18,7 +18,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         SwipeAndTouchHelper.ActionCompletionContract {
     private static final String TAG = LocationListAdapter.class.getSimpleName();
     private List<LocationItem> mDataset;
-    private final View.OnClickListener mOnClickListener;
+    private final MainActivity.IAdapterListener mListener;
     private LocationItem mSelectedItem;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -36,16 +36,16 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    LocationListAdapter(View.OnClickListener listener) {
+    LocationListAdapter(MainActivity.IAdapterListener listener) {
         mDataset = new ArrayList<>();
-        mOnClickListener = listener;
+        mListener = listener;
     }
 
     @Override
     public LocationListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_location_fixed_mode_item, parent, false);
-        view.setOnClickListener(mOnClickListener);
+        view.setOnClickListener(mListener);
         return new ViewHolder(view);
     }
 
@@ -74,6 +74,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onViewSwiped(int position) {
+        mListener.onItemRemoved(getItemAt(position));
         mDataset.remove(position);
         notifyItemRemoved(position);
     }

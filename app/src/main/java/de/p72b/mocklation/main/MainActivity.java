@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private LocationListAdapter mAdapter = new LocationListAdapter(new ItemOnClickListener());
+    private LocationListAdapter mAdapter = new LocationListAdapter(new AdapterListener());
     private IMainPresenter mPresenter;
     private TextView mSelectedLocationName;
     private EditText mSelectedLocationLatidude;
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         });
     }
 
-    private class ItemOnClickListener implements View.OnClickListener {
+    private class AdapterListener implements IAdapterListener {
 
         @Override
         public void onClick(View view) {
@@ -200,5 +200,15 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
             Log.d(TAG, "onClick item: " + item.getCode());
             mPresenter.locationItemPressed(item);
         }
+
+        @Override
+        public void onItemRemoved(LocationItem item) {
+            Log.d(TAG, "onItemRemoved item: " + item.getCode());
+            mPresenter.locationItemRemoved(item);
+        }
+    }
+
+    public interface IAdapterListener extends View.OnClickListener {
+        void onItemRemoved(LocationItem item);
     }
 }

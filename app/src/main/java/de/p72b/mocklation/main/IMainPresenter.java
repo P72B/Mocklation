@@ -14,4 +14,6 @@ public interface IMainPresenter {
     void onMockPermissionsResult(int[] grantedResults);
 
     void onPlayClicked();
+
+    void locationItemRemoved(LocationItem item);
 }
