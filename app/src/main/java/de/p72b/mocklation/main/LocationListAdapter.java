@@ -14,29 +14,29 @@ import java.util.List;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.room.LocationItem;
 
-public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapter.ViewHolder> {
+public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+        SwipeAndTouchHelper.ActionCompletionContract {
     private static final String TAG = LocationListAdapter.class.getSimpleName();
     private List<LocationItem> mDataset;
     private final View.OnClickListener mOnClickListener;
     private LocationItem mSelectedItem;
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mTextView;
-        public View mFlagView;
+        TextView mTextView;
+        View mFlagView;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
-            mTextView = (TextView) view.findViewById(R.id.info_text);
+            mTextView = view.findViewById(R.id.info_text);
             mFlagView = view.findViewById(R.id.item_flag);
         }
 
-        public void flagVisibility(int visibility) {
+        void flagVisibility(int visibility) {
             mFlagView.setVisibility(visibility);
         }
     }
 
-    public LocationListAdapter(View.OnClickListener listener) {
+    LocationListAdapter(View.OnClickListener listener) {
         mDataset = new ArrayList<>();
         mOnClickListener = listener;
     }
@@ -46,19 +46,19 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_location_fixed_mode_item, parent, false);
         view.setOnClickListener(mOnClickListener);
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         LocationItem locationItem = mDataset.get(position);
+        ViewHolder viewHolder = (ViewHolder) holder;
 
-        holder.mTextView.setText(locationItem.getCode());
+        viewHolder.mTextView.setText(locationItem.getCode());
         if (mSelectedItem != null && locationItem.getCode().equals(mSelectedItem.getCode())) {
-            holder.flagVisibility(View.VISIBLE);
+            viewHolder.flagVisibility(View.VISIBLE);
         } else {
-            holder.flagVisibility(View.INVISIBLE);
+            viewHolder.flagVisibility(View.INVISIBLE);
         }
     }
 
@@ -67,7 +67,18 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
         return mDataset.size();
     }
 
-    public LocationItem getItemAt(int position) {
+    @Override
+    public void onViewMoved(int oldPosition, int newPosition) {
+        // nothing to to
+    }
+
+    @Override
+    public void onViewSwiped(int position) {
+        mDataset.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    LocationItem getItemAt(int position) {
         return mDataset.get(position);
     }
 
@@ -77,7 +88,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<LocationListAdapte
         notifyDataSetChanged();
     }
 
-    public void flagItem(LocationItem item) {
+    void flagItem(LocationItem item) {
         mSelectedItem = item;
         notifyDataSetChanged();
     }

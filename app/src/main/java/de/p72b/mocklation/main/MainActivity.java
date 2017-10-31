@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -160,9 +161,11 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new SwipeAndTouchHelper(mAdapter));
+        touchHelper.attachToRecyclerView(mRecyclerView);
+
         mButtonPlayStop = findViewById(R.id.play_stop);
         mButtonPlayStop.setOnClickListener(this);
-
 
         final View root = findViewById(R.id.main_root);
         root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
