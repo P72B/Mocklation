@@ -74,9 +74,10 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onViewSwiped(int position) {
-        mListener.onItemRemoved(getItemAt(position));
+        LocationItem item = getItemAt(position);
         mDataset.remove(position);
         notifyItemRemoved(position);
+        mListener.onItemRemoved(item);
     }
 
     LocationItem getItemAt(int position) {

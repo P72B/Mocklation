@@ -83,7 +83,8 @@ public class MainPresenter implements IMainPresenter {
     @Override
     public void locationItemPressed(final LocationItem item) {
         mSelectedItem = item;
-        if (mMockServiceInteractor.isServiceRunning()) {
+        if (mMockServiceInteractor.isServiceRunning() && !item.getCode().equals(
+                mSetting.getMockLocationItemCode())) {
             mView.showSnackbar(R.string.error_1001, R.string.stop, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -115,6 +116,22 @@ public class MainPresenter implements IMainPresenter {
 
     @Override
     public void locationItemRemoved(final LocationItem item) {
+        if (mMockServiceInteractor.isServiceRunning() && item.getCode().equals(
+                mSetting.getMockLocationItemCode())) {
+            // don't remove the actual mocked location
+            mLocationItems.add(item);
+            handleLocationItems(mLocationItems);
+            mView.showSnackbar(R.string.error_1001, R.string.stop, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mMockServiceInteractor.stopMockLocationService();
+                    mSetting.saveLastPressedLocation(item.getCode());
+                    mView.selectLocation(item);
+                }
+            }, Snackbar.LENGTH_LONG);
+            return;
+        }
+
         Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {

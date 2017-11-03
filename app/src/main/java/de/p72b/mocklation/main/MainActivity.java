@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     private LocationListAdapter mAdapter = new LocationListAdapter(new AdapterListener());
     private IMainPresenter mPresenter;
     private TextView mSelectedLocationName;
-    private EditText mSelectedLocationLatidude;
+    private EditText mSelectedLocationLatitude;
     private EditText mSelectedLocationLongitude;
     private ImageButton mButtonPlayStop;
     private View mDataView;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
             case "Point":
                 GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
                 LatLng latLng = point.getCoordinates();
-                mSelectedLocationLatidude.setText(String.valueOf(latLng.latitude));
+                mSelectedLocationLatitude.setText(String.valueOf(latLng.latitude));
                 mSelectedLocationLongitude.setText(String.valueOf(latLng.longitude));
                 break;
             default:
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         });
 
         mSelectedLocationName = findViewById(R.id.card_view_selected_location_name);
-        mSelectedLocationLatidude = findViewById(R.id.card_view_selected_location_latitude);
+        mSelectedLocationLatitude = findViewById(R.id.card_view_selected_location_latitude);
         mSelectedLocationLongitude = findViewById(R.id.card_view_selected_location_longitude);
 
         mRecyclerView = findViewById(R.id.location_list);
