@@ -15,6 +15,8 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.location.LocationItemFeature;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.VisibilityAnimationListener;
 
 public class MainActivity extends AppCompatActivity implements IMainView, View.OnClickListener{
 
@@ -42,6 +45,13 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     private EditText mSelectedLocationLatidude;
     private EditText mSelectedLocationLongitude;
     private ImageButton mButtonPlayStop;
+    private View mDataView;
+    private View mDataEmpty;
+    private Animation mFadeInAnimation;
+    private Animation mFadeOutAnimation;
+    private VisibilityAnimationListener mFadeOutListener = new VisibilityAnimationListener();
+    private VisibilityAnimationListener mFadeInListener = new VisibilityAnimationListener();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         ISetting setting = (ISetting) AppServices.getService(AppServices.SETTINGS);
         mPresenter = new MainPresenter(this, setting);
+        mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
+        mFadeInAnimation.setAnimationListener(mFadeInListener);
+        mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
+        mFadeOutAnimation.setAnimationListener(mFadeOutListener);
     }
 
     @Override
@@ -79,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     @Override
     public void showSavedLocations(List<LocationItem> locationItems) {
+        toggleDataViewTo(View.VISIBLE);
         mAdapter.setData(locationItems);
     }
 
@@ -103,7 +118,29 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     @Override
     public void showEmptyPlaceholder() {
-        // TODO
+        toggleDataViewTo(View.INVISIBLE);
+    }
+
+    private void toggleDataViewTo(int state) {
+        if (View.INVISIBLE == state) {
+            if (mDataEmpty.getVisibility() != View.VISIBLE) {
+                mFadeInListener.setViewAndVisibility(mDataEmpty, View.VISIBLE);
+                mDataEmpty.startAnimation(mFadeInAnimation);
+            }
+            if (mDataView.getVisibility() != View.INVISIBLE) {
+                mFadeOutListener.setViewAndVisibility(mDataView, View.INVISIBLE);
+                mDataView.startAnimation(mFadeOutAnimation);
+            }
+        } else {
+            if (mDataEmpty.getVisibility() != View.INVISIBLE) {
+                mFadeOutListener.setViewAndVisibility(mDataEmpty, View.INVISIBLE);
+                mDataEmpty.startAnimation(mFadeOutAnimation);
+            }
+            if (mDataView.getVisibility() != View.VISIBLE) {
+                mFadeInListener.setViewAndVisibility(mDataView, View.VISIBLE);
+                mDataView.startAnimation(mFadeInAnimation);
+            }
+        }
     }
 
     @Override
@@ -140,6 +177,11 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         setContentView(R.layout.activity_main);
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mDataView = findViewById(R.id.data_view);
+        mDataEmpty = findViewById(R.id.data_empty);
+        mDataView.setVisibility(View.INVISIBLE);
+        mDataEmpty.setVisibility(View.INVISIBLE);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         final Intent intent = new Intent(this, MapsActivity.class);
