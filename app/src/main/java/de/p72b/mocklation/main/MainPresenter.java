@@ -134,6 +134,7 @@ public class MainPresenter implements IMainPresenter {
                     public void onComplete() {
                         mDisposables.remove(mDisposableDeleteItem);
                         mLocationItems.remove(item);
+                        handleLocationItems(mLocationItems);
                         mView.showSnackbar(R.string.message_location_item_removed,
                                 R.string.snackbar_action_undo, new View.OnClickListener() {
                                     @Override
