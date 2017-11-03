@@ -151,7 +151,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
                 mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
                 mPresenter.onMapLongClicked(latLng);
-
+                mBottomSheet.setVisibility(View.VISIBLE);
                 if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
                     return;
                 }
@@ -430,8 +430,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                     mShouldMarkerDisapperOnHideBottomSheet = true;
                 }
 
-                if (slideOffset < 0) {
+                if (slideOffset == -1) {
                     if (mShouldMarkerDisapperOnHideBottomSheet) {
+                        mBottomSheet.setVisibility(View.GONE);
                         removeMarker();
                         mShouldMarkerDisapperOnHideBottomSheet = false;
                     }
