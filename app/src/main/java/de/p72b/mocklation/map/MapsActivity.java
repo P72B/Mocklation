@@ -47,6 +47,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final long MARKER_REMOVE_MILLISECONDS = 300;
+    private static final float DEFAULT_ZOOM_LEVEL = 15L;
 
     private IMapsPresenter mPresenter;
     private OnLocationChangedListener mMapLocationListener = null;
@@ -261,7 +262,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         }
         LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                lastKnowLocation, mMap.getCameraPosition().zoom));
+                lastKnowLocation, DEFAULT_ZOOM_LEVEL));
         setFollowGps(true);
     }
 
