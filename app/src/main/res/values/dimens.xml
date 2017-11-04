@@ -5,4 +5,5 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="text_size_middle">18sp</dimen>
     <dimen name="text_size_large">21sp</dimen>
+    <dimen name="card_view_corner_radius">3dp</dimen>
 </resources>

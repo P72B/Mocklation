@@ -6,6 +6,7 @@ import java.util.Calendar;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
@@ -15,21 +16,26 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -149,14 +155,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
-                mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
                 mPresenter.onMapLongClicked(latLng);
-                mBottomSheet.setVisibility(View.VISIBLE);
-                if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
-                    return;
-                }
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -209,7 +208,10 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick");
-        mPresenter.onClick(view);
+        switch(view.getId()) {
+            default:
+                mPresenter.onClick(view);
+        }
     }
 
     @Override
@@ -252,6 +254,13 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                         .icon(BitmapDescriptorFactory.fromResource(
                                 R.drawable.ic_new_location))
         );
+        mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
+        mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
+        mBottomSheet.setVisibility(View.VISIBLE);
+        if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
+            return;
+        }
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
@@ -288,13 +297,24 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
             mBottomSheetTitleTextProgressBar.startAnimation(mFadeInAnimation);
             mBottomSheetTitleText.startAnimation(mFadeOutAnimation);
-
         } else {
             mBottomSheetTitleTextProgressBar.setVisibility(View.GONE);
             mBottomSheetTitleText.setVisibility(View.VISIBLE);
 
             mBottomSheetTitleTextProgressBar.startAnimation(mFadeOutAnimation);
             mBottomSheetTitleText.startAnimation(mFadeInAnimation);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks whether a hardware keyboard is available
+        if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO) {
+            Toast.makeText(this, "keyboard visible", Toast.LENGTH_SHORT).show();
+        } else if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES) {
+            Toast.makeText(this, "keyboard hidden", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -330,6 +350,37 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         });
 
         initBottomSheet();
+        initMapSearchBar();
+    }
+
+    private void initMapSearchBar() {
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                Log.i(TAG, "Place: " + place.getName());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        place.getLatLng(), DEFAULT_ZOOM_LEVEL));
+                mPresenter.onMapLongClicked(place.getLatLng());
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
+        View view = autocompleteFragment.getView();
+        if (view != null) {
+            EditText editText = view.findViewById(R.id.place_autocomplete_search_input);
+            editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(
+                    R.dimen.text_size_middle));
+        }
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
     }
 
     private void initBottomSheet() {

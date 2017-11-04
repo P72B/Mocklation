@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#CF4141</color>
     <color name="colorPrimaryDark">#541D1B</color>
-    <color name="colorAccent">#C2823F</color>
+    <color name="colorAccent">#FF9800</color>
 
     <color name="face">#FEFEFD</color>
     <color name="eye">#584E45</color>
@@ -11,5 +11,5 @@
     <color name="head">#0F1012</color>
     <color name="dress">#CF4141</color>
     <color name="dress_dark">#541D1B</color>
-    <color name="dress_flower">#C2823F</color>
+    <color name="dress_flower">#FF9800</color>
 </resources>

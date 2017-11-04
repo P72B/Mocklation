@@ -37,6 +37,7 @@ dependencies {
     compile "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"
 
     compile "com.google.android.gms:play-services-maps:${playServicesVersion}"
+    compile "com.google.android.gms:play-services-places:${playServicesVersion}"
     compile "com.google.android.gms:play-services-location:${playServicesVersion}"
     compile "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
     compile "com.google.code.gson:gson:${gsonVersion}"
