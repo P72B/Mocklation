@@ -6,4 +6,5 @@
     <dimen name="text_size_middle">18sp</dimen>
     <dimen name="text_size_large">21sp</dimen>
     <dimen name="card_view_corner_radius">3dp</dimen>
+    <dimen name="map_search_panel_margin_top">33dp</dimen>
 </resources>

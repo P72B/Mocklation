@@ -8,6 +8,9 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.support.animation.DynamicAnimation;
+import android.support.animation.SpringAnimation;
+import android.support.animation.SpringForce;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +22,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
@@ -78,6 +82,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mBottomSheetTitleTextProgressBar;
     private Animation mFadeInAnimation;
     private Animation mFadeOutAnimation;
+    private View mCardViewAutocompleteWrapper;
+    private int mDeltaMapSearchBar;
+    private int mStateMapItems = View.VISIBLE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +162,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
+                if (mStateMapItems == View.INVISIBLE) {
+                    toggleAnimationOverlayItems();
+                }
                 mPresenter.onMapLongClicked(latLng);
             }
         });
@@ -165,8 +175,11 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                     mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     return;
                 }
-
-                hideComponents();
+                if (BottomSheetBehavior.STATE_HIDDEN == mBottomSheetBehavior.getState()) {
+                    toggleAnimationOverlayItems();
+                } else {
+                    hideComponents();
+                }
             }
         });
 
@@ -208,7 +221,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick");
-        switch(view.getId()) {
+        switch (view.getId()) {
             default:
                 mPresenter.onClick(view);
         }
@@ -327,6 +340,24 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         return mPermissionService.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
+    private void toggleAnimationOverlayItems() {
+        if (mStateMapItems == View.VISIBLE) {
+            mStateMapItems = View.INVISIBLE;
+        } else {
+            mStateMapItems = View.VISIBLE;
+        }
+
+        int finalPosition = mDeltaMapSearchBar;
+        if (mStateMapItems == View.VISIBLE) {
+            finalPosition = 0;
+        }
+
+        SpringAnimation springAnimation = new SpringAnimation(mCardViewAutocompleteWrapper,
+                DynamicAnimation.TRANSLATION_Y, finalPosition);
+        springAnimation.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY);
+        springAnimation.start();
+    }
+
     private void initViews() {
         setContentView(R.layout.activity_maps);
 
@@ -354,10 +385,22 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     private void initMapSearchBar() {
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+        mCardViewAutocompleteWrapper = findViewById(R.id.card_view_selected_location);
+        mCardViewAutocompleteWrapper.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        mCardViewAutocompleteWrapper.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        int mapSearchBarHeight = mCardViewAutocompleteWrapper.getHeight();
+                        int mapSearchBarMarginTop = (int) getResources().getDimension(R.dimen.map_search_panel_margin_top);
+                        mDeltaMapSearchBar = (mapSearchBarHeight + mapSearchBarMarginTop) * -1;
+                    }
+                });
+
+        PlaceAutocompleteFragment mAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        mAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i(TAG, "Place: " + place.getName());
@@ -371,7 +414,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 Log.i(TAG, "An error occurred: " + status);
             }
         });
-        View view = autocompleteFragment.getView();
+        View view = mAutocompleteFragment.getView();
         if (view != null) {
             EditText editText = view.findViewById(R.id.place_autocomplete_search_input);
             editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(
@@ -380,7 +423,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
                 .build();
-        autocompleteFragment.setFilter(typeFilter);
+        mAutocompleteFragment.setFilter(typeFilter);
     }
 
     private void initBottomSheet() {
@@ -460,7 +503,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {}
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
