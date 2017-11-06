@@ -87,6 +87,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private int mStateMapItems = View.VISIBLE;
     private int mDeltaFabs;
     private View mFabWrapper;
+    private int mBottomSheetCollapsedHeight;
+    private int mBottomSheetHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -447,6 +449,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mFabWrapper.getLocationOnScreen(location);
         int fabMarginBottom = (int) getResources().getDimension(R.dimen.fab_margin);
         mDeltaFabs = fabsHeight - fabMarginBottom;
+
+        mBottomSheetCollapsedHeight = (int) getResources().getDimension(R.dimen.bottom_sheet_collapsed_height);
+        mBottomSheetHeight = mBottomSheet.getHeight();
     }
 
     private void initBottomSheet() {
@@ -531,6 +536,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                adjustMapLogoPadding(slideOffset);
+
                 if (slideOffset > 0) {
                     if (!mIsDark) {
                         mIsDark = true;
@@ -560,4 +567,16 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         });
     }
 
+    private void adjustMapLogoPadding(float slideOffset) {
+        float deltaCollapsed;
+        float finalPadding;
+        if (slideOffset <= 0) {
+            deltaCollapsed = (1 + slideOffset) * mBottomSheetCollapsedHeight;
+            finalPadding = deltaCollapsed;
+        } else {
+            deltaCollapsed = ((slideOffset - 1) * mBottomSheetCollapsedHeight) * -1;
+            finalPadding = slideOffset * mBottomSheetHeight + deltaCollapsed;
+        }
+        mMap.setPadding(0,0,0, (int) finalPadding);
+    }
 }

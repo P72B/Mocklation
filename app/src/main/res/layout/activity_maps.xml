@@ -60,7 +60,7 @@
             <LinearLayout
                 android:id="@+id/bottom_sheet_header"
                 android:layout_width="match_parent"
-                android:layout_height="300px"
+                android:layout_height="@dimen/bottom_sheet_collapsed_height"
                 android:background="@color/face"
                 android:orientation="vertical"
                 android:padding="12dp"
