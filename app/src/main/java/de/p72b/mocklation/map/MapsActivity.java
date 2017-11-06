@@ -85,6 +85,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mCardViewAutocompleteWrapper;
     private int mDeltaMapSearchBar;
     private int mStateMapItems = View.VISIBLE;
+    private int mDeltaFabs;
+    private View mFabWrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -347,15 +349,22 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             mStateMapItems = View.VISIBLE;
         }
 
-        int finalPosition = mDeltaMapSearchBar;
+        int finalPositionMapSeachBar = mDeltaMapSearchBar;
+        int finalPositionFabs = mDeltaFabs;
         if (mStateMapItems == View.VISIBLE) {
-            finalPosition = 0;
+            finalPositionMapSeachBar = 0;
+            finalPositionFabs = 0;
         }
 
-        SpringAnimation springAnimation = new SpringAnimation(mCardViewAutocompleteWrapper,
-                DynamicAnimation.TRANSLATION_Y, finalPosition);
-        springAnimation.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY);
-        springAnimation.start();
+        SpringAnimation springAnimationMapSearch = new SpringAnimation(mCardViewAutocompleteWrapper,
+                DynamicAnimation.TRANSLATION_Y, finalPositionMapSeachBar);
+        springAnimationMapSearch.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY);
+        springAnimationMapSearch.start();
+
+        SpringAnimation springAnimationFabs = new SpringAnimation(mFabWrapper,
+                DynamicAnimation.TRANSLATION_Y, finalPositionFabs);
+        springAnimationFabs.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY);
+        springAnimationFabs.start();
     }
 
     private void initViews() {
@@ -364,6 +373,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mFabWrapper = findViewById(R.id.fabs_wrapper);
         mFabActionSave = findViewById(R.id.save);
         mFabActionSave.setOnClickListener(this);
         mFabActionLocation = findViewById(R.id.location);
@@ -390,12 +401,12 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        mCardViewAutocompleteWrapper.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        int mapSearchBarHeight = mCardViewAutocompleteWrapper.getHeight();
-                        int mapSearchBarMarginTop = (int) getResources().getDimension(R.dimen.map_search_panel_margin_top);
-                        mDeltaMapSearchBar = (mapSearchBarHeight + mapSearchBarMarginTop) * -1;
+                        mCardViewAutocompleteWrapper.getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this);
+                        calculateViewElementDimension();
                     }
-                });
+                }
+        );
 
         PlaceAutocompleteFragment mAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -424,6 +435,18 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
                 .build();
         mAutocompleteFragment.setFilter(typeFilter);
+    }
+
+    private void calculateViewElementDimension() {
+        int mapSearchBarHeight = mCardViewAutocompleteWrapper.getHeight();
+        int fabsHeight = mFabWrapper.getHeight();
+        int[] location = new int[2];
+        mCardViewAutocompleteWrapper.getLocationOnScreen(location);
+        mDeltaMapSearchBar = (mapSearchBarHeight + location[1]) * -1;
+
+        mFabWrapper.getLocationOnScreen(location);
+        int fabMarginBottom = (int) getResources().getDimension(R.dimen.fab_margin);
+        mDeltaFabs = fabsHeight - fabMarginBottom;
     }
 
     private void initBottomSheet() {
