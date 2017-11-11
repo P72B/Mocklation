@@ -295,6 +295,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void showSnackbar(int message, int action, View.OnClickListener listener, int duration) {
         Snackbar snackbar = Snackbar.make(findViewById(R.id.touch_overlay), message, duration);
+        View view = snackbar.getView();
+        view.setElevation(50);
         if (action != -1) {
             snackbar.setAction(action, listener);
         }
