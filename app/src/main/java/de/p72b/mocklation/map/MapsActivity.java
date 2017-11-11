@@ -89,6 +89,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private View mFabWrapper;
     private int mBottomSheetCollapsedHeight;
     private int mBottomSheetHeight;
+    private int mTopMapPadding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +192,8 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             tryToInitCameraPostion();
         }
 
+        mTopMapPadding = (int) getResources().getDimension(R.dimen.map_top_padding);
+        adjustMapLogoPadding(-1);
         mPresenter.onMapReady();
     }
 
@@ -579,6 +582,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             deltaCollapsed = ((slideOffset - 1) * mBottomSheetCollapsedHeight) * -1;
             finalPadding = slideOffset * mBottomSheetHeight + deltaCollapsed;
         }
-        mMap.setPadding(0,0,0, (int) finalPadding);
+        mMap.setPadding(0,mTopMapPadding,0, (int) finalPadding);
     }
 }
