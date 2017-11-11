@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import de.p72b.mocklation.R;
@@ -87,6 +89,13 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void setData(List<LocationItem> items) {
         Log.d(TAG, "LocationItems list size: " + items.size());
         mDataset = items;
+
+        Collections.sort(mDataset, new Comparator<LocationItem>() {
+            @Override
+            public int compare(LocationItem o1, LocationItem o2) {
+                return o1.getDisplayedName().compareToIgnoreCase(o2.getDisplayedName());
+            }
+        });
         notifyDataSetChanged();
     }
 
