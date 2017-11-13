@@ -12,6 +12,11 @@
     <string name="snackbar_action_undo">undo</string>
     <string name="snackbar_action_retry">retry</string>
     <string name="empty_data">Please create a new location to be mocked.</string>
+    <string name="button_discard">Discard</string>
+    <string name="action_save">Save</string>
+    <string name="dialog_edit_item_title">Validate data</string>
+    <string name="dialog_edit_item_message">Please confirm data</string>
+    <string name="dialog_edit_item_displayed_name">Name</string>
     <string name="error_1001">Service is running.</string>
     <string name="error_1002">Please long press somewhere inside the map first.</string>
     <string name="error_1003">No location data provided.</string>
@@ -21,4 +26,5 @@
     <string name="error_1007">No Geocoder available.</string>
     <string name="error_1008">Delete failed.</string>
     <string name="error_1009">Restore failed.</string>
+    <string name="error_1010">Enter valid name</string>
 </resources>

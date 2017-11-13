@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/face"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/dialog_edit_item_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
+            android:layout_marginRight="@dimen/guideline_dialog_content_padding"
+            android:paddingBottom="@dimen/guideline_dialog_title_body_padding"
+            android:paddingTop="@dimen/guideline_dialog_content_padding"
+            android:text="@string/dialog_edit_item_title"
+            android:textColor="@color/head"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
+            android:layout_marginRight="@dimen/guideline_dialog_content_padding"
+            android:text="@string/dialog_edit_item_message"
+            android:textColor="@color/eye"
+            android:textSize="@dimen/text_size_middle" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_pin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
+            android:layout_marginRight="@dimen/guideline_dialog_content_padding"
+            android:paddingTop="@dimen/guideline_screen_edge_top_bottom_distance_half"
+            android:theme="@style/TextInputLayoutDialog">
+
+            <EditText
+                android:id="@+id/input_displayed_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/dialog_edit_item_displayed_name"
+                android:inputType="text"
+                android:textColor="@color/eye" />
+        </android.support.design.widget.TextInputLayout>
+</LinearLayout>

@@ -1,16 +1,18 @@
 package de.p72b.mocklation.map;
 
-import android.app.Activity;
 import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.os.ResultReceiver;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.dialog.EditLocationItemDialog;
 import de.p72b.mocklation.service.geocoder.Constants;
 import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
 import de.p72b.mocklation.service.permission.IPermissionService;
@@ -27,21 +30,17 @@ import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
-import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.schedulers.Schedulers;
 
 public class MapsPresenter implements IMapsPresenter {
 
     private static final String TAG = MapsPresenter.class.getSimpleName();
     private final IPermissionService mPermissionService;
     private final AppDatabase mDb;
+    private final boolean mIsLargeLayout;
     private IMapsView mView;
-    private Activity mActivity;
+    private FragmentActivity mActivity;
     private Pair<String, LocationItem> mOnTheMapItemPair;
     private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
@@ -50,7 +49,7 @@ public class MapsPresenter implements IMapsPresenter {
     private String mAddressOutput;
     private AddressResultReceiver mResultReceiver;
 
-    MapsPresenter(Activity activity, IPermissionService permissionService, ISetting setting) {
+    MapsPresenter(FragmentActivity activity, IPermissionService permissionService, ISetting setting) {
         Log.d(TAG, "new MapsPresenter");
         mActivity = activity;
         mView = (IMapsView) activity;
@@ -60,6 +59,7 @@ public class MapsPresenter implements IMapsPresenter {
         mAddressRequested = false;
         mAddressOutput = "";
         mResultReceiver = new AddressResultReceiver(new Handler());
+        mIsLargeLayout = mActivity.getResources().getBoolean(R.bool.large_layout);
 
         updateUIWidgets();
     }
@@ -116,6 +116,8 @@ public class MapsPresenter implements IMapsPresenter {
                     return;
                 }
 
+                showEditLocationItemDialog();
+                /*
                 // new item was created, not restored from mSettings
                 Completable.fromAction(new Action() {
                     @Override
@@ -143,6 +145,7 @@ public class MapsPresenter implements IMapsPresenter {
                                 // TODO: show error
                             }
                         });
+                        */
                 break;
             case R.id.location:
                 mView.showMyLocation();
@@ -150,6 +153,20 @@ public class MapsPresenter implements IMapsPresenter {
             default:
                 // do nothing;
         }
+    }
+
+    private void showEditLocationItemDialog() {
+        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+        EditLocationItemDialog dialog = EditLocationItemDialog.newInstance(
+                new EditLocationItemDialog.EditLocationItemDialogListener() {
+                    @Override
+                    public void onPositiveClick(LocationItem item) {
+
+                    }
+                }
+        );
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+        dialog.show(fragmentManager, EditLocationItemDialog.TAG);
     }
 
     @Override
@@ -196,13 +213,20 @@ public class MapsPresenter implements IMapsPresenter {
         mView.setAddressProgressbarVisibility(mAddressRequested ? ProgressBar.VISIBLE : ProgressBar.GONE);
     }
 
+    private void closeEditLocationItemDialog() {
+        EditLocationItemDialog dialogFragment = EditLocationItemDialog.findOnStack(mActivity.getSupportFragmentManager());
+        if (dialogFragment != null) {
+            dialogFragment.dismiss();
+        }
+    }
+
     private class AddressResultReceiver extends ResultReceiver {
         AddressResultReceiver(Handler handler) {
             super(handler);
         }
 
         /**
-         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         * Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
          */
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {

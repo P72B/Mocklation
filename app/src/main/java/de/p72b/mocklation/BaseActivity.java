@@ -4,14 +4,14 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
 
-public class BaseActivity extends FragmentActivity {
+public class BaseActivity extends AppCompatActivity {
     private static final String TAG = BaseActivity.class.getSimpleName();
 
     protected ISetting mSetting;
