@@ -11,6 +11,7 @@
     <string name="message_location_item_removed">1 deleted.</string>
     <string name="snackbar_action_undo">undo</string>
     <string name="snackbar_action_retry">retry</string>
+    <string name="snackbar_action_save">Save</string>
     <string name="empty_data">Please create a new location to be mocked.</string>
     <string name="button_discard">Discard</string>
     <string name="action_save">Save</string>
@@ -26,5 +27,7 @@
     <string name="error_1007">No Geocoder available.</string>
     <string name="error_1008">Delete failed.</string>
     <string name="error_1009">Restore failed.</string>
-    <string name="error_1010">Enter valid name</string>
+    <string name="error_1010">Enter valid name.</string>
+    <string name="error_1011">Duplicate name found.</string>
+    <string name="error_1012">Couldn`t save location.</string>
 </resources>
