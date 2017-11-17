@@ -2,6 +2,11 @@ package de.p72b.mocklation.util;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.content.Context;
+import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -83,5 +88,29 @@ public class AppUtil {
         valueAnimator.setDuration(duration);
         valueAnimator.setStartDelay(delay);
         valueAnimator.start();
+    }
+
+    /**
+     * Opens the keyboard.
+     *
+     * @param context The {@link Context} showing the keyboard.
+     */
+    public static void showKeyboard(Context context) {
+        InputMethodManager imm = ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE));
+        if (imm != null) {
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+    }
+
+    /**
+     * Closes the keyboard.
+     *
+     * @param context The {@link Context} hiding the keyboard.
+     */
+    public static void hideKeyboard(Context context, View view) {
+        InputMethodManager imm = ((InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE));
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }
