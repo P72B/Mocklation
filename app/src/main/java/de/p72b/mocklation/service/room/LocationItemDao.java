@@ -22,6 +22,9 @@ public interface LocationItemDao {
     @Query("SELECT * FROM locations where code = :code")
     Maybe<LocationItem> findByCode(String code);
 
+    @Query("SELECT * FROM locations where displayed_name = :displayedName")
+    Maybe<List<LocationItem>> findByDisplayedName(String displayedName);
+
 
     @Insert
     void insertAll(LocationItem... locationItems);
