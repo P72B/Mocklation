@@ -4,7 +4,10 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -18,7 +21,7 @@ import org.json.JSONObject;
 import de.p72b.mocklation.service.location.LocationItemFeature;
 
 @Entity(tableName = "locations")
-public class LocationItem {
+public class LocationItem implements Parcelable {
     @NonNull
     @PrimaryKey()
     @ColumnInfo(name = "code")
@@ -35,6 +38,16 @@ public class LocationItem {
 
     @ColumnInfo(name = "speed")
     private int mSpeed;
+
+    public static final Parcelable.Creator<LocationItem> CREATOR = new Parcelable.Creator<LocationItem>() {
+        public LocationItem createFromParcel(Parcel in) {
+            return new LocationItem(in);
+        }
+
+        public LocationItem[] newArray(int size) {
+            return new LocationItem[size];
+        }
+    };
 
     public LocationItem(@NonNull String code, String displayedName, String geoJson, int accuracy, int speed) {
         mCode = code;
@@ -98,6 +111,37 @@ public class LocationItem {
         }
 
         return locationItemFeature;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    // write your object's data to the passed-in Parcel
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(mCode);
+        out.writeString(mDisplayedName);
+        out.writeString(mGeoJson);
+        out.writeInt(mAccuracy);
+        out.writeInt(mSpeed);
+    }
+
+    public static String getNameToBeDisplayed(LocationItem item) {
+        String name = item.getCode();
+        if (!TextUtils.isEmpty(item.getDisplayedName())) {
+            name = item.getDisplayedName();
+        }
+        return name;
+    }
+
+    private LocationItem(Parcel in) {
+        mCode = in.readString();
+        mDisplayedName = in.readString();
+        mGeoJson = in.readString();
+        mAccuracy = in.readInt();
+        mSpeed = in.readInt();
     }
 
     private GeoJsonPolygonStyle createStyle(String fillColor) {
