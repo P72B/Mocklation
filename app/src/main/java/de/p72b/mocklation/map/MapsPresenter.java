@@ -1,6 +1,5 @@
 package de.p72b.mocklation.map;
 
-import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
@@ -26,25 +25,20 @@ import de.p72b.mocklation.dialog.EditLocationItemDialog;
 import de.p72b.mocklation.service.geocoder.Constants;
 import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
 import de.p72b.mocklation.service.permission.IPermissionService;
-import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 public class MapsPresenter implements IMapsPresenter {
 
     private static final String TAG = MapsPresenter.class.getSimpleName();
     private final IPermissionService mPermissionService;
-    private final AppDatabase mDb;
     private final boolean mIsLargeLayout;
     private IMapsView mView;
     private FragmentActivity mActivity;
     private Pair<String, LocationItem> mOnTheMapItemPair;
-    private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
-    private Disposable mDisposableInsertAll;
     private boolean mAddressRequested;
     private String mAddressOutput;
     private AddressResultReceiver mResultReceiver;
@@ -54,8 +48,6 @@ public class MapsPresenter implements IMapsPresenter {
         mActivity = activity;
         mView = (IMapsView) activity;
         mPermissionService = permissionService;
-        mSetting = setting;
-        mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
         mAddressRequested = false;
         mAddressOutput = "";
         mResultReceiver = new AddressResultReceiver(new Handler());
@@ -117,35 +109,6 @@ public class MapsPresenter implements IMapsPresenter {
                 }
 
                 showEditLocationItemDialog();
-                /*
-                // new item was created, not restored from mSettings
-                Completable.fromAction(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        mDb.locationItemDao().insertAll(mOnTheMapItemPair.second);
-                    }
-                })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(new CompletableObserver() {
-                            @Override
-                            public void onSubscribe(Disposable disposable) {
-                                mDisposableInsertAll = disposable;
-                                mDisposables.add(mDisposableInsertAll);
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                mDisposables.remove(mDisposableInsertAll);
-                                // TODO: finish map
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                // TODO: show error
-                            }
-                        });
-                        */
                 break;
             case R.id.location:
                 mView.showMyLocation();
@@ -161,9 +124,9 @@ public class MapsPresenter implements IMapsPresenter {
                 new EditLocationItemDialog.EditLocationItemDialogListener() {
                     @Override
                     public void onPositiveClick(LocationItem item) {
-
+                        mActivity.finish();
                     }
-                }
+                }, mOnTheMapItemPair.second
         );
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
         dialog.show(fragmentManager, EditLocationItemDialog.TAG);
