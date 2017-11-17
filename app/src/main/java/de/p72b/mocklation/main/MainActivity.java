@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     @Override
     public void selectLocation(LocationItem item) {
-        mSelectedLocationName.setText(item.getCode());
+        mSelectedLocationName.setText(LocationItem.getNameToBeDisplayed(item));
         LocationItemFeature feature = item.deserialize();
 
         switch (feature.getGeoJsonFeature().getGeometry().getType()) {

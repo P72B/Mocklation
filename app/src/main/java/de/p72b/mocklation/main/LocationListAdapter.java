@@ -56,7 +56,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LocationItem locationItem = mDataset.get(position);
         ViewHolder viewHolder = (ViewHolder) holder;
 
-        viewHolder.mTextView.setText(locationItem.getCode());
+        viewHolder.mTextView.setText(LocationItem.getNameToBeDisplayed(locationItem));
         if (mSelectedItem != null && locationItem.getCode().equals(mSelectedItem.getCode())) {
             viewHolder.flagVisibility(View.VISIBLE);
         } else {
