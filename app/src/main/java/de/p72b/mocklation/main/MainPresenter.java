@@ -1,14 +1,17 @@
 package de.p72b.mocklation.main;
 
-import android.app.Activity;
 import android.arch.persistence.room.Room;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 
 import java.util.List;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.dialog.EditLocationItemDialog;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
@@ -26,7 +29,7 @@ public class MainPresenter implements IMainPresenter {
     private static final String TAG = MainPresenter.class.getSimpleName();
     private IMainView mView;
     private AppDatabase mDb;
-    private Activity mActivity;
+    private FragmentActivity mActivity;
     private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private IMockServiceInteractor mMockServiceInteractor;
@@ -36,7 +39,7 @@ public class MainPresenter implements IMainPresenter {
     private Disposable mDisposableGetAll;
     private List<LocationItem> mLocationItems;
 
-    MainPresenter(Activity activity, ISetting setting) {
+    MainPresenter(FragmentActivity activity, ISetting setting) {
         Log.d(TAG, "new MainPresenter");
         mActivity = activity;
         mView = (IMainView) activity;
@@ -67,11 +70,7 @@ public class MainPresenter implements IMainPresenter {
 
     @Override
     public void onResume() {
-        mDisposableGetAll = mDb.locationItemDao().getAll()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new LocationItemObserver());
-        mDisposables.add(mDisposableGetAll);
+        fetchAll();
     }
 
     @Override
@@ -101,16 +100,14 @@ public class MainPresenter implements IMainPresenter {
     }
 
     @Override
-    public void onPlayClicked() {
-        if (mSelectedItem == null) {
-            // TODO show error missing location item to start mocking.
-            return;
-        }
-
-        if (mSetting.getMockLocationItemCode() != null) {
-            mMockServiceInteractor.stopMockLocationService();
-        } else {
-            mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.play_stop:
+                onPlayClicked();
+                break;
+            case R.id.edit:
+                showEditLocationItemDialog();
+                break;
         }
     }
 
@@ -240,6 +237,41 @@ public class MainPresenter implements IMainPresenter {
 
         mView.showSavedLocations(mLocationItems);
         mView.selectLocation(mSelectedItem);
+    }
+
+    private void onPlayClicked() {
+        if (mSelectedItem == null) {
+            // TODO show error missing location item to start mocking.
+            return;
+        }
+
+        if (mSetting.getMockLocationItemCode() != null) {
+            mMockServiceInteractor.stopMockLocationService();
+        } else {
+            mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+        }
+    }
+
+    private void showEditLocationItemDialog() {
+        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+        EditLocationItemDialog dialog = EditLocationItemDialog.newInstance(
+                new EditLocationItemDialog.EditLocationItemDialogListener() {
+                    @Override
+                    public void onPositiveClick(LocationItem item) {
+                        fetchAll();
+                    }
+                }, mSelectedItem
+        );
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+        dialog.show(fragmentManager, EditLocationItemDialog.TAG);
+    }
+
+    private void fetchAll() {
+        mDisposableGetAll = mDb.locationItemDao().getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new LocationItemObserver());
+        mDisposables.add(mDisposableGetAll);
     }
 
     private class LocationItemObserver implements Consumer<List<LocationItem>> {

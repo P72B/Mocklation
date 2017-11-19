@@ -1,6 +1,7 @@
 package de.p72b.mocklation.dialog;
 
 import android.app.Dialog;
+import android.arch.persistence.room.EmptyResultSetException;
 import android.arch.persistence.room.Room;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -58,8 +59,10 @@ public class EditLocationItemDialog extends DialogFragment {
     private TextInputLayout mLongitudeLayoutName;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private Disposable mDisposableInsertAll;
-    private AppDatabase mDb = null;
     private Disposable mDisposableFindByCode;
+    private Disposable mDisposableFindByDisplayedName;
+    private Disposable mDisposableUpdateItem;
+    private AppDatabase mDb = null;
     private View mRootView;
 
     public EditLocationItemDialog() {
@@ -176,7 +179,7 @@ public class EditLocationItemDialog extends DialogFragment {
                 return true;
             }
 
-            saveItem();
+            checkUpdateOrCreateMode();
             return true;
         } else if (id == android.R.id.home) {
             dismiss();
@@ -186,26 +189,57 @@ public class EditLocationItemDialog extends DialogFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveItem() {
-        // new item was created, not restored from mSettings
-        if (mDb == null) {
-            showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    saveItem();
-                }
-            }, Snackbar.LENGTH_LONG);
-            return;
-        }
+    private void checkUpdateOrCreateMode() {
+        checkDbConnection();
 
+        Log.d(TAG, "requestLocationItem");
+        mDisposableFindByCode = mDb.locationItemDao().findByCode(mLocationItem.getCode())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new LocationItemCodeObserver(), new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        if (throwable instanceof EmptyResultSetException) {
+                            // create NEW item
+                            saveItem();
+                            return;
+                        }
+                        Log.d(TAG, "Error on getting DEvents - " + Log.getStackTraceString(throwable));
+                        retry();
+                    }
+                });
+        mDisposables.add(mDisposableFindByCode);
+    }
+
+    private void checkDbConnection() {
+        if (mDb == null) {
+            retry();
+        }
+    }
+
+    private void retry() {
+        showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkUpdateOrCreateMode();
+            }
+        }, Snackbar.LENGTH_LONG);
+        return;
+    }
+
+    private void saveItem() {
+        checkDbConnection();
+        saveFormData();
+        requestLocationItem(mLocationItem.getDisplayedName());
+    }
+
+    private void saveFormData() {
         // save the form data
         mLocationItem.setDisplayedName(mDisplayedName.getText().toString());
         if (mLatitudeLayoutName.getVisibility() == View.VISIBLE) {
-            String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + mLatitude.getText() + "," + mLongitude.getText() + "]}}";
+            String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + mLongitude.getText() + "," + mLatitude.getText() + "]}}";
             mLocationItem.setGeoJson(geoJson);
         }
-
-        requestLocationItem(mLocationItem.getDisplayedName());
     }
 
     private void writeItem() {
@@ -250,9 +284,6 @@ public class EditLocationItemDialog extends DialogFragment {
     }
 
     private boolean validateData() {
-        Log.d(TAG, "mDisplayedName:" + mDisplayedName.getText().length());
-        Log.d(TAG, "mLatitude:" + mLatitude.getText().length());
-        Log.d(TAG, "mLongitude:" + mLongitude.getText().toString().length());
         if (mDisplayedName.getText().toString().length() == 0) {
             mDisplayedName.setError(getString(R.string.error_1010));
             return false;
@@ -274,11 +305,11 @@ public class EditLocationItemDialog extends DialogFragment {
 
     private void requestLocationItem(String displayedName) {
         Log.d(TAG, "requestLocationItem");
-        mDisposableFindByCode = mDb.locationItemDao().findByDisplayedName(displayedName)
+        mDisposableFindByDisplayedName = mDb.locationItemDao().findByDisplayedName(displayedName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new LocationItemObserver());
-        mDisposables.add(mDisposableFindByCode);
+                .subscribe(new LocationItemDisplayedNameObserver());
+        mDisposables.add(mDisposableFindByDisplayedName);
     }
 
     private void showSnackbar(int message, int action, View.OnClickListener listener, int duration) {
@@ -291,6 +322,44 @@ public class EditLocationItemDialog extends DialogFragment {
             snackbar.setAction(action, listener);
         }
         snackbar.show();
+    }
+
+    private void updateItem() {
+        saveFormData();
+        Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                mDb.locationItemDao().updateLocationItems(mLocationItem);
+            }
+        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable disposable) {
+                        mDisposableUpdateItem = disposable;
+                        mDisposables.add(mDisposableUpdateItem);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        mDisposables.remove(mDisposableUpdateItem);
+                        if (mListener != null) {
+                            mListener.onPositiveClick(mLocationItem);
+                        }
+                        dismiss();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                updateItem();
+                            }
+                        }, Snackbar.LENGTH_LONG);
+                    }
+                });
     }
 
     public interface EditLocationItemDialogListener {
@@ -323,10 +392,10 @@ public class EditLocationItemDialog extends DialogFragment {
         }
     }
 
-    private class LocationItemObserver implements Consumer<List<LocationItem>> {
+    private class LocationItemDisplayedNameObserver implements Consumer<List<LocationItem>> {
         @Override
         public void accept(List<LocationItem> locationItems) throws Exception {
-            mDisposables.remove(mDisposableFindByCode);
+            mDisposables.remove(mDisposableFindByDisplayedName);
 
             if (locationItems == null) {
                 return;
@@ -343,6 +412,14 @@ public class EditLocationItemDialog extends DialogFragment {
                     writeItem();
                 }
             }, Snackbar.LENGTH_LONG);
+        }
+    }
+
+    private class LocationItemCodeObserver implements Consumer<LocationItem> {
+        @Override
+        public void accept(LocationItem locationItem) throws Exception {
+            mDisposables.remove(mDisposableFindByCode);
+            updateItem();
         }
     }
 }

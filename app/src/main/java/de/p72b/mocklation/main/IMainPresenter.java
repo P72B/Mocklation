@@ -1,6 +1,8 @@
 package de.p72b.mocklation.main;
 
 
+import android.view.View;
+
 import de.p72b.mocklation.service.room.LocationItem;
 
 public interface IMainPresenter {
@@ -13,7 +15,7 @@ public interface IMainPresenter {
 
     void onMockPermissionsResult(int[] grantedResults);
 
-    void onPlayClicked();
+    void onClick(View view);
 
     void locationItemRemoved(LocationItem item);
 }

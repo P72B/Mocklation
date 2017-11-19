@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 @Dao
 public interface LocationItemDao {
@@ -20,7 +21,7 @@ public interface LocationItemDao {
     Flowable<List<LocationItem>> loadAllByIds(int[] locationItemIds);
 
     @Query("SELECT * FROM locations where code = :code")
-    Maybe<LocationItem> findByCode(String code);
+    Single<LocationItem> findByCode(String code);
 
     @Query("SELECT * FROM locations where displayed_name = :displayedName")
     Maybe<List<LocationItem>> findByDisplayedName(String displayedName);

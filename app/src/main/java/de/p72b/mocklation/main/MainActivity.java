@@ -145,10 +145,13 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     @Override
     public void onClick(View view) {
+        Log.d(TAG, "onClick");
         switch (view.getId()) {
-            case R.id.play_stop:
-                mPresenter.onPlayClicked();
+            case R.id.fab:
+                startActivity(new Intent(this, MapsActivity.class));
                 break;
+            default:
+                mPresenter.onClick(view);
         }
     }
 
@@ -184,13 +187,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         mDataEmpty.setVisibility(View.INVISIBLE);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        final Intent intent = new Intent(this, MapsActivity.class);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(intent);
-            }
-        });
+        fab.setOnClickListener(this);
 
         mSelectedLocationName = findViewById(R.id.card_view_selected_location_name);
         mSelectedLocationLatitude = findViewById(R.id.card_view_selected_location_latitude);
@@ -208,6 +205,8 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         mButtonPlayStop = findViewById(R.id.play_stop);
         mButtonPlayStop.setOnClickListener(this);
+
+        findViewById(R.id.edit).setOnClickListener(this);
 
         final View root = findViewById(R.id.main_root);
         root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
