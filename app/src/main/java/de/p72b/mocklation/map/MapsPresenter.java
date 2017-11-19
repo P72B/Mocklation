@@ -1,6 +1,7 @@
 package de.p72b.mocklation.map;
 
 import android.content.Intent;
+import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
@@ -13,12 +14,15 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
@@ -40,7 +44,7 @@ public class MapsPresenter implements IMapsPresenter {
     private Pair<String, LocationItem> mOnTheMapItemPair;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private boolean mAddressRequested;
-    private String mAddressOutput;
+    private Address mAddressOutput;
     private AddressResultReceiver mResultReceiver;
 
     MapsPresenter(FragmentActivity activity, IPermissionService permissionService, ISetting setting) {
@@ -49,7 +53,7 @@ public class MapsPresenter implements IMapsPresenter {
         mView = (IMapsView) activity;
         mPermissionService = permissionService;
         mAddressRequested = false;
-        mAddressOutput = "";
+        mAddressOutput = null;
         mResultReceiver = new AddressResultReceiver(new Handler());
         mIsLargeLayout = mActivity.getResources().getBoolean(R.bool.large_layout);
 
@@ -193,11 +197,26 @@ public class MapsPresenter implements IMapsPresenter {
          */
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
-            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
-            mView.setAddress(mAddressOutput);
+            mAddressOutput = resultData.getParcelable(Constants.RESULT_DATA_KEY);
+            String resultMessage;
+            if (resultCode == Constants.FAILURE_RESULT) {
+                resultMessage = resultData.getString(Constants.RESULT_DATA_MESSAGE);
+            } else {
+                resultMessage = getFormattedAddress(mAddressOutput);
+            }
+            mView.setAddress(resultMessage);
 
             mAddressRequested = false;
             updateUIWidgets();
+        }
+
+        private String getFormattedAddress(Address address) {
+            ArrayList<String> addressFragments = new ArrayList<>();
+
+            for(int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                addressFragments.add(address.getAddressLine(i));
+            }
+            return TextUtils.join(System.getProperty("line.separator"), addressFragments);
         }
     }
 }

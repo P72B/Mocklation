@@ -47,7 +47,7 @@ public class GeocoderIntentService extends IntentService {
         if (location == null) {
             errorMessage = getString(R.string.error_1003);
             Log.wtf(TAG, errorMessage);
-            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage, null);
             return;
         }
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -74,26 +74,20 @@ public class GeocoderIntentService extends IntentService {
                 errorMessage = getString(R.string.error_1006);
                 Log.e(TAG, errorMessage);
             }
-            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage, null);
         } else {
-            Address address = addresses.get(0);
-            ArrayList<String> addressFragments = new ArrayList<>();
-
-            for(int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                addressFragments.add(address.getAddressLine(i));
-            }
             Log.i(TAG, "Address found");
-            deliverResultToReceiver(Constants.SUCCESS_RESULT,
-                    TextUtils.join(System.getProperty("line.separator"), addressFragments));
+            deliverResultToReceiver(Constants.SUCCESS_RESULT, null, addresses.get(0));
         }
     }
 
     /**
      * Sends a resultCode and message to the receiver.
      */
-    private void deliverResultToReceiver(int resultCode, String message) {
+    private void deliverResultToReceiver(int resultCode, String message, Address address) {
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.RESULT_DATA_KEY, message);
+        bundle.putParcelable(Constants.RESULT_DATA_KEY, address);
+        bundle.putString(Constants.RESULT_DATA_MESSAGE, message);
         mReceiver.send(resultCode, bundle);
     }
 }
