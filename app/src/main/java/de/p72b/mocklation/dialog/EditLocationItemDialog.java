@@ -26,9 +26,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 
+import com.google.maps.android.geojson.GeoJsonPoint;
+
 import java.util.List;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.service.location.LocationItemFeature;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.util.AppUtil;
@@ -48,7 +51,11 @@ public class EditLocationItemDialog extends DialogFragment {
     private EditLocationItemDialogListener mListener;
     private LocationItem mLocationItem;
     private EditText mDisplayedName;
+    private EditText mLatitude;
+    private EditText mLongitude;
     private TextInputLayout mDisplayedNameLayoutName;
+    private TextInputLayout mLatitudeLayoutName;
+    private TextInputLayout mLongitudeLayoutName;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private Disposable mDisposableInsertAll;
     private AppDatabase mDb = null;
@@ -112,13 +119,37 @@ public class EditLocationItemDialog extends DialogFragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             mLocationItem = arguments.getParcelable(EXTRA_LOCATION_ITEM);
+        } else {
+            return;
         }
         if (getContext() != null) {
             mDb = Room.databaseBuilder(getContext(), AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
         }
         mDisplayedName = mRootView.findViewById(R.id.input_displayed_name);
-        mDisplayedName.addTextChangedListener(new SimpleTextWatcher(mDisplayedName));
+        mLatitude = mRootView.findViewById(R.id.input_latitude);
+        mLongitude = mRootView.findViewById(R.id.input_longitude);
+
         mDisplayedNameLayoutName = mRootView.findViewById(R.id.input_layout_pin);
+        mLatitudeLayoutName = mRootView.findViewById(R.id.input_layout_latitude);
+        mLongitudeLayoutName = mRootView.findViewById(R.id.input_layout_longitude);
+
+        LocationItemFeature feature = mLocationItem.deserialize();
+        switch (feature.getGeoJsonFeature().getGeometry().getType()) {
+            case "Point":
+                GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
+                mLatitudeLayoutName.setVisibility(View.VISIBLE);
+                mLongitudeLayoutName.setVisibility(View.VISIBLE);
+                mLatitude.setText(String.valueOf(point.getCoordinates().latitude));
+                mLongitude.setText(String.valueOf(point.getCoordinates().longitude));
+                break;
+            default:
+                // do nothing
+        }
+        mDisplayedName.setText(mLocationItem.getDisplayedName());
+
+        mDisplayedName.addTextChangedListener(new SimpleTextWatcher(mDisplayedName));
+        mLatitude.addTextChangedListener(new SimpleTextWatcher(mLatitude));
+        mLongitude.addTextChangedListener(new SimpleTextWatcher(mLongitude));
     }
 
     @Override
@@ -158,17 +189,26 @@ public class EditLocationItemDialog extends DialogFragment {
     private void saveItem() {
         // new item was created, not restored from mSettings
         if (mDb == null) {
-            // TODO: show error
+            showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    saveItem();
+                }
+            }, Snackbar.LENGTH_LONG);
             return;
         }
 
         // save the form data
         mLocationItem.setDisplayedName(mDisplayedName.getText().toString());
+        if (mLatitudeLayoutName.getVisibility() == View.VISIBLE) {
+            String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + mLatitude.getText() + "," + mLongitude.getText() + "]}}";
+            mLocationItem.setGeoJson(geoJson);
+        }
 
         requestLocationItem(mLocationItem.getDisplayedName());
     }
 
-    private void wirteItem() {
+    private void writeItem() {
         Completable.fromAction(new Action() {
             @Override
             public void run() throws Exception {
@@ -210,12 +250,25 @@ public class EditLocationItemDialog extends DialogFragment {
     }
 
     private boolean validateData() {
-        if (mDisplayedName.getText().toString().trim().isEmpty()) {
+        Log.d(TAG, "mDisplayedName:" + mDisplayedName.getText().length());
+        Log.d(TAG, "mLatitude:" + mLatitude.getText().length());
+        Log.d(TAG, "mLongitude:" + mLongitude.getText().toString().length());
+        if (mDisplayedName.getText().toString().length() == 0) {
             mDisplayedName.setError(getString(R.string.error_1010));
+            return false;
+        }
+        if (mLatitude.getText().toString().length() == 0) {
+            mLatitude.setError(getString(R.string.error_1013));
+            return false;
+        }
+        if (mLongitude.getText().toString().length() == 0) {
+            mLongitude.setError(getString(R.string.error_1013));
             return false;
         }
 
         mDisplayedNameLayoutName.setErrorEnabled(false);
+        mLatitudeLayoutName.setErrorEnabled(false);
+        mLongitudeLayoutName.setErrorEnabled(false);
         return true;
     }
 
@@ -260,7 +313,10 @@ public class EditLocationItemDialog extends DialogFragment {
 
         public void afterTextChanged(Editable editable) {
             switch (view.getId()) {
+                case R.id.input_latitude:
+                case R.id.input_longitude:
                 case R.id.input_displayed_name:
+                    // Fallthrough expected
                     validateData();
                     break;
             }
@@ -277,14 +333,14 @@ public class EditLocationItemDialog extends DialogFragment {
             }
 
             if (locationItems.size() == 0) {
-                wirteItem();
+                writeItem();
                 return;
             }
 
             showSnackbar(R.string.error_1011, R.string.action_save, new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    wirteItem();
+                    writeItem();
                 }
             }, Snackbar.LENGTH_LONG);
         }

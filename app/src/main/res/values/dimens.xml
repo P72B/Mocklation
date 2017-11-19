@@ -3,6 +3,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="fab_margin_right">18dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_middle">18sp</dimen>
     <dimen name="text_size_large">21sp</dimen>
     <dimen name="card_view_corner_radius">3dp</dimen>
