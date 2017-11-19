@@ -124,13 +124,18 @@ public class MapsPresenter implements IMapsPresenter {
 
     private void showEditLocationItemDialog() {
         FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+        LocationItem item = mOnTheMapItemPair.second;
+        if (mAddressOutput != null && item != null) {
+            item.setDisplayedName(mAddressOutput.getLocality());
+        }
+
         EditLocationItemDialog dialog = EditLocationItemDialog.newInstance(
                 new EditLocationItemDialog.EditLocationItemDialogListener() {
                     @Override
                     public void onPositiveClick(LocationItem item) {
                         mActivity.finish();
                     }
-                }, mOnTheMapItemPair.second
+                }, item
         );
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
         dialog.show(fragmentManager, EditLocationItemDialog.TAG);
