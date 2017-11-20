@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,12 +23,14 @@ import java.util.List;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.service.location.MockLocationService;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.AppUtil;
 
 public class MockServiceInteractor implements IMockServiceInteractor {
 
-    public static final int PERMISSIONS_MOCKING = 115;
-    public static final int SERVICE_STATE_STOP = 0;
-    public static final int SERVICE_STATE_RUNNING = 1;
+    static final int PERMISSIONS_MOCKING = 115;
+    static final int SERVICE_STATE_STOP = 0;
+    static final int SERVICE_STATE_RUNNING = 1;
+    static final int SERVICE_STATE_PAUSE = 2;
 
     private static final String TAG = MockServiceInteractor.class.getSimpleName();
     private final ISetting mSetting;
@@ -37,14 +40,47 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     private String mLocationItemCode;
     private MockServiceListener mListener;
     private @ServiceStatus int mState;
+    private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            Log.d(TAG, "Received local broadcast: " + AppUtil.toString(intent));
+            final String action = intent.getAction();
+            if (action == null) {
+                return;
+            }
+            switch (action) {
+                case MockLocationService.EVENT_PAUSE:
+                    Log.d(TAG, "Pause service");
+                    mState = SERVICE_STATE_PAUSE;
+                    break;
+                case MockLocationService.EVENT_PLAY:
+                    Log.d(TAG, "Play service");
+                    mState = SERVICE_STATE_RUNNING;
+                    break;
+                case MockLocationService.EVENT_STOP:
+                    Log.d(TAG, "Stop service");
+                    mState = SERVICE_STATE_STOP;
+                    break;
+            }
+            if (mListener != null) {
+                mListener.onUpdate();
+            }
+        }
+    };
 
-    public MockServiceInteractor(Activity activity, ISetting setting, MockServiceListener listener) {
+    MockServiceInteractor(Activity activity, ISetting setting, MockServiceListener listener) {
         mActivity = activity;
         mSetting = setting;
         mContext = activity.getApplicationContext();
         mRunningServices = new ArrayList<>();
         mListener = listener;
         mState = isServiceRunning() ? SERVICE_STATE_RUNNING : SERVICE_STATE_STOP;
+        AppUtil.registerLocalBroadcastReceiver(
+                mActivity,
+                mLocalAppBroadcastReceiver,
+                MockLocationService.EVENT_PAUSE,
+                MockLocationService.EVENT_PLAY,
+                MockLocationService.EVENT_STOP);
     }
 
     @Override
@@ -53,6 +89,24 @@ public class MockServiceInteractor implements IMockServiceInteractor {
             checkDefaultMockLocationApp();
         } else {
             // TODO: permission is needed.
+        }
+    }
+
+    @Override
+    public void pauseMockLocationService() {
+        if (isServiceRunning()) {
+            AppUtil.sendLocalBroadcast(mContext, new Intent(
+                    MockLocationService.EVENT_PAUSE));
+            mState = SERVICE_STATE_PAUSE;
+        }
+    }
+
+    @Override
+    public void playMockLocationService() {
+        if (isServiceRunning()) {
+            AppUtil.sendLocalBroadcast(mContext, new Intent(
+                    MockLocationService.EVENT_PLAY));
+            mState = SERVICE_STATE_RUNNING;
         }
     }
 
@@ -184,7 +238,9 @@ public class MockServiceInteractor implements IMockServiceInteractor {
             //if marshmallow
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 AppOpsManager opsManager = (AppOpsManager) mContext.getSystemService(Context.APP_OPS_SERVICE);
-                isMockLocation = (opsManager.checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID) == AppOpsManager.MODE_ALLOWED);
+                if (opsManager != null) {
+                    isMockLocation = (opsManager.checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID) == AppOpsManager.MODE_ALLOWED);
+                }
             } else {
                 // in marshmallow this will always return true
                 isMockLocation = !android.provider.Settings.Secure.getString(mContext.getContentResolver(), "mock_location").equals("0");
@@ -204,10 +260,11 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         void onStart();
         void onStop();
         void onError();
+        void onUpdate();
     }
 
-    @IntDef({SERVICE_STATE_RUNNING, SERVICE_STATE_STOP})
+    @IntDef({SERVICE_STATE_RUNNING, SERVICE_STATE_STOP, SERVICE_STATE_PAUSE})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface ServiceStatus {
+    @interface ServiceStatus {
     }
 }

@@ -49,13 +49,13 @@ public class MainPresenter implements IMainPresenter {
             @Override
             public void onStart() {
                 Log.d(TAG, "MockServiceListener onStart()");
-                mView.setPlayStopStatus(mMockServiceInteractor.getState());
+                mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
             }
 
             @Override
             public void onStop() {
                 Log.d(TAG, "MockServiceListener onStop()");
-                mView.setPlayStopStatus(mMockServiceInteractor.getState());
+                mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
             }
 
             @Override
@@ -63,9 +63,15 @@ public class MainPresenter implements IMainPresenter {
                 Log.d(TAG, "MockServiceListener onError()");
 
             }
+
+            @Override
+            public void onUpdate() {
+                Log.d(TAG, "MockServiceListener onUpdate()");
+                mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
+            }
         });
 
-        mView.setPlayStopStatus(mMockServiceInteractor.getState());
+        mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
     }
 
     @Override
@@ -103,7 +109,10 @@ public class MainPresenter implements IMainPresenter {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.play_stop:
-                onPlayClicked();
+                onPlayStopClicked();
+                break;
+            case R.id.pause:
+                onPauseClicked();
                 break;
             case R.id.edit:
                 showEditLocationItemDialog();
@@ -239,7 +248,21 @@ public class MainPresenter implements IMainPresenter {
         mView.selectLocation(mSelectedItem);
     }
 
-    private void onPlayClicked() {
+    private void onPauseClicked() {
+        if (mSetting.getMockLocationItemCode() != null) {
+            switch(mMockServiceInteractor.getState()) {
+                case MockServiceInteractor.SERVICE_STATE_RUNNING:
+                    mMockServiceInteractor.pauseMockLocationService();
+                    break;
+                case MockServiceInteractor.SERVICE_STATE_PAUSE:
+                    mMockServiceInteractor.playMockLocationService();
+                    break;
+            }
+            mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
+        }
+    }
+
+    private void onPlayStopClicked() {
         if (mSelectedItem == null) {
             // TODO show error missing location item to start mocking.
             return;
@@ -249,6 +272,7 @@ public class MainPresenter implements IMainPresenter {
             mMockServiceInteractor.stopMockLocationService();
         } else {
             mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+
         }
     }
 

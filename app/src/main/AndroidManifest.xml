@@ -45,6 +45,18 @@
                 android:value=".main.MainActivity" />
         </activity>
 
+        <receiver android:name=".notification.NotificationBroadcastReceiver">
+            <intent-filter>
+                <action android:name="EVENT_PAUSE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="EVENT_PLAY" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="EVENT_STOP" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".service.location.MockLocationService"
             android:enabled="true" />

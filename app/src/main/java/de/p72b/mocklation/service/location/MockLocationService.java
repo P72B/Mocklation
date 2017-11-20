@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.arch.persistence.room.Room;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -34,12 +35,14 @@ import java.util.concurrent.TimeUnit;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.main.MainActivity;
+import de.p72b.mocklation.notification.NotificationBroadcastReceiver;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.service.setting.Setting;
+import de.p72b.mocklation.util.AppUtil;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -53,7 +56,14 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     private static final String TAG = MockLocationService.class.getSimpleName();
     public static final int PERMISSION_REQUEST_CODE = 97;
-    private static final int NOTIFICATION_ID = 909;
+    public static final int NOTIFICATION_ID = 909;
+    public static final String NOTIFICATION_ACTION_PAUSE = "NOTIFICATION_ACTION_PAUSE";
+    public static final String NOTIFICATION_ACTION_PLAY = "NOTIFICATION_ACTION_PLAY";
+    public static final String NOTIFICATION_ACTION_STOP = "NOTIFICATION_ACTION_STOP";
+    public static final String EVENT_PAUSE = "EVENT_PAUSE";
+    public static final String EVENT_PLAY = "EVENT_PLAY";
+    public static final String EVENT_STOP = "EVENT_STOP";
+    private static final String NOTIFICATION_CHANNEL_ID = "MOCK_LOCATION_NOTIFICATION";
     private static final String MOCKLOCATION_PROVIDER_NAME = "gps";
 
     @Nullable
@@ -69,6 +79,49 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private List<LatLng> mLatLngList = new ArrayList<>();
     private AppDatabase mDb;
     private Disposable mDisposableFindByCode;
+    private LocationUpdateInterval mMockLocationUpdateInterval;
+    private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            Log.d(TAG, "Received local broadcast: " + AppUtil.toString(intent));
+            final String action = intent.getAction();
+            if (action == null) {
+                return;
+            }
+            switch (action) {
+                case EVENT_PAUSE:
+                    Log.d(TAG, "Pause service");
+                    mNotifyBuilder.mActions.clear();
+                    mNotifyBuilder.setColor(getResources().getColor(R.color.mouth));
+                    mNotifyBuilder.addAction(getPlayAction());
+                    mNotifyBuilder.addAction(getStopAction());
+                    if (mMockLocationUpdateInterval != null && !mMockLocationUpdateInterval.isDisposed()) {
+                        mMockLocationUpdateInterval.dispose();
+                        mDisposables.remove(mMockLocationUpdateInterval);
+                    }
+                    mNotificationManager.notify(
+                            NOTIFICATION_ID,
+                            mNotifyBuilder.build());
+                    break;
+                case EVENT_PLAY:
+                    Log.d(TAG, "Play service");
+                    mNotifyBuilder.mActions.clear();
+                    mNotifyBuilder.setColor(getResources().getColor(R.color.dark_green));
+                    mNotifyBuilder.addAction(getPauseAction());
+                    mNotifyBuilder.addAction(getStopAction());
+                    mMockLocationUpdateInterval = getUpdateInterval();
+                    mDisposables.add(mMockLocationUpdateInterval);
+                    mNotificationManager.notify(
+                            NOTIFICATION_ID,
+                            mNotifyBuilder.build());
+                    break;
+                case EVENT_STOP:
+                    Log.d(TAG, "Stop service");
+                    onDestroy();
+                    break;
+            }
+        }
+    };
 
     public MockLocationService() {
     }
@@ -138,6 +191,12 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         } else {
             mGoogleApiClient.connect();
         }
+        AppUtil.registerLocalBroadcastReceiver(
+                getApplicationContext(),
+                mLocalAppBroadcastReceiver,
+                EVENT_PAUSE,
+                EVENT_PLAY,
+                EVENT_STOP);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -154,6 +213,9 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mPermissions.unSubscribeToPermissionChanges(this);
 
         mDisposables.clear();
+
+        AppUtil.unregisterLocalBroadcastReceiver(getApplicationContext(),
+                mLocalAppBroadcastReceiver);
 
         super.onDestroy();
     }
@@ -199,19 +261,15 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mLocationManager.addTestProvider(MOCKLOCATION_PROVIDER_NAME, false, false,
                 false, false, true, true, true, 0, 5);
 
-        mDisposables.add(Observable.interval(0, 1, TimeUnit.SECONDS)
-                // Run on a background thread
-                .subscribeOn(Schedulers.io())
-                // Be notified on the main thread
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new LocationUpdateInterval()));
+        mMockLocationUpdateInterval = getUpdateInterval();
+        mDisposables.add(mMockLocationUpdateInterval);
 
         createNotification();
     }
 
     private void createNotification() {
         mNumMessages = 0;
-        mNotifyBuilder = new NotificationCompat.Builder(this)
+        mNotifyBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_location_on_black_24dp)
                 .setContentTitle(getApplicationName());
 
@@ -226,9 +284,42 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                 );
 
         mNotifyBuilder.setContentIntent(resultPendingIntent);
+        mNotifyBuilder.setColor(getResources().getColor(R.color.dark_green));
+        mNotifyBuilder.addAction(getPauseAction());
+        mNotifyBuilder.addAction(getStopAction());
         mNotifyBuilder.setOngoing(true);
         mNotifyBuilder.setAutoCancel(false);
         mNotificationManager.notify(NOTIFICATION_ID, mNotifyBuilder.build());
+    }
+
+    private NotificationCompat.Action getPauseAction() {
+        Intent intent = new Intent(getApplicationContext(), NotificationBroadcastReceiver.class);
+        intent.setAction(NOTIFICATION_ACTION_PAUSE);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
+                0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return new NotificationCompat.Action.Builder(R.drawable.ic_pause_black_24dp,
+                getString(R.string.action_pause), pendingIntent).build();
+    }
+
+    private NotificationCompat.Action getPlayAction() {
+        Intent intent = new Intent(getApplicationContext(), NotificationBroadcastReceiver.class);
+        intent.setAction(NOTIFICATION_ACTION_PLAY);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
+                0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return new NotificationCompat.Action.Builder(R.drawable.ic_play_arrow_black_24dp,
+                getString(R.string.action_play), pendingIntent).build();
+    }
+
+    private NotificationCompat.Action getStopAction() {
+        Intent intent = new Intent(getApplicationContext(), NotificationBroadcastReceiver.class);
+        intent.setAction(NOTIFICATION_ACTION_STOP);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),
+                0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return new NotificationCompat.Action.Builder(R.drawable.ic_stop_black_24dp,
+                getString(R.string.action_stop), pendingIntent).build();
     }
 
     public String getApplicationName() {
@@ -248,6 +339,22 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private void dismissNotification() {
         if (mNotificationManager != null) {
             mNotificationManager.cancel(NOTIFICATION_ID);
+        }
+    }
+
+    public LocationUpdateInterval getUpdateInterval() {
+        return Observable.interval(0, 1, TimeUnit.SECONDS)
+                // Run on a background thread
+                .subscribeOn(Schedulers.io())
+                // Be notified on the main thread
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new LocationUpdateInterval());
+    }
+
+    private void pauseService() {
+        if (mMockLocationUpdateInterval != null && !mMockLocationUpdateInterval.isDisposed()) {
+            mMockLocationUpdateInterval.dispose();
+            mDisposables.remove(mMockLocationUpdateInterval);
         }
     }
 
@@ -309,7 +416,6 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         @Override
         public void onNext(Long value) {
             Log.d(TAG, " onNext : value : " + value);
-
             LatLng nextLatLng = mLatLngList.get(0);
             Location location = new Location(MOCKLOCATION_PROVIDER_NAME);
             location.setLatitude(nextLatLng.latitude);

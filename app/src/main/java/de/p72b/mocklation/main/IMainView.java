@@ -15,7 +15,7 @@ public interface IMainView {
 
     void showEmptyPlaceholder();
 
-    void setPlayStopStatus(int state);
+    void setPlayPauseStopStatus(int state);
 
     void showSnackbar(int message, int action, View.OnClickListener listener, int duration);
 }

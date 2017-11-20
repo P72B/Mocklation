@@ -45,13 +45,13 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     private EditText mSelectedLocationLatitude;
     private EditText mSelectedLocationLongitude;
     private ImageButton mButtonPlayStop;
+    private ImageButton mButtonPausePlay;
     private View mDataView;
     private View mDataEmpty;
     private Animation mFadeInAnimation;
     private Animation mFadeOutAnimation;
     private VisibilityAnimationListener mFadeOutListener = new VisibilityAnimationListener();
     private VisibilityAnimationListener mFadeInListener = new VisibilityAnimationListener();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,14 +156,19 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     }
 
     @Override
-    public void setPlayStopStatus(@MockServiceInteractor.ServiceStatus int state) {
+    public void setPlayPauseStopStatus(@MockServiceInteractor.ServiceStatus int state) {
         switch(state) {
             case MockServiceInteractor.SERVICE_STATE_RUNNING:
                 mButtonPlayStop.setBackgroundResource(R.drawable.ic_stop_black_24dp);
+                mButtonPausePlay.setBackgroundResource(R.drawable.ic_pause_black_24dp);
+                mButtonPausePlay.setVisibility(View.VISIBLE);
                 break;
             case MockServiceInteractor.SERVICE_STATE_STOP:
                 mButtonPlayStop.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                mButtonPausePlay.setVisibility(View.INVISIBLE);
                 break;
+            case MockServiceInteractor.SERVICE_STATE_PAUSE:
+                mButtonPausePlay.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
         }
     }
 
@@ -205,6 +210,9 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         mButtonPlayStop = findViewById(R.id.play_stop);
         mButtonPlayStop.setOnClickListener(this);
+
+        mButtonPausePlay = findViewById(R.id.pause);
+        mButtonPausePlay.setOnClickListener(this);
 
         findViewById(R.id.edit).setOnClickListener(this);
 

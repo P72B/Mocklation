@@ -3,8 +3,14 @@ package de.p72b.mocklation.util;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -14,6 +20,7 @@ import com.google.android.gms.maps.model.Marker;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 public class AppUtil {
@@ -112,5 +119,93 @@ public class AppUtil {
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    /**
+     * Creates a string from a {@link Bundle} for debugging purposes.
+     *
+     * @param bundle The bundle to create a String from.
+     * @return String describing the given bundle.
+     */
+    public static String toString(Bundle bundle) {
+        if (bundle == null || bundle.isEmpty()) {
+            return null;
+        }
+        final StringBuffer strBuf = new StringBuffer();
+        final Set<String> keys = bundle.keySet();
+        Object value;
+        for (String key : keys) {
+            value = bundle.get(key);
+            strBuf.append("\t");
+            strBuf.append(key);
+            if (value == null) {
+                strBuf.append(":null");
+                strBuf.append("\n");
+            } else {
+                strBuf.append("[");
+                strBuf.append(value.getClass().toString());
+                strBuf.append("]:");
+                strBuf.append(value);
+                strBuf.append("\n");
+            }
+        }
+        return strBuf.toString();
+    }
+
+    /**
+     * Creates a string from a {@link Intent} for debugging purposes.
+     *
+     * @param intent The intent to create a String from.
+     * @return String describing the given intent.
+     */
+    public static String toString(Intent intent) {
+        final StringBuffer strBuf = new StringBuffer();
+        strBuf.append("Intent:\n");
+        strBuf.append("-------\n");
+        strBuf.append("Action:\n");
+        strBuf.append(intent.getAction());
+        strBuf.append("Data:\n");
+        strBuf.append(intent.getDataString());
+        strBuf.append("Bundle:\n");
+        strBuf.append(toString(intent.getExtras()));
+        return strBuf.toString();
+    }
+    /**
+     * Registers a given {@link BroadcastReceiver} to a list of actions.
+     *
+     * @param context           The {@link Context} of the {@link LocalBroadcastManager}.
+     * @param broadcastReceiver The  {@link BroadcastReceiver} to register.
+     * @param actions           The actions to register for.
+     */
+    public static void registerLocalBroadcastReceiver(
+            @NonNull final Context context,
+            @NonNull final BroadcastReceiver broadcastReceiver,
+            @NonNull final String... actions) {
+        final LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
+        for (String action : actions) {
+            localBroadcastManager.registerReceiver(broadcastReceiver, new IntentFilter(action));
+        }
+    }
+
+    /**
+     * Unregisters a given {@link BroadcastReceiver}.
+     *
+     * @param context           The {@link Context} of the {@link LocalBroadcastManager}.
+     * @param broadcastReceiver The  {@link BroadcastReceiver} to unregister.
+     */
+    public static void unregisterLocalBroadcastReceiver(
+            @NonNull final Context context,
+            @NonNull final BroadcastReceiver broadcastReceiver) {
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver);
+    }
+
+    /**
+     * Sends a local broadcast.
+     *
+     * @param context The {@link Context} sending the local broadcast.
+     * @param intent  The {@link Intent} to send.
+     */
+    public static void sendLocalBroadcast(@NonNull final Context context, @NonNull final Intent intent) {
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }

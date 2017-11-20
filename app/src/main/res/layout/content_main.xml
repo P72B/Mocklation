@@ -127,6 +127,15 @@
                             android:background="@drawable/ic_play_arrow_black_24dp" />
 
                         <ImageButton
+                            android:id="@+id/pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="invisible"
+                            android:layout_marginEnd="@dimen/guideline_screen_edge_left_right_distance_half"
+                            android:layout_toLeftOf="@+id/play_stop"
+                            android:background="@drawable/ic_pause_black_24dp" />
+
+                        <ImageButton
                             android:id="@+id/edit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
