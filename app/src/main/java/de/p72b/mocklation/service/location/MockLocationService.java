@@ -8,7 +8,6 @@ import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -96,10 +95,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                     mNotifyBuilder.setColor(getResources().getColor(R.color.mouth));
                     mNotifyBuilder.addAction(getPlayAction());
                     mNotifyBuilder.addAction(getStopAction());
-                    if (mMockLocationUpdateInterval != null && !mMockLocationUpdateInterval.isDisposed()) {
-                        mMockLocationUpdateInterval.dispose();
-                        mDisposables.remove(mMockLocationUpdateInterval);
-                    }
+                    pause();
                     mNotificationManager.notify(
                             NOTIFICATION_ID,
                             mNotifyBuilder.build());
@@ -110,8 +106,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                     mNotifyBuilder.setColor(getResources().getColor(R.color.dark_green));
                     mNotifyBuilder.addAction(getPauseAction());
                     mNotifyBuilder.addAction(getStopAction());
-                    mMockLocationUpdateInterval = getUpdateInterval();
-                    mDisposables.add(mMockLocationUpdateInterval);
+                    play();
                     mNotificationManager.notify(
                             NOTIFICATION_ID,
                             mNotifyBuilder.build());
@@ -228,7 +223,6 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         Log.d(TAG, "code: " + code + " hasPermission: " + mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION));
         if (mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 && code != null) {
-            LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, true);
             requestLocationItem(code);
         }
     }
@@ -250,21 +244,14 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         if (mGpsLocationListener != null) {
             mLocationManager.removeUpdates(mGpsLocationListener);
         }
+        mGpsLocationListener = null;
     }
 
-    @SuppressWarnings("MissingPermission")
     private void processLocationItem() {
         Log.d(TAG, "processLocationItem");
         reset();
 
-        mGpsLocationListener = new GpsLocationListener();
-        mLocationManager.requestLocationUpdates(MOCKLOCATION_PROVIDER_NAME, 0, 0, mGpsLocationListener);
-
-        mLocationManager.addTestProvider(MOCKLOCATION_PROVIDER_NAME, false, false,
-                false, false, true, true, true, 0, 5);
-
-        mMockLocationUpdateInterval = getUpdateInterval();
-        mDisposables.add(mMockLocationUpdateInterval);
+        play();
 
         createNotification();
     }
@@ -324,12 +311,6 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                 getString(R.string.action_stop), pendingIntent).build();
     }
 
-    public String getApplicationName() {
-        ApplicationInfo applicationInfo = getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : getString(stringId);
-    }
-
     private void updateNotification(Location location) {
         mNotifyBuilder.setContentText(location.getLatitude() + " / " + location.getLongitude())
                 .setNumber(++mNumMessages);
@@ -353,7 +334,27 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                 .subscribeWith(new LocationUpdateInterval());
     }
 
-    private void pauseService() {
+    @SuppressWarnings("MissingPermission")
+    private void play() {
+        LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, true);
+
+        mGpsLocationListener = new GpsLocationListener();
+
+        mLocationManager.requestLocationUpdates(MOCKLOCATION_PROVIDER_NAME, 0, 0, mGpsLocationListener);
+        mLocationManager.addTestProvider(MOCKLOCATION_PROVIDER_NAME, false, false,
+                false, false, true, true, true, 0, 5);
+
+        mMockLocationUpdateInterval = getUpdateInterval();
+        mDisposables.add(mMockLocationUpdateInterval);
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void pause() {
+        LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, false);
+
+        mLocationManager.removeUpdates(mGpsLocationListener);
+        mLocationManager.removeTestProvider(MOCKLOCATION_PROVIDER_NAME);
+
         if (mMockLocationUpdateInterval != null && !mMockLocationUpdateInterval.isDisposed()) {
             mMockLocationUpdateInterval.dispose();
             mDisposables.remove(mMockLocationUpdateInterval);
