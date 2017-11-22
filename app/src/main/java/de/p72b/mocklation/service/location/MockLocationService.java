@@ -80,6 +80,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private AppDatabase mDb;
     private Disposable mDisposableFindByCode;
     private LocationUpdateInterval mMockLocationUpdateInterval;
+    private LocationItem mLocationItem;
     private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -271,7 +272,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mNumMessages = 0;
         mNotifyBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_location_on_black_24dp)
-                .setContentTitle(getApplicationName());
+                .setContentTitle(mLocationItem.getDisplayedName());
 
         Intent resultIntent = new Intent(this, MainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -384,15 +385,15 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         @Override
         public void accept(LocationItem locationItem) throws Exception {
             mDisposables.remove(mDisposableFindByCode);
-
-            if (locationItem == null) {
+            mLocationItem = locationItem;
+            if (mLocationItem == null) {
                 return;
             }
 
-            Log.d(TAG, " item: " + locationItem.getCode() + "\n" + locationItem.getGeoJson());
+            Log.d(TAG, " item: " + mLocationItem.getCode() + "\n" + mLocationItem.getGeoJson());
 
             // parse geojson feature
-            LocationItemFeature feature = locationItem.deserialize();
+            LocationItemFeature feature = mLocationItem.deserialize();
 
             switch (feature.getGeoJsonFeature().getGeometry().getType()) {
                 case "Point":
