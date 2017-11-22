@@ -118,7 +118,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                     break;
                 case EVENT_STOP:
                     Log.d(TAG, "Stop service");
-                    onDestroy();
+                    stopService(new Intent(getApplication(), MockLocationService.class));
                     break;
             }
         }
@@ -204,6 +204,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        mSetting.setMockLocationItemCode(null);
         dismissNotification();
 
         reset();

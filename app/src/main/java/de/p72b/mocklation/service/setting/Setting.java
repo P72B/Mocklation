@@ -32,7 +32,7 @@ public class Setting implements ISetting{
         SharedPreferences.Editor edit = mPreferences.edit();
         edit.putFloat(LAST_POSITION_LAT, (float) latitude);
         edit.putFloat(LAST_POSITION_LNG, (float) longitude);
-        edit.commit();
+        edit.apply();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class Setting implements ISetting{
         }
         SharedPreferences.Editor edit = mPreferences.edit();
         edit.putBoolean(permissionKey, decision);
-        edit.commit();
+        edit.apply();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Setting implements ISetting{
         }
         SharedPreferences.Editor edit = mPreferences.edit();
         edit.putString(ACTIVE_MOCK_LOCATION_CODE, code);
-        edit.commit();
+        edit.apply();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Setting implements ISetting{
         }
         SharedPreferences.Editor edit = mPreferences.edit();
         edit.putString(LAST_SELECTED_LOCATION_CODE, code);
-        edit.commit();
+        edit.apply();
     }
 
     @Override

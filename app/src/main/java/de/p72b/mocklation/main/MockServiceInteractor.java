@@ -60,6 +60,9 @@ public class MockServiceInteractor implements IMockServiceInteractor {
                 case MockLocationService.EVENT_STOP:
                     Log.d(TAG, "Stop service");
                     mState = SERVICE_STATE_STOP;
+                    if (mRunningServices.contains(MockLocationService.class)) {
+                        mRunningServices.remove(MockLocationService.class);
+                    }
                     break;
             }
             if (mListener != null) {
@@ -112,7 +115,6 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
     @Override
     public void stopMockLocationService() {
-        mSetting.setMockLocationItemCode(null);
         if (isServiceRunning()) {
             stopMockLocationService(MockLocationService.class);
         }
