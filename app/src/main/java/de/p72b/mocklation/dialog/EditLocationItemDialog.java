@@ -224,7 +224,6 @@ public class EditLocationItemDialog extends DialogFragment {
                 checkUpdateOrCreateMode();
             }
         }, Snackbar.LENGTH_LONG);
-        return;
     }
 
     private void saveItem() {
@@ -294,6 +293,16 @@ public class EditLocationItemDialog extends DialogFragment {
         }
         if (mLongitude.getText().toString().length() == 0) {
             mLongitude.setError(getString(R.string.error_1013));
+            return false;
+        }
+        float latitude = Float.valueOf(mLatitude.getText().toString());
+        float longitude = Float.valueOf(mLongitude.getText().toString());
+        if (latitude > 90 || latitude < -90) {
+            mLatitude.setError(getString(R.string.error_1014));
+            return false;
+        }
+        if (longitude > 180 || longitude < -180) {
+            mLongitude.setError(getString(R.string.error_1015));
             return false;
         }
 

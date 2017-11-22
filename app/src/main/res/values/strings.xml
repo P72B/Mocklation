@@ -36,4 +36,6 @@
     <string name="error_1011">Duplicate name found.</string>
     <string name="error_1012">Couldn`t save location.</string>
     <string name="error_1013">Provide any coordinate.</string>
+    <string name="error_1014">Invalid latitude. Range 90 to -90 degree.</string>
+    <string name="error_1015">Invalid longitude. Range 180 to -180 degree.</string>
 </resources>
