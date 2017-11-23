@@ -93,7 +93,18 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Collections.sort(mDataset, new Comparator<LocationItem>() {
             @Override
             public int compare(LocationItem o1, LocationItem o2) {
-                return o1.getDisplayedName().compareToIgnoreCase(o2.getDisplayedName());
+                boolean equal = o1.isIsFavorite() && o2.isIsFavorite() || !o1.isIsFavorite() && !o2.isIsFavorite();
+                boolean greater = o1.isIsFavorite() && !o2.isIsFavorite();
+                boolean less = !o1.isIsFavorite() && o2.isIsFavorite();
+                int stringCompare = o1.getDisplayedName().compareToIgnoreCase(o2.getDisplayedName());
+
+                if (equal) {
+                    return stringCompare;
+                } else if (greater) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         });
         notifyDataSetChanged();
