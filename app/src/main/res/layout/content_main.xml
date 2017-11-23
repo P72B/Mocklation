@@ -132,7 +132,7 @@
                             android:layout_height="wrap_content"
                             android:visibility="invisible"
                             android:layout_marginEnd="@dimen/guideline_screen_edge_left_right_distance_half"
-                            android:layout_toLeftOf="@+id/play_stop"
+                            android:layout_toStartOf="@+id/play_stop"
                             android:background="@drawable/ic_pause_black_24dp" />
 
                         <ImageButton
@@ -142,6 +142,14 @@
                             android:layout_alignParentStart="true"
                             android:layout_marginEnd="@dimen/guideline_screen_edge_left_right_distance_half"
                             android:background="@drawable/ic_edit_black_24dp" />
+
+                        <ImageButton
+                            android:id="@+id/favorite"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@id/edit"
+                            android:layout_marginEnd="@dimen/guideline_screen_edge_left_right_distance_half"
+                            android:background="@drawable/ic_favorite_border_black_24dp" />
                     </RelativeLayout>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
@@ -156,7 +164,7 @@
                 android:layout_marginStart="15dp"
                 android:textAllCaps="true"
                 android:layout_marginTop="15dp"
-                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:text="@string/location_list_title" />
 
             <android.support.v7.widget.RecyclerView

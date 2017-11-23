@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     private Animation mFadeOutAnimation;
     private VisibilityAnimationListener mFadeOutListener = new VisibilityAnimationListener();
     private VisibilityAnimationListener mFadeInListener = new VisibilityAnimationListener();
+    private ImageButton mFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +102,12 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     public void selectLocation(LocationItem item) {
         mSelectedLocationName.setText(LocationItem.getNameToBeDisplayed(item));
         LocationItemFeature feature = item.deserialize();
+
+        if (item.isIsFavorite()) {
+            mFavorite.setBackground(getDrawable(R.drawable.ic_favorite_black_24dp));
+        } else {
+            mFavorite.setBackground(getDrawable(R.drawable.ic_favorite_border_black_24dp));
+        }
 
         switch (feature.getGeoJsonFeature().getGeometry().getType()) {
             case "Point":
@@ -213,6 +220,9 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         mButtonPausePlay = findViewById(R.id.pause);
         mButtonPausePlay.setOnClickListener(this);
+
+        mFavorite = findViewById(R.id.favorite);
+        mFavorite.setOnClickListener(this);
 
         findViewById(R.id.edit).setOnClickListener(this);
 

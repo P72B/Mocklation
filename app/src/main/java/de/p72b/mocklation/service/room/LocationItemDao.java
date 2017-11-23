@@ -34,5 +34,5 @@ public interface LocationItemDao {
     void delete(LocationItem locationItem);
 
     @Update
-    public void updateLocationItems(LocationItem... locationItems);
+    void updateLocationItems(LocationItem... locationItems);
 }

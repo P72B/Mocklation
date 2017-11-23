@@ -39,6 +39,9 @@ public class LocationItem implements Parcelable {
     @ColumnInfo(name = "speed")
     private int mSpeed;
 
+    @ColumnInfo(name = "favorite")
+    private boolean mIsFavorite;
+
     public static final Parcelable.Creator<LocationItem> CREATOR = new Parcelable.Creator<LocationItem>() {
         public LocationItem createFromParcel(Parcel in) {
             return new LocationItem(in);
@@ -49,12 +52,14 @@ public class LocationItem implements Parcelable {
         }
     };
 
-    public LocationItem(@NonNull String code, String displayedName, String geoJson, int accuracy, int speed) {
+    public LocationItem(@NonNull String code, @NonNull String displayedName,
+                        @NonNull String geoJson, int accuracy, int speed) {
         mCode = code;
         mDisplayedName = displayedName;
         mGeoJson = geoJson;
         mAccuracy = accuracy;
         mSpeed = speed;
+        mIsFavorite = false;
     }
 
     public String getCode() {
@@ -95,6 +100,14 @@ public class LocationItem implements Parcelable {
 
     public void setSpeed(int speed) {
         mSpeed = speed;
+    }
+
+    public boolean isIsFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setIsFavorite(boolean isFavorite) {
+        mIsFavorite = isFavorite;
     }
 
     public LocationItemFeature deserialize() throws JsonParseException {

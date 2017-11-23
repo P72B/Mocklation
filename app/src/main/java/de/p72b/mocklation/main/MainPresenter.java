@@ -37,6 +37,7 @@ public class MainPresenter implements IMainPresenter {
     private Disposable mDisposableInsertAll;
     private LocationItem mSelectedItem;
     private Disposable mDisposableGetAll;
+    private Disposable mDisposableUpdateItem;
     private List<LocationItem> mLocationItems;
 
     MainPresenter(FragmentActivity activity, ISetting setting) {
@@ -116,6 +117,9 @@ public class MainPresenter implements IMainPresenter {
                 break;
             case R.id.edit:
                 showEditLocationItemDialog();
+                break;
+            case R.id.favorite:
+                onFavoriteClicked();
                 break;
         }
     }
@@ -250,7 +254,7 @@ public class MainPresenter implements IMainPresenter {
 
     private void onPauseClicked() {
         if (mSetting.getMockLocationItemCode() != null) {
-            switch(mMockServiceInteractor.getState()) {
+            switch (mMockServiceInteractor.getState()) {
                 case MockServiceInteractor.SERVICE_STATE_RUNNING:
                     mMockServiceInteractor.pauseMockLocationService();
                     break;
@@ -296,6 +300,46 @@ public class MainPresenter implements IMainPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new LocationItemObserver());
         mDisposables.add(mDisposableGetAll);
+    }
+
+    private void onFavoriteClicked() {
+        mSelectedItem.setIsFavorite(!mSelectedItem.isIsFavorite());
+        updateItem(mSelectedItem);
+    }
+
+    private void updateItem(final LocationItem item) {
+        Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                mDb.locationItemDao().updateLocationItems(item);
+            }
+        })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable disposable) {
+                        mDisposableUpdateItem = disposable;
+                        mDisposables.add(mDisposableUpdateItem);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        mDisposables.remove(mDisposableUpdateItem);
+                        handleLocationItems(mLocationItems);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mView.showSnackbar(R.string.error_1012, R.string.snackbar_action_retry,
+                                new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        updateItem(item);
+                                    }
+                                }, Snackbar.LENGTH_LONG);
+                    }
+                });
     }
 
     private class LocationItemObserver implements Consumer<List<LocationItem>> {
