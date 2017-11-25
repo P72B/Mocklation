@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Mocklation</string>
+    <string name="app_name" translatable="false">Mocklation</string>
     <string name="error_missing_location_to_start_service">Please select a location</string>
     <string name="title_activity_main">Fixed mode</string>
     <string name="action_settings">Settings</string>

@@ -21,23 +21,22 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-
 ext {
     // version numbers
-    appVersionName = '10.7.3'
-    appersionCode = 305
+    appVersionName = '0.9.0'
+    appVersionCode = 10
 
     appMinSdk = 21
-    appCompileSdk = 26
+    appCompileSdk = 27
     appBuildTools = "25.0.2"
 
-    supportLibVersion = "27.0.0"
-    playServicesVersion = "11.4.2"
+    supportLibVersion = "27.0.1"
+    playServicesVersion = "11.6.0"
     gsonVersion = "2.8.1"
     mapsUtilsVersion = "0.4.3"
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
-    roomVersion = '1.0.0-rc1'
+    roomVersion = '1.0.0'
 
     rxjavaVersion = "2.1.2"
     rxandroidVersion = "2.0.1"

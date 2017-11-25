@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private LinearLayoutManager mLayoutManager;
     private LocationListAdapter mAdapter = new LocationListAdapter(new AdapterListener());
     private IMainPresenter mPresenter;
     private TextView mSelectedLocationName;
@@ -193,6 +193,11 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getString(R.string.title_activity_main));
+        }
+
         mDataView = findViewById(R.id.data_view);
         mDataEmpty = findViewById(R.id.data_empty);
         mDataView.setVisibility(View.INVISIBLE);
@@ -207,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         mRecyclerView = findViewById(R.id.location_list);
         mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
