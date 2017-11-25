@@ -1,5 +1,6 @@
 package de.p72b.mocklation.dialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.arch.persistence.room.EmptyResultSetException;
 import android.arch.persistence.room.Room;
@@ -117,7 +118,7 @@ public class EditLocationItemDialog extends DialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mRootView = view;
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -155,19 +156,26 @@ public class EditLocationItemDialog extends DialogFragment {
         mLongitude.addTextChangedListener(new SimpleTextWatcher(mLongitude));
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
 
-        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.requestFeature(Window.FEATURE_NO_TITLE);
+            window.setBackgroundDrawable(new ColorDrawable(0));
+        }
         return dialog;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        getActivity().getMenuInflater().inflate(R.menu.menu_dialog_edit_location_item, menu);
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.getMenuInflater().inflate(R.menu.menu_dialog_edit_location_item, menu);
+        }
     }
 
     @Override
@@ -250,32 +258,7 @@ public class EditLocationItemDialog extends DialogFragment {
         })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable disposable) {
-                        mDisposableInsertAll = disposable;
-                        mDisposables.add(mDisposableInsertAll);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mDisposables.remove(mDisposableInsertAll);
-                        if (mListener != null) {
-                            mListener.onPositiveClick(mLocationItem);
-                        }
-                        dismiss();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                saveItem();
-                            }
-                        }, Snackbar.LENGTH_LONG);
-                    }
-                });
+                .subscribe(new SaveLocationItemObserver());
     }
 
     public void setListener(EditLocationItemDialogListener listener) {
@@ -343,32 +326,7 @@ public class EditLocationItemDialog extends DialogFragment {
         })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable disposable) {
-                        mDisposableUpdateItem = disposable;
-                        mDisposables.add(mDisposableUpdateItem);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mDisposables.remove(mDisposableUpdateItem);
-                        if (mListener != null) {
-                            mListener.onPositiveClick(mLocationItem);
-                        }
-                        dismiss();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                updateItem();
-                            }
-                        }, Snackbar.LENGTH_LONG);
-                    }
-                });
+                .subscribe(new UpdateLocationItemObserver());
     }
 
     public interface EditLocationItemDialogListener {
@@ -429,6 +387,60 @@ public class EditLocationItemDialog extends DialogFragment {
         public void accept(LocationItem locationItem) throws Exception {
             mDisposables.remove(mDisposableFindByCode);
             updateItem();
+        }
+    }
+
+    private class SaveLocationItemObserver implements CompletableObserver {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+            mDisposableInsertAll = disposable;
+            mDisposables.add(mDisposableInsertAll);
+        }
+
+        @Override
+        public void onComplete() {
+            mDisposables.remove(mDisposableInsertAll);
+            if (mListener != null) {
+                mListener.onPositiveClick(mLocationItem);
+            }
+            dismiss();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    saveItem();
+                }
+            }, Snackbar.LENGTH_LONG);
+        }
+    }
+
+    private class UpdateLocationItemObserver implements CompletableObserver {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+            mDisposableUpdateItem = disposable;
+            mDisposables.add(mDisposableUpdateItem);
+        }
+
+        @Override
+        public void onComplete() {
+            mDisposables.remove(mDisposableUpdateItem);
+            if (mListener != null) {
+                mListener.onPositiveClick(mLocationItem);
+            }
+            dismiss();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            showSnackbar(R.string.error_1012, R.string.snackbar_action_retry, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    updateItem();
+                }
+            }, Snackbar.LENGTH_LONG);
         }
     }
 }

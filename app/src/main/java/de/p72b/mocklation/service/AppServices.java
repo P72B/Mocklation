@@ -15,7 +15,7 @@ import de.p72b.mocklation.service.setting.Setting;
 
 public final class AppServices {
 
-    public static final String WEB_SERVICE = "WEB_SERVICE";
+    private static final String WEB_SERVICE = "WEB_SERVICE";
     public static final String SETTINGS = "SETTINGS";
     public static final String PERMISSIONS = "PERMISSIONS";
     public static final String LOCATION = "LOCATION";

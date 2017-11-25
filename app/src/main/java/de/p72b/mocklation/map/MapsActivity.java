@@ -6,6 +6,7 @@ import java.util.Calendar;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.support.animation.DynamicAnimation;
@@ -65,20 +66,19 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private ILocationService mLocationService;
     private ISetting mSetting;
     private Marker mLocationMarker;
-    private FloatingActionButton mFabActionSave;
     private FloatingActionButton mFabActionLocation;
     private BottomSheetBehavior<View> mBottomSheetBehavior;
     private TextView mTstamp;
     private View mBottomSheet;
     private View mBottomSheetHeader;
     private boolean mIsDark;
-    private boolean mShouldMarkerDisapperOnHideBottomSheet;
+    private boolean mShouldMarkerDisappearOnHideBottomSheet;
     private TextView mBottomSheetSubTitleText;
     private TextView mBottomSheetTitleText;
     private boolean mInitCameraPositionSet = false;
     private boolean mOnInitialLocationDetermined = false;
-    private int mMyLocatioNotCenterColor;
-    private int mMyLocatioCenterColor;
+    private int mMyLocationNotCenterColor;
+    private int mMyLocationCenterColor;
     private View mBottomSheetTitleTextProgressBar;
     private Animation mFadeInAnimation;
     private Animation mFadeOutAnimation;
@@ -103,7 +103,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
 
-        mPresenter = new MapsPresenter(this, mPermissionService, mSetting);
+        mPresenter = new MapsPresenter(this);
     }
 
     @Override
@@ -205,7 +205,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private void removeMarker() {
         mPresenter.removeMarker();
         if (mLocationMarker != null) {
-            AppUtil.removeMarkerAnimated(mLocationMarker, MARKER_REMOVE_MILLISECONDS, 0);
+            AppUtil.removeMarkerAnimated(mLocationMarker, MARKER_REMOVE_MILLISECONDS);
             mLocationMarker = null;
         }
     }
@@ -341,7 +341,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     private void setFollowGps(boolean followGps) {
-        int color = followGps ? mMyLocatioCenterColor : mMyLocatioNotCenterColor;
+        int color = followGps ? mMyLocationCenterColor : mMyLocationNotCenterColor;
         DrawableCompat.setTint(mFabActionLocation.getDrawable(), color);
     }
 
@@ -382,15 +382,15 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mapFragment.getMapAsync(this);
 
         mFabWrapper = findViewById(R.id.fabs_wrapper);
-        mFabActionSave = findViewById(R.id.save);
-        mFabActionSave.setOnClickListener(this);
+        findViewById(R.id.save).setOnClickListener(this);
         mFabActionLocation = findViewById(R.id.location);
         mFabActionLocation.setOnClickListener(this);
 
-        mMyLocatioNotCenterColor = ContextCompat.getColor(this, R.color.eye);
-        mMyLocatioCenterColor = ContextCompat.getColor(this, R.color.colorAccent);
+        mMyLocationNotCenterColor = ContextCompat.getColor(this, R.color.eye);
+        mMyLocationCenterColor = ContextCompat.getColor(this, R.color.colorAccent);
 
         findViewById(R.id.touch_overlay).setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 setFollowGps(false);
@@ -558,14 +558,14 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 }
 
                 if (slideOffset >= 0) {
-                    mShouldMarkerDisapperOnHideBottomSheet = true;
+                    mShouldMarkerDisappearOnHideBottomSheet = true;
                 }
 
                 if (slideOffset == -1) {
-                    if (mShouldMarkerDisapperOnHideBottomSheet) {
+                    if (mShouldMarkerDisappearOnHideBottomSheet) {
                         mBottomSheet.setVisibility(View.GONE);
                         removeMarker();
-                        mShouldMarkerDisapperOnHideBottomSheet = false;
+                        mShouldMarkerDisappearOnHideBottomSheet = false;
                     }
                 }
             }

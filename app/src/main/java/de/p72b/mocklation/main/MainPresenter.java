@@ -46,31 +46,7 @@ public class MainPresenter implements IMainPresenter {
         mView = (IMainView) activity;
         mSetting = setting;
         mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
-        mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting, new MockServiceInteractor.MockServiceListener() {
-            @Override
-            public void onStart() {
-                Log.d(TAG, "MockServiceListener onStart()");
-                mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
-            }
-
-            @Override
-            public void onStop() {
-                Log.d(TAG, "MockServiceListener onStop()");
-                mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
-            }
-
-            @Override
-            public void onError() {
-                Log.d(TAG, "MockServiceListener onError()");
-
-            }
-
-            @Override
-            public void onUpdate() {
-                Log.d(TAG, "MockServiceListener onUpdate()");
-                mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
-            }
-        });
+        mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting, new MockServiceListener());
 
         mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
     }
@@ -150,38 +126,7 @@ public class MainPresenter implements IMainPresenter {
         })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable disposable) {
-                        mDisposableDeleteItem = disposable;
-                        mDisposables.add(mDisposableDeleteItem);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mDisposables.remove(mDisposableDeleteItem);
-                        mLocationItems.remove(item);
-                        handleLocationItems(mLocationItems);
-                        mView.showSnackbar(R.string.message_location_item_removed,
-                                R.string.snackbar_action_undo, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        saveLocationItem(item);
-                                    }
-                                }, Snackbar.LENGTH_LONG);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showSnackbar(R.string.error_1008,
-                                R.string.snackbar_action_retry, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        locationItemRemoved(item);
-                                    }
-                                }, Snackbar.LENGTH_LONG);
-                    }
-                });
+                .subscribe(new DeleteLocationItemObserver(item));
     }
 
     @Override
@@ -198,31 +143,7 @@ public class MainPresenter implements IMainPresenter {
         })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable disposable) {
-                        mDisposableInsertAll = disposable;
-                        mDisposables.add(mDisposableInsertAll);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mDisposables.remove(mDisposableInsertAll);
-                        mLocationItems.add(item);
-                        handleLocationItems(mLocationItems);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showSnackbar(R.string.error_1009,
-                                R.string.snackbar_action_retry, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        saveLocationItem(item);
-                                    }
-                                }, Snackbar.LENGTH_LONG);
-                    }
-                });
+                .subscribe(new SaveLocationItemObserver(item));
     }
 
     private void handleLocationItems(List<LocationItem> locationItems) {
@@ -261,6 +182,9 @@ public class MainPresenter implements IMainPresenter {
                 case MockServiceInteractor.SERVICE_STATE_PAUSE:
                     mMockServiceInteractor.playMockLocationService();
                     break;
+                case MockServiceInteractor.SERVICE_STATE_STOP:
+                    // nothing to do here
+                    break;
             }
             mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
         }
@@ -298,7 +222,7 @@ public class MainPresenter implements IMainPresenter {
         mDisposableGetAll = mDb.locationItemDao().getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new LocationItemObserver());
+                .subscribe(new FetchAllLocationItemObserver());
         mDisposables.add(mDisposableGetAll);
     }
 
@@ -316,37 +240,135 @@ public class MainPresenter implements IMainPresenter {
         })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable disposable) {
-                        mDisposableUpdateItem = disposable;
-                        mDisposables.add(mDisposableUpdateItem);
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mDisposables.remove(mDisposableUpdateItem);
-                        handleLocationItems(mLocationItems);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mView.showSnackbar(R.string.error_1012, R.string.snackbar_action_retry,
-                                new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        updateItem(item);
-                                    }
-                                }, Snackbar.LENGTH_LONG);
-                    }
-                });
+                .subscribe(new UpdateLocationItemObserver(item));
     }
 
-    private class LocationItemObserver implements Consumer<List<LocationItem>> {
+    private class FetchAllLocationItemObserver implements Consumer<List<LocationItem>> {
         @Override
         public void accept(List<LocationItem> locationItems) throws Exception {
             handleLocationItems(locationItems);
             mDisposables.remove(mDisposableGetAll);
+        }
+    }
+
+    private class UpdateLocationItemObserver implements CompletableObserver {
+        private final LocationItem mItem;
+
+        UpdateLocationItemObserver(LocationItem item) {
+            mItem = item;
+        }
+
+        @Override
+        public void onSubscribe(Disposable disposable) {
+            mDisposableUpdateItem = disposable;
+            mDisposables.add(mDisposableUpdateItem);
+        }
+
+        @Override
+        public void onComplete() {
+            mDisposables.remove(mDisposableUpdateItem);
+            handleLocationItems(mLocationItems);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            mView.showSnackbar(R.string.error_1012, R.string.snackbar_action_retry,
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            updateItem(mItem);
+                        }
+                    }, Snackbar.LENGTH_LONG);
+        }
+    }
+
+    private class SaveLocationItemObserver implements CompletableObserver {
+        private final LocationItem mItem;
+
+        SaveLocationItemObserver(LocationItem item) {
+            mItem = item;
+        }
+
+        @Override
+        public void onSubscribe(Disposable disposable) {
+            mDisposableInsertAll = disposable;
+            mDisposables.add(mDisposableInsertAll);
+        }
+
+        @Override
+        public void onComplete() {
+            mDisposables.remove(mDisposableInsertAll);
+            mLocationItems.add(mItem);
+            handleLocationItems(mLocationItems);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            mView.showSnackbar(R.string.error_1009,
+                    R.string.snackbar_action_retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            saveLocationItem(mItem);
+                        }
+                    }, Snackbar.LENGTH_LONG);
+        }
+    }
+
+    private class DeleteLocationItemObserver implements CompletableObserver {
+        private final LocationItem mItem;
+
+        DeleteLocationItemObserver(LocationItem item) {
+            mItem = item;
+        }
+        @Override
+        public void onSubscribe(Disposable disposable) {
+            mDisposableDeleteItem = disposable;
+            mDisposables.add(mDisposableDeleteItem);
+        }
+
+        @Override
+        public void onComplete() {
+            mDisposables.remove(mDisposableDeleteItem);
+            mLocationItems.remove(mItem);
+            handleLocationItems(mLocationItems);
+            mView.showSnackbar(R.string.message_location_item_removed,
+                    R.string.snackbar_action_undo, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            saveLocationItem(mItem);
+                        }
+                    }, Snackbar.LENGTH_LONG);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            mView.showSnackbar(R.string.error_1008,
+                    R.string.snackbar_action_retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            locationItemRemoved(mItem);
+                        }
+                    }, Snackbar.LENGTH_LONG);
+        }
+    }
+
+    private class MockServiceListener implements MockServiceInteractor.MockServiceListener {
+        @Override
+        public void onStart() {
+            Log.d(TAG, "MockServiceListener onStart()");
+            mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
+        }
+
+        @Override
+        public void onStop() {
+            Log.d(TAG, "MockServiceListener onStop()");
+            mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
+        }
+
+        @Override
+        public void onUpdate() {
+            Log.d(TAG, "MockServiceListener onUpdate()");
+            mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
         }
     }
 }

@@ -38,7 +38,6 @@ public interface ILocationService {
      *
      * @return Location holding last permanently saved location.
      */
-    @NonNull
     Location getRestoredLocation();
 
     /**
@@ -77,7 +76,7 @@ public interface ILocationService {
         /**
          * Emit when the first location of GoogleApiClient FusedLocation was found.
          *
-         * @param location
+         * @param location It Location
          */
         void onInitialLocationDetermined(Location location);
 

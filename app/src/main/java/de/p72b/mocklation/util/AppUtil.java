@@ -2,14 +2,12 @@ package de.p72b.mocklation.util;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -27,7 +25,7 @@ public class AppUtil {
     private static final String COORDINATE_DECIMAL_FORMAT = "%.6f";
 
 
-    public static final String createLocationItemCode(LatLng latLng) {
+    public static String createLocationItemCode(LatLng latLng) {
         return latLng.latitude + "_" + latLng.longitude + "_" + Calendar.getInstance().getTimeInMillis();
     }
 
@@ -56,13 +54,13 @@ public class AppUtil {
         return roundedLatLng.latitude + " / " + roundedLatLng.longitude;
     }
 
-    public static String timeZone() {
+    private static String timeZone() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"), Locale.getDefault());
-        String   timeZone = new SimpleDateFormat("Z").format(calendar.getTime());
+        String   timeZone = new SimpleDateFormat("Z", Locale.getDefault()).format(calendar.getTime());
         return timeZone.substring(0, 3) + ":"+ timeZone.substring(3, 5);
     }
 
-    public static void removeMarkerAnimated(final Marker marker, final long duration, long delay) {
+    public static void removeMarkerAnimated(final Marker marker, final long duration) {
         // Animate marker
         ValueAnimator valueAnimator = new ValueAnimator();
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -93,7 +91,7 @@ public class AppUtil {
         });
         valueAnimator.setFloatValues(0, 1); // Ignored.
         valueAnimator.setDuration(duration);
-        valueAnimator.setStartDelay(delay);
+        valueAnimator.setStartDelay((long) 0);
         valueAnimator.start();
     }
 
@@ -127,11 +125,11 @@ public class AppUtil {
      * @param bundle The bundle to create a String from.
      * @return String describing the given bundle.
      */
-    public static String toString(Bundle bundle) {
+    private static String toString(Bundle bundle) {
         if (bundle == null || bundle.isEmpty()) {
             return null;
         }
-        final StringBuffer strBuf = new StringBuffer();
+        final StringBuilder strBuf = new StringBuilder();
         final Set<String> keys = bundle.keySet();
         Object value;
         for (String key : keys) {
@@ -159,16 +157,14 @@ public class AppUtil {
      * @return String describing the given intent.
      */
     public static String toString(Intent intent) {
-        final StringBuffer strBuf = new StringBuffer();
-        strBuf.append("Intent:\n");
-        strBuf.append("-------\n");
-        strBuf.append("Action:\n");
-        strBuf.append(intent.getAction());
-        strBuf.append("Data:\n");
-        strBuf.append(intent.getDataString());
-        strBuf.append("Bundle:\n");
-        strBuf.append(toString(intent.getExtras()));
-        return strBuf.toString();
+        return "Intent:\n" +
+                "-------\n" +
+                "Action:\n" +
+                intent.getAction() +
+                "Data:\n" +
+                intent.getDataString() +
+                "Bundle:\n" +
+                toString(intent.getExtras());
     }
     /**
      * Registers a given {@link BroadcastReceiver} to a list of actions.

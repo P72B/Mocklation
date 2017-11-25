@@ -10,7 +10,7 @@ public class Setting implements ISetting{
 
     private static final String TAG = Setting.class.getSimpleName();
 
-    public static final String PERMISSION_LOCATION = "PERMISSION_LOCATION";
+    private static final String PERMISSION_LOCATION = "PERMISSION_LOCATION";
 
     private static final String SHARED_PREFS_FILE = "omagu.settings";
     private static final String LAST_POSITION_LAT = "LAST_POSITION_LAT";
@@ -47,10 +47,8 @@ public class Setting implements ISetting{
 
     @Override
     public boolean getPermissionDecision(String permission) {
-        if (mPreferences == null) {
-            return false;
-        }
-        return mPreferences.getBoolean(resolvePermissionPreferencesKey(permission), false);
+        return mPreferences != null && mPreferences.getBoolean(
+                resolvePermissionPreferencesKey(permission), false);
     }
 
     @Nullable

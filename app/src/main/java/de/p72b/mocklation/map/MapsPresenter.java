@@ -37,8 +37,6 @@ import io.reactivex.disposables.CompositeDisposable;
 public class MapsPresenter implements IMapsPresenter {
 
     private static final String TAG = MapsPresenter.class.getSimpleName();
-    private final IPermissionService mPermissionService;
-    private final boolean mIsLargeLayout;
     private IMapsView mView;
     private FragmentActivity mActivity;
     private Pair<String, LocationItem> mOnTheMapItemPair;
@@ -47,15 +45,13 @@ public class MapsPresenter implements IMapsPresenter {
     private Address mAddressOutput;
     private AddressResultReceiver mResultReceiver;
 
-    MapsPresenter(FragmentActivity activity, IPermissionService permissionService, ISetting setting) {
+    MapsPresenter(FragmentActivity activity) {
         Log.d(TAG, "new MapsPresenter");
         mActivity = activity;
         mView = (IMapsView) activity;
-        mPermissionService = permissionService;
         mAddressRequested = false;
         mAddressOutput = null;
         mResultReceiver = new AddressResultReceiver(new Handler());
-        mIsLargeLayout = mActivity.getResources().getBoolean(R.bool.large_layout);
 
         updateUIWidgets();
     }
@@ -183,13 +179,6 @@ public class MapsPresenter implements IMapsPresenter {
 
     private void updateUIWidgets() {
         mView.setAddressProgressbarVisibility(mAddressRequested ? ProgressBar.VISIBLE : ProgressBar.GONE);
-    }
-
-    private void closeEditLocationItemDialog() {
-        EditLocationItemDialog dialogFragment = EditLocationItemDialog.findOnStack(mActivity.getSupportFragmentManager());
-        if (dialogFragment != null) {
-            dialogFragment.dismiss();
-        }
     }
 
     private class AddressResultReceiver extends ResultReceiver {

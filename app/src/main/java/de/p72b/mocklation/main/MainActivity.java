@@ -3,6 +3,7 @@ package de.p72b.mocklation.main;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -80,7 +81,8 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult requestCode: " + requestCode);
         switch (requestCode) {
             case MockServiceInteractor.PERMISSIONS_MOCKING: {

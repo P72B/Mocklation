@@ -102,9 +102,10 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     return stringCompare;
                 } else if (greater) {
                     return -1;
-                } else {
+                } else if (less){
                     return 1;
                 }
+                return 0;
             }
         });
         notifyDataSetChanged();

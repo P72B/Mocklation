@@ -86,7 +86,7 @@ public class LocationItem implements Parcelable {
         mGeoJson = geoJson;
     }
 
-    public int getAccuracy() {
+    int getAccuracy() {
         return mAccuracy;
     }
 
@@ -94,7 +94,7 @@ public class LocationItem implements Parcelable {
         mAccuracy = accuracy;
     }
 
-    public int getSpeed() {
+    int getSpeed() {
         return mSpeed;
     }
 

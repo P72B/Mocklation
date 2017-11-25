@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 
 public final class MocklationApp extends Application {
     @SuppressLint("StaticFieldLeak")
-    @NonNull
     private static MocklationApp sInstance;
     private MocklationComponent mainComponent;
 

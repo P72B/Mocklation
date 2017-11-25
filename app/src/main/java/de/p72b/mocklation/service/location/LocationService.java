@@ -33,7 +33,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
     private static final long FASTEST_INTERVAL = 1_000 * 2; // 2 seconds
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
     private static final int DELAY_FOR_RETRY_LAST_KNOWN_LOCATION = 1; // 1 second
-    public static final int PERMISSION_REQUEST_CODE = 97;
+    private static final int PERMISSION_REQUEST_CODE = 97;
 
     @Nullable
     private GoogleApiClient mGoogleApiClient;
@@ -107,7 +107,6 @@ public class LocationService implements ILocationService, LocationListener, Goog
         return mLastKnownLocation;
     }
 
-    @NonNull
     @Override
     public Location getRestoredLocation() {
         return null;

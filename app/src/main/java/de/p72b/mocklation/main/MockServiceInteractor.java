@@ -214,6 +214,9 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
     private boolean isServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        if (manager == null) {
+            return false;
+        }
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 return true;
@@ -248,7 +251,7 @@ public class MockServiceInteractor implements IMockServiceInteractor {
                 isMockLocation = !android.provider.Settings.Secure.getString(mContext.getContentResolver(), "mock_location").equals("0");
             }
         } catch (Exception e) {
-            return isMockLocation;
+            return false;
         }
         return isMockLocation;
     }
@@ -261,7 +264,6 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     public interface MockServiceListener {
         void onStart();
         void onStop();
-        void onError();
         void onUpdate();
     }
 
