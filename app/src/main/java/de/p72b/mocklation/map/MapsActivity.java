@@ -3,6 +3,7 @@ package de.p72b.mocklation.map;
 import android.Manifest;
 
 import java.util.Calendar;
+import java.util.List;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
@@ -49,6 +50,7 @@ import de.p72b.mocklation.BaseActivity;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.location.ILocationService;
+import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
 
@@ -159,7 +161,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                //mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 mPresenter.onMarkerClicked(marker);
                 return true;
             }
@@ -195,34 +197,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mTopMapPadding = (int) getResources().getDimension(R.dimen.map_top_padding);
         adjustMapLogoPadding(-1);
         mPresenter.onMapReady();
-    }
-
-    private void hideComponents() {
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        removeMarker();
-    }
-
-    private void removeMarker() {
-        mPresenter.removeMarker();
-        if (mLocationMarker != null) {
-            AppUtil.removeMarkerAnimated(mLocationMarker, MARKER_REMOVE_MILLISECONDS);
-            mLocationMarker = null;
-        }
-    }
-
-    private void tryToInitCameraPostion() {
-        Log.d(TAG, "tryToInitCameraPostion mInitCameraPositionSet: " + mInitCameraPositionSet);
-        if (mInitCameraPositionSet || mMap == null) {
-            return;
-        }
-
-        Location location = mLocationService.getLastKnownLocation();
-        if (location != null) {
-            Log.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
-            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 15.0f));
-            mInitCameraPositionSet = true;
-        }
     }
 
     @Override
@@ -263,24 +237,57 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void selectLocation(LatLng latLng, String id, float zoom) {
-        if (mLocationMarker != null) {
-            mLocationMarker.remove();
+    public void showBottomSheet(LocationItem item) {
+        Object geometry = item.getGeometry();
+        if (!(geometry instanceof LatLng)) {
+            return;
         }
 
-        mLocationMarker = mMap.addMarker(
-                new MarkerOptions()
-                        .position(latLng)
-                        .icon(BitmapDescriptorFactory.fromResource(
-                                R.drawable.ic_new_location))
-        );
-        mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
+        mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates((LatLng) geometry));
         mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
         mBottomSheet.setVisibility(View.VISIBLE);
         if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
             return;
         }
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    @Override
+    public void addNewMarker(LocationItem item) {
+        Object geometry = item.getGeometry();
+        if (!(geometry instanceof LatLng)) {
+            return;
+        }
+        if (mLocationMarker != null) {
+            mLocationMarker.remove();
+        }
+
+        mLocationMarker = mMap.addMarker(
+                new MarkerOptions()
+                        .position((LatLng) geometry)
+                        .icon(BitmapDescriptorFactory.fromResource(
+                                R.drawable.ic_new_location))
+        );
+        mLocationMarker.setTag(item);
+        showBottomSheet(item);
+    }
+
+    @Override
+    public void addMarkers(List<LocationItem> items) {
+        for (LocationItem item : items) {
+            Object geometry = item.getGeometry();
+            if (!(geometry instanceof LatLng)) {
+                continue;
+            }
+
+            Marker marker = mMap.addMarker(
+                    new MarkerOptions()
+                            .position((LatLng) geometry)
+                            .icon(BitmapDescriptorFactory.fromResource(
+                                    R.drawable.ic_new_location))
+            );
+            marker.setTag(item);
+        }
     }
 
     @Override
@@ -337,6 +344,34 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             Toast.makeText(this, "keyboard visible", Toast.LENGTH_SHORT).show();
         } else if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES) {
             Toast.makeText(this, "keyboard hidden", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void hideComponents() {
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        removeMarker();
+    }
+
+    private void removeMarker() {
+        mPresenter.removeMarker();
+        if (mLocationMarker != null) {
+            AppUtil.removeMarkerAnimated(mLocationMarker, MARKER_REMOVE_MILLISECONDS);
+            mLocationMarker = null;
+        }
+    }
+
+    private void tryToInitCameraPostion() {
+        Log.d(TAG, "tryToInitCameraPostion mInitCameraPositionSet: " + mInitCameraPositionSet);
+        if (mInitCameraPositionSet || mMap == null) {
+            return;
+        }
+
+        Location location = mLocationService.getLastKnownLocation();
+        if (location != null) {
+            Log.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
+            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 15.0f));
+            mInitCameraPositionSet = true;
         }
     }
 

@@ -1,5 +1,6 @@
 package de.p72b.mocklation.map;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -23,16 +24,20 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
 import de.p72b.mocklation.service.geocoder.Constants;
 import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
-import de.p72b.mocklation.service.permission.IPermissionService;
+import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
-import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MapsPresenter implements IMapsPresenter {
 
@@ -42,8 +47,10 @@ public class MapsPresenter implements IMapsPresenter {
     private Pair<String, LocationItem> mOnTheMapItemPair;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private boolean mAddressRequested;
+    private AppDatabase mDb;
     private Address mAddressOutput;
     private AddressResultReceiver mResultReceiver;
+    private Disposable mDisposableGetAll;
 
     MapsPresenter(FragmentActivity activity) {
         Log.d(TAG, "new MapsPresenter");
@@ -52,6 +59,7 @@ public class MapsPresenter implements IMapsPresenter {
         mAddressRequested = false;
         mAddressOutput = null;
         mResultReceiver = new AddressResultReceiver(new Handler());
+        mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
 
         updateUIWidgets();
     }
@@ -83,13 +91,15 @@ public class MapsPresenter implements IMapsPresenter {
         mOnTheMapItemPair = new Pair<>(code, item);
 
         resolveAddressFromLocation(latLng);
-
-        mView.selectLocation(roundedLatLng, code, -1);
+        mView.addNewMarker(item);
     }
 
     @Override
     public void onMarkerClicked(Marker marker) {
         Log.d(TAG, "onMarkerClicked marker id: " + marker.getId());
+
+        resolveAddressFromLocation(marker.getPosition());
+        mView.showBottomSheet((LocationItem) marker.getTag());
     }
 
     @Override
@@ -139,6 +149,7 @@ public class MapsPresenter implements IMapsPresenter {
 
     @Override
     public void onMapReady() {
+        fetchAll();
     }
 
     @Override
@@ -181,6 +192,14 @@ public class MapsPresenter implements IMapsPresenter {
         mView.setAddressProgressbarVisibility(mAddressRequested ? ProgressBar.VISIBLE : ProgressBar.GONE);
     }
 
+    private void fetchAll() {
+        mDisposableGetAll = mDb.locationItemDao().getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new FetchAllLocationItemObserver());
+        mDisposables.add(mDisposableGetAll);
+    }
+
     private class AddressResultReceiver extends ResultReceiver {
         AddressResultReceiver(Handler handler) {
             super(handler);
@@ -211,6 +230,14 @@ public class MapsPresenter implements IMapsPresenter {
                 addressFragments.add(address.getAddressLine(i));
             }
             return TextUtils.join(System.getProperty("line.separator"), addressFragments);
+        }
+    }
+
+    private class FetchAllLocationItemObserver implements Consumer<List<LocationItem>> {
+        @Override
+        public void accept(List<LocationItem> locationItems) throws Exception {
+            mView.addMarkers(locationItems);
+            mDisposables.remove(mDisposableGetAll);
         }
     }
 }

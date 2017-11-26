@@ -24,14 +24,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.geojson.GeoJsonPoint;
 
 import java.util.List;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.AppServices;
-import de.p72b.mocklation.service.location.LocationItemFeature;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.VisibilityAnimationListener;
@@ -103,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     @Override
     public void selectLocation(LocationItem item) {
         mSelectedLocationName.setText(LocationItem.getNameToBeDisplayed(item));
-        LocationItemFeature feature = item.deserialize();
 
         if (item.isIsFavorite()) {
             mFavorite.setBackground(getDrawable(R.drawable.ic_favorite_black_24dp));
@@ -111,17 +108,11 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
             mFavorite.setBackground(getDrawable(R.drawable.ic_favorite_border_black_24dp));
         }
 
-        switch (feature.getGeoJsonFeature().getGeometry().getType()) {
-            case "Point":
-                GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
-                LatLng latLng = point.getCoordinates();
-                mSelectedLocationLatitude.setText(String.valueOf(latLng.latitude));
-                mSelectedLocationLongitude.setText(String.valueOf(latLng.longitude));
-                break;
-            default:
-                // do nothing
+        Object geometry = item.getGeometry();
+        if (geometry instanceof LatLng) {
+            mSelectedLocationLatitude.setText(String.valueOf(((LatLng) geometry).latitude));
+            mSelectedLocationLongitude.setText(String.valueOf(((LatLng) geometry).longitude));
         }
-
         mAdapter.flagItem(item);
     }
 

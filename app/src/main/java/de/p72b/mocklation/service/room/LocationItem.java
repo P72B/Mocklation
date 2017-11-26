@@ -7,12 +7,15 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.maps.android.geojson.GeoJsonFeature;
 import com.google.maps.android.geojson.GeoJsonLayer;
+import com.google.maps.android.geojson.GeoJsonPoint;
 import com.google.maps.android.geojson.GeoJsonPolygonStyle;
 
 import org.json.JSONException;
@@ -124,6 +127,18 @@ public class LocationItem implements Parcelable {
         }
 
         return locationItemFeature;
+    }
+
+    @Nullable
+    public Object getGeometry() {
+        LocationItemFeature feature = deserialize();
+        switch (feature.getGeoJsonFeature().getGeometry().getType()) {
+            case "Point":
+                GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
+                return new LatLng(point.getCoordinates().latitude,
+                        point.getCoordinates().longitude);
+        }
+        return null;
     }
 
     @Override

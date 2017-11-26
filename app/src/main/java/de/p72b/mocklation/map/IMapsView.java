@@ -3,11 +3,13 @@ package de.p72b.mocklation.map;
 
 import android.view.View;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.util.List;
+
+import de.p72b.mocklation.service.room.LocationItem;
 
 public interface IMapsView {
 
-    void selectLocation(LatLng latLng, String id, float zoom);
+    void showBottomSheet(LocationItem item);
 
     void showMyLocation();
 
@@ -16,4 +18,9 @@ public interface IMapsView {
     void setAddress(String formattedAddress);
 
     void setAddressProgressbarVisibility(int visibility);
+
+    void addMarkers(List<LocationItem> items);
+
+    void addNewMarker(LocationItem item);
+
 }

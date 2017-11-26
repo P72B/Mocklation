@@ -28,12 +28,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 
-import com.google.maps.android.geojson.GeoJsonPoint;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.service.location.LocationItemFeature;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.util.AppUtil;
@@ -137,17 +136,12 @@ public class EditLocationItemDialog extends DialogFragment {
         mLatitudeLayoutName = mRootView.findViewById(R.id.input_layout_latitude);
         mLongitudeLayoutName = mRootView.findViewById(R.id.input_layout_longitude);
 
-        LocationItemFeature feature = mLocationItem.deserialize();
-        switch (feature.getGeoJsonFeature().getGeometry().getType()) {
-            case "Point":
-                GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
-                mLatitudeLayoutName.setVisibility(View.VISIBLE);
-                mLongitudeLayoutName.setVisibility(View.VISIBLE);
-                mLatitude.setText(String.valueOf(point.getCoordinates().latitude));
-                mLongitude.setText(String.valueOf(point.getCoordinates().longitude));
-                break;
-            default:
-                // do nothing
+        Object geometry = mLocationItem.getGeometry();
+        if ((geometry instanceof LatLng)) {
+            mLatitudeLayoutName.setVisibility(View.VISIBLE);
+            mLongitudeLayoutName.setVisibility(View.VISIBLE);
+            mLatitude.setText(String.valueOf(((LatLng) geometry).latitude));
+            mLongitude.setText(String.valueOf(((LatLng) geometry).longitude));
         }
         mDisplayedName.setText(mLocationItem.getDisplayedName());
 
