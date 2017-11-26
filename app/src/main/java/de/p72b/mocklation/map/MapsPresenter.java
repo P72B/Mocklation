@@ -51,6 +51,8 @@ public class MapsPresenter implements IMapsPresenter {
     private Address mAddressOutput;
     private AddressResultReceiver mResultReceiver;
     private Disposable mDisposableGetAll;
+    private LatLng mAddressRequestedLatLng;
+    private String mAddressResult;
 
     MapsPresenter(FragmentActivity activity) {
         Log.d(TAG, "new MapsPresenter");
@@ -87,7 +89,7 @@ public class MapsPresenter implements IMapsPresenter {
 
         String code = AppUtil.createLocationItemCode(roundedLatLng);
         String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}";
-        LocationItem item = new LocationItem(code, code, geoJson, 6, 0);
+        LocationItem item = new LocationItem(code, "", geoJson, 6, 0);
         mOnTheMapItemPair = new Pair<>(code, item);
 
         resolveAddressFromLocation(latLng);
@@ -98,8 +100,11 @@ public class MapsPresenter implements IMapsPresenter {
     public void onMarkerClicked(Marker marker) {
         Log.d(TAG, "onMarkerClicked marker id: " + marker.getId());
 
-        resolveAddressFromLocation(marker.getPosition());
-        mView.showBottomSheet((LocationItem) marker.getTag());
+        LocationItem item = (LocationItem) marker.getTag();
+        if (item != null && item.getDisplayedName().length() == 0) {
+            resolveAddressFromLocation(marker.getPosition());
+        }
+        mView.showBottomSheet(item);
     }
 
     @Override
@@ -171,6 +176,14 @@ public class MapsPresenter implements IMapsPresenter {
             return;
         }
 
+        if (mAddressRequestedLatLng != null && mAddressRequestedLatLng.latitude == latLng.latitude
+            && mAddressRequestedLatLng.longitude == latLng.longitude) {
+            // cached result
+            mView.setAddress(mAddressResult);
+            return;
+        }
+        mAddressRequestedLatLng = latLng;
+
         Location location = new Location("");
         location.setLatitude(latLng.latitude);
         location.setLongitude(latLng.longitude);
@@ -217,7 +230,8 @@ public class MapsPresenter implements IMapsPresenter {
             } else {
                 resultMessage = getFormattedAddress(mAddressOutput);
             }
-            mView.setAddress(resultMessage);
+            mAddressResult = resultMessage;
+            mView.setAddress(mAddressResult);
 
             mAddressRequested = false;
             updateUIWidgets();

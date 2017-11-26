@@ -242,7 +242,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         if (!(geometry instanceof LatLng)) {
             return;
         }
-
+        if (!item.getDisplayedName().isEmpty()) {
+            mBottomSheetTitleText.setText(item.getDisplayedName());
+        }
         mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates((LatLng) geometry));
         mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
         mBottomSheet.setVisibility(View.VISIBLE);
