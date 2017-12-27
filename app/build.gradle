@@ -82,8 +82,10 @@ dependencies {
     compile "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
     compile "com.google.code.gson:gson:${gsonVersion}"
     compile "com.google.dagger:dagger:${daggerVersion}"
+    compile "com.google.firebase:firebase-core:${firebaseVersion}"
     annotationProcessor rootProject.ext.daggerCompiler
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
     compile "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
     testCompile 'junit:junit:4.12'
 }
+apply plugin: 'com.google.gms.google-services'
