@@ -1,6 +1,7 @@
 package de.p72b.mocklation.service.location;
 
 import android.Manifest;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -8,6 +9,7 @@ import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -262,6 +264,19 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     }
 
     private void createNotification() {
+        String channelId = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            channelId = "mocklation_channel";
+            CharSequence channelName = "Mocklation Channel";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mNotificationManager.createNotificationChannel(notificationChannel);
+        }
+
         mNumMessages = 0;
         mNotifyBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_location_on_black_24dp)
@@ -282,7 +297,11 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mNotifyBuilder.addAction(getPauseAction());
         mNotifyBuilder.addAction(getStopAction());
         mNotifyBuilder.setOngoing(true);
-        mNotifyBuilder.setAutoCancel(false);
+        if (channelId != null) {
+            mNotifyBuilder.setChannelId(channelId);
+        } else {
+            mNotifyBuilder.setAutoCancel(false);
+        }
         mNotificationManager.notify(NOTIFICATION_ID, mNotifyBuilder.build());
     }
 
