@@ -36,6 +36,8 @@ import de.p72b.mocklation.R;
 import de.p72b.mocklation.main.MainActivity;
 import de.p72b.mocklation.notification.NotificationBroadcastReceiver;
 import de.p72b.mocklation.service.AppServices;
+import de.p72b.mocklation.service.analytics.AnalyticsService;
+import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
@@ -80,6 +82,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private Disposable mDisposableFindByCode;
     private LocationUpdateInterval mMockLocationUpdateInterval;
     private LocationItem mLocationItem;
+    private IAnalyticsService mAnalyticsService;
     private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -126,6 +129,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     public void onCreate() {
         super.onCreate();
         mPermissions = (IPermissionService) AppServices.getService(AppServices.PERMISSIONS);
+        mAnalyticsService = (IAnalyticsService) AppServices.getService(AppServices.ANALYTICS);
         mPermissions.subscribeToPermissionChanges(this);
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -199,6 +203,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        mAnalyticsService.trackEvent(AnalyticsService.Event.STOP_MOCK_LOCATION_SERVICE);
         mSetting.setMockLocationItemCode(null);
         dismissNotification();
 
@@ -336,6 +341,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     @SuppressWarnings("MissingPermission")
     private void play() {
+        mAnalyticsService.trackEvent(AnalyticsService.Event.START_MOCK_LOCATION_SERVICE);
         LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, true);
 
         mGpsLocationListener = new GpsLocationListener();
@@ -350,6 +356,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     @SuppressWarnings("MissingPermission")
     private void pause() {
+        mAnalyticsService.trackEvent(AnalyticsService.Event.PAUSE_MOCK_LOCATION_SERVICE);
         LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, false);
 
         mLocationManager.removeUpdates(mGpsLocationListener);

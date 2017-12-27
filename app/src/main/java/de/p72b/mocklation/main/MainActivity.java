@@ -30,6 +30,7 @@ import java.util.List;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.AppServices;
+import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.VisibilityAnimationListener;
@@ -59,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
         initViews();
 
         ISetting setting = (ISetting) AppServices.getService(AppServices.SETTINGS);
-        mPresenter = new MainPresenter(this, setting);
+        IAnalyticsService analytics = (IAnalyticsService) AppServices.getService(AppServices.ANALYTICS);
+        mPresenter = new MainPresenter(this, setting, analytics);
         mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
         mFadeInAnimation.setAnimationListener(mFadeInListener);
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);

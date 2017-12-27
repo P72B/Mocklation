@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.p72b.mocklation.dagger.MocklationApp;
+import de.p72b.mocklation.service.analytics.AnalyticsService;
 import de.p72b.mocklation.service.location.LocationService;
 import de.p72b.mocklation.service.permission.PermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
@@ -19,6 +20,7 @@ public final class AppServices {
     public static final String SETTINGS = "SETTINGS";
     public static final String PERMISSIONS = "PERMISSIONS";
     public static final String LOCATION = "LOCATION";
+    public static final String ANALYTICS = "ANALYTICS";
 
     private final static Map<String, Object> SERVICES = new HashMap<>();
 
@@ -27,6 +29,7 @@ public final class AppServices {
         SERVICES.put(SETTINGS, settings);
         SERVICES.put(PERMISSIONS, new PermissionService(settings));
         SERVICES.put(LOCATION, new LocationService());
+        SERVICES.put(ANALYTICS, new AnalyticsService(MocklationApp.getInstance()));
     }
 
     public AppServices() {
@@ -37,8 +40,8 @@ public final class AppServices {
         return SERVICES.get(service);
     }
 
-    @StringDef({WEB_SERVICE, SETTINGS, PERMISSIONS, LOCATION})
+    @StringDef({WEB_SERVICE, SETTINGS, PERMISSIONS, LOCATION, ANALYTICS})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface Service {
+    @interface Service {
     }
 }

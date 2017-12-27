@@ -4,7 +4,11 @@ package de.p72b.mocklation.dagger;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import de.p72b.mocklation.service.AppServices;
+import de.p72b.mocklation.service.analytics.IAnalyticsService;
 
 
 public final class MocklationApp extends Application {
@@ -17,6 +21,7 @@ public final class MocklationApp extends Application {
         sInstance = this;
 
         mainComponent = DaggerMocklationComponent.builder().mocklationModule(new MocklationModule(this)).build();
+        ((IAnalyticsService) AppServices.getService(AppServices.ANALYTICS)).trackEvent(FirebaseAnalytics.Event.APP_OPEN);
     }
 
     public static MocklationApp getInstance() {

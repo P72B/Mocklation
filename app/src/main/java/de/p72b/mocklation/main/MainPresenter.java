@@ -1,6 +1,7 @@
 package de.p72b.mocklation.main;
 
 import android.arch.persistence.room.Room;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -8,10 +9,14 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.List;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
+import de.p72b.mocklation.service.analytics.AnalyticsService;
+import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
@@ -38,15 +43,18 @@ public class MainPresenter implements IMainPresenter {
     private LocationItem mSelectedItem;
     private Disposable mDisposableGetAll;
     private Disposable mDisposableUpdateItem;
+    private IAnalyticsService mAnalyticsService;
     private List<LocationItem> mLocationItems;
 
-    MainPresenter(FragmentActivity activity, ISetting setting) {
+    MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics) {
         Log.d(TAG, "new MainPresenter");
         mActivity = activity;
         mView = (IMainView) activity;
         mSetting = setting;
+        mAnalyticsService = analytics;
         mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
-        mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting, new MockServiceListener());
+        mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting,
+                new MockServiceListener());
 
         mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
     }
@@ -227,6 +235,15 @@ public class MainPresenter implements IMainPresenter {
     }
 
     private void onFavoriteClicked() {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, mSelectedItem.getCode());
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, mSelectedItem.getDisplayedName());
+        if (mSelectedItem.isIsFavorite()) {
+            mAnalyticsService.trackEvent(AnalyticsService.Event.REMOVE_FAVORITE, bundle);
+        } else {
+            mAnalyticsService.trackEvent(AnalyticsService.Event.ADD_FAVORITE, bundle);
+        }
+
         mSelectedItem.setIsFavorite(!mSelectedItem.isIsFavorite());
         updateItem(mSelectedItem);
     }
