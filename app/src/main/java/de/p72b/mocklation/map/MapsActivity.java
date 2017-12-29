@@ -39,8 +39,8 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -61,6 +61,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final long MARKER_REMOVE_MILLISECONDS = 300;
     private static final float DEFAULT_ZOOM_LEVEL = 15L;
+    private static final String KEY_MAP_STATE = "mapViewSaveState";
 
     private IMapsPresenter mPresenter;
     private OnLocationChangedListener mMapLocationListener = null;
@@ -92,12 +93,13 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private int mBottomSheetCollapsedHeight;
     private int mBottomSheetHeight;
     private int mTopMapPadding;
+    private MapView mMapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        initViews();
+        initViews(savedInstanceState);
 
         mLocationService = (ILocationService) AppServices.getService(AppServices.LOCATION);
         mSetting = (ISetting) AppServices.getService(AppServices.SETTINGS);
@@ -114,6 +116,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         Log.d(TAG, "onStart");
         mLocationService.onStartCommand(this, mPermissionService, mSetting);
         mPresenter.onStart();
+        mMapView.onStart();
     }
 
     @Override
@@ -122,12 +125,14 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         Log.d(TAG, "onResume");
         mLocationService.onResume();
         mLocationService.subscribeToLocationChanges(this);
+        mMapView.onResume();
     }
 
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause");
         mLocationService.unSubscribeToLocationChanges(this);
+        mMapView.onPause();
         super.onPause();
     }
 
@@ -135,6 +140,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     protected void onStop() {
         Log.d(TAG, "onStop");
         mPresenter.onStop();
+        mMapView.onStop();
         super.onStop();
     }
 
@@ -142,8 +148,27 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
         mPresenter.onDestroy();
+        mMapView.onDestroy();
         mLocationService.onDestroyCommand();
         super.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        //This MUST be done before saving any of your own or your base class's variables
+        final Bundle mapViewSaveState = new Bundle(outState);
+        if (mMapView != null) {
+            mMapView.onSaveInstanceState(mapViewSaveState);
+        }
+        outState.putBundle(KEY_MAP_STATE, mapViewSaveState);
+        //Add any other variables here.
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onLowMemory() {
+        mMapView.onLowMemory();
+        super.onLowMemory();
     }
 
     @SuppressWarnings("MissingPermission")
@@ -195,7 +220,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         }
 
         mTopMapPadding = (int) getResources().getDimension(R.dimen.map_top_padding);
-        adjustMapLogoPadding(-1);
         mPresenter.onMapReady();
     }
 
@@ -411,12 +435,15 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         springAnimationFabs.start();
     }
 
-    private void initViews() {
+    private void initViews(Bundle savedInstanceState) {
         setContentView(R.layout.activity_maps);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mMapView = findViewById(R.id.map);
+
+        final Bundle mapViewSavedInstanceState = savedInstanceState != null ?
+                savedInstanceState.getBundle(KEY_MAP_STATE) : null;
+        mMapView.onCreate(mapViewSavedInstanceState);
+        mMapView.getMapAsync(this);
 
         mFabWrapper = findViewById(R.id.fabs_wrapper);
         findViewById(R.id.save).setOnClickListener(this);
@@ -578,8 +605,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                adjustMapLogoPadding(slideOffset);
-
                 if (slideOffset > 0) {
                     if (!mIsDark) {
                         mIsDark = true;
@@ -607,18 +632,5 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 }
             }
         });
-    }
-
-    private void adjustMapLogoPadding(float slideOffset) {
-        float deltaCollapsed;
-        float finalPadding;
-        if (slideOffset <= 0) {
-            deltaCollapsed = (1 + slideOffset) * mBottomSheetCollapsedHeight;
-            finalPadding = deltaCollapsed;
-        } else {
-            deltaCollapsed = ((slideOffset - 1) * mBottomSheetCollapsedHeight) * -1;
-            finalPadding = slideOffset * mBottomSheetHeight + deltaCollapsed;
-        }
-        mMap.setPadding(0,mTopMapPadding,0, (int) finalPadding);
     }
 }
