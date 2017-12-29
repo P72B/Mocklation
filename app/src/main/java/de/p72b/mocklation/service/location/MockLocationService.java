@@ -1,6 +1,7 @@
 package de.p72b.mocklation.service.location;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -272,8 +273,8 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
             NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            notificationChannel.enableVibration(false);
+            notificationChannel.setSound(null, null);
             mNotificationManager.createNotificationChannel(notificationChannel);
         }
 
@@ -297,12 +298,15 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mNotifyBuilder.addAction(getPauseAction());
         mNotifyBuilder.addAction(getStopAction());
         mNotifyBuilder.setOngoing(true);
+        mNotifyBuilder.setVibrate(new long[]{0L});
         if (channelId != null) {
             mNotifyBuilder.setChannelId(channelId);
         } else {
             mNotifyBuilder.setAutoCancel(false);
         }
-        mNotificationManager.notify(NOTIFICATION_ID, mNotifyBuilder.build());
+        Notification notification = mNotifyBuilder.build();
+        notification.defaults = 0;
+        mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
     private NotificationCompat.Action getPauseAction() {
