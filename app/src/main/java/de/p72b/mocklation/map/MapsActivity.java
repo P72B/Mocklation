@@ -90,9 +90,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private int mStateMapItems = View.VISIBLE;
     private int mDeltaFabs;
     private View mFabWrapper;
-    private int mBottomSheetCollapsedHeight;
-    private int mBottomSheetHeight;
-    private int mTopMapPadding;
     private MapView mMapView;
 
     @Override
@@ -219,7 +216,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             tryToInitCameraPostion();
         }
 
-        mTopMapPadding = (int) getResources().getDimension(R.dimen.map_top_padding);
         mPresenter.onMapReady();
     }
 
@@ -519,8 +515,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         int fabMarginBottom = (int) getResources().getDimension(R.dimen.fab_margin);
         mDeltaFabs = fabsHeight - fabMarginBottom;
 
-        mBottomSheetCollapsedHeight = (int) getResources().getDimension(R.dimen.bottom_sheet_collapsed_height);
-        mBottomSheetHeight = mBottomSheet.getHeight();
+        mBottomSheetBehavior.setPeekHeight(mBottomSheetHeader.getHeight());
     }
 
     private void initBottomSheet() {
@@ -531,7 +526,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mBottomSheetSubTitleText = findViewById(R.id.bottom_sheet_subheader_title);
         mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
         mBottomSheetBehavior.setHideable(true);
-        mBottomSheetBehavior.setPeekHeight(300);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         mTstamp = findViewById(R.id.tstamp);
 

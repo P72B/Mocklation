@@ -8,7 +8,7 @@
     <dimen name="text_size_large">21sp</dimen>
     <dimen name="card_view_corner_radius">3dp</dimen>
     <dimen name="map_search_panel_margin_top">33dp</dimen>
-    <dimen name="bottom_sheet_collapsed_height">80dp</dimen>
+    <dimen name="bottom_sheet_peak_collapsed_height">80dp</dimen>
     <dimen name="map_top_padding">80dp</dimen>
 
     <dimen name="guideline_dialog_button_height">36dp</dimen>
