@@ -5,8 +5,12 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -22,11 +27,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
+import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.AppServices;
@@ -35,9 +42,10 @@ import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.VisibilityAnimationListener;
 
-public class MainActivity extends AppCompatActivity implements IMainView, View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements IMainView, View.OnClickListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private LocationListAdapter mAdapter = new LocationListAdapter(new AdapterListener());
     private IMainPresenter mPresenter;
@@ -53,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     private VisibilityAnimationListener mFadeOutListener = new VisibilityAnimationListener();
     private VisibilityAnimationListener mFadeInListener = new VisibilityAnimationListener();
     private ImageButton mFavorite;
+    private DrawerLayout mDrawer;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +156,31 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
     }
 
     @Override
+    public void onBackPressed() {
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        switch(item.getItemId()) {
+            case R.id.nav_fixed_mode:
+                break;
+            case R.id.nav_route_mode:
+                Toast.makeText(this, R.string.error_1016, Toast.LENGTH_LONG).show();
+                return false;
+        }
+
+        mDrawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick");
         switch (view.getId()) {
@@ -190,8 +225,18 @@ public class MainActivity extends AppCompatActivity implements IMainView, View.O
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(getString(R.string.title_activity_main));
+            actionBar.setTitle(getString(R.string.title_activity_fixed_mode));
         }
+        mDrawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        mNavigationView = findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
+        mNavigationView.setCheckedItem(R.id.nav_fixed_mode);
+        ((TextView) findViewById(R.id.nav_footer_item)).setText(BuildConfig.VERSION_NAME);
 
         mDataView = findViewById(R.id.data_view);
         mDataEmpty = findViewById(R.id.data_empty);

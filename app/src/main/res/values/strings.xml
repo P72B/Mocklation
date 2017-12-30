@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">Mocklation</string>
     <string name="error_missing_location_to_start_service">Please select a location</string>
-    <string name="title_activity_main">Fixed mode</string>
+    <string name="title_activity_fixed_mode">Fixed mode</string>
+    <string name="title_activity_route_mode">Route mode</string>
     <string name="action_settings">Settings</string>
     <string name="location_list_title">Saved Location(s)</string>
     <string name="selected_location_title">Selected location</string>
@@ -23,6 +24,8 @@
     <string name="dialog_edit_item_displayed_name">Name</string>
     <string name="dialog_edit_item_latitude">Latitude</string>
     <string name="dialog_edit_item_longitude">Longitude</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="error_1001">Service is running.</string>
     <string name="error_1002">Please long press somewhere inside the map first.</string>
     <string name="error_1003">No location data provided.</string>
@@ -38,4 +41,5 @@
     <string name="error_1013">Provide any coordinate.</string>
     <string name="error_1014">Invalid latitude. Range 90 to -90 degree.</string>
     <string name="error_1015">Invalid longitude. Range 180 to -180 degree.</string>
+    <string name="error_1016">Coming soon. Stay tuned.</string>
 </resources>
