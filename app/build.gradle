@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "IMPRINT_LIB", '"' + supportLibVersion + '"'
     }
 
     signingConfigs {
@@ -83,6 +84,7 @@ dependencies {
     compile "com.google.code.gson:gson:${gsonVersion}"
     compile "com.google.dagger:dagger:${daggerVersion}"
     compile "com.google.firebase:firebase-core:${firebaseVersion}"
+    compile "com.google.firebase:firebase-config:${firebaseVersion}"
     annotationProcessor rootProject.ext.daggerCompiler
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
     compile "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"

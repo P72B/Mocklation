@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- START xml_defaults -->
+<defaultsMap>
+    <entry>
+        <key>imprint_producer_contact_name</key>
+        <value>...</value>
+    </entry>
+    <entry>
+        <key>imprint_procuder_contact_city</key>
+        <value>...</value>
+    </entry>
+    <entry>
+        <key>imprint_producer_contact_country</key>
+        <value>..</value>
+    </entry>
+    <entry>
+        <key>imprint_producer</key>
+        <value>...</value>
+    </entry>
+    <entry>
+        <key>imprint_producer_contact_mail</key>
+        <value>...</value>
+    </entry>
+    <entry>
+        <key>imprint_github_project_repository</key>
+        <value>...</value>
+    </entry>
+</defaultsMap>
+<!-- END xml_defaults -->

@@ -40,6 +40,16 @@
                 android:value=".main.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".imprint.ImprintActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".main.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".main.MainActivity" />
+        </activity>
+
         <receiver android:name=".notification.NotificationBroadcastReceiver">
             <intent-filter>
                 <action android:name="EVENT_PAUSE" />

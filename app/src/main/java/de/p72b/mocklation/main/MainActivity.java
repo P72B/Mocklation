@@ -35,6 +35,7 @@ import java.util.List;
 
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.imprint.ImprintActivity;
 import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
@@ -174,6 +175,9 @@ private static final String TAG = MainActivity.class.getSimpleName();
             case R.id.nav_route_mode:
                 Toast.makeText(this, R.string.error_1016, Toast.LENGTH_LONG).show();
                 return false;
+            case R.id.nav_imprint:
+                startActivity(new Intent(this, ImprintActivity.class));
+                break;
         }
 
         mDrawer.closeDrawer(GravityCompat.START);

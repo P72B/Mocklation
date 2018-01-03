@@ -14,12 +14,12 @@
             android:title="@string/title_activity_route_mode" />
     </group>
 
-    <item android:title="About">
+    <item android:title="@string/nav_divider_readings">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_imprint"
                 android:icon="@drawable/ic_info_outline_black_24dp"
-                android:title="Imprint" />
+                android:title="@string/title_activity_imprint" />
         </menu>
     </item>
 

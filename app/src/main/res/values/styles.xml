@@ -42,5 +42,10 @@
         <item name="windowActionBar">true</item>
     </style>
 
+    <style name="TitleH1">
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
 
 </resources>
