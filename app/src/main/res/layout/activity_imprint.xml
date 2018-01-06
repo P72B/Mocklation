@@ -93,6 +93,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/imprint_dependencies_title" />
 
+            <LinearLayout
+                android:id="@+id/wrapper_dependencies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"

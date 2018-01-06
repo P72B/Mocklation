@@ -11,7 +11,15 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "IMPRINT_LIB", '"' + supportLibVersion + '"'
+        buildConfigField "String", "SUPPORT_LIB_VERSION", '"' + supportLibVersion + '"'
+        buildConfigField "String", "ROOM_VERSION", '"' + rootProject.roomVersion + '"'
+        buildConfigField "String", "PLAY_SERVICES_VERSION", '"' + playServicesVersion + '"'
+        buildConfigField "String", "MAP_UTILITIES_VERSION", '"' + mapsUtilsVersion + '"'
+        buildConfigField "String", "GSON_VERSION", '"' + gsonVersion + '"'
+        buildConfigField "String", "DAGGER_VERSION", '"' + daggerVersion + '"'
+        buildConfigField "String", "FIREBASE_VERSION", '"' + firebaseVersion + '"'
+        buildConfigField "String", "RX_JAVA_VERSION", '"' + rxjavaVersion + '"'
+        buildConfigField "String", "RX_ANDROID_VERSION", '"' + rxandroidVersion + '"'
     }
 
     signingConfigs {
