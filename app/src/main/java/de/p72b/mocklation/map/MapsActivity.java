@@ -1,25 +1,27 @@
 package de.p72b.mocklation.map;
 
 import android.Manifest;
-
-import java.util.Calendar;
-import java.util.List;
-
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.animation.DynamicAnimation;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
-import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.text.TextPaint;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -41,10 +43,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import de.p72b.mocklation.BaseActivity;
 import de.p72b.mocklation.R;
@@ -91,6 +98,11 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private int mDeltaFabs;
     private View mFabWrapper;
     private MapView mMapView;
+    private Bitmap mEmptyMarkerBitmap;
+    private float mColoredMarkerFontSize;
+    private int mColoredCenterX;
+    private int mColoredCenterY;
+    private int mColoredRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +117,13 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
 
         mPresenter = new MapsPresenter(this);
+
+        mEmptyMarkerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_new_location);
+        mColoredMarkerFontSize = 18 * getResources().getDisplayMetrics().density;
+        int width = mEmptyMarkerBitmap.getWidth();
+        mColoredCenterY = (int) Math.round(40.27777 * width / 100);
+        mColoredRadius = (int) (Math.round(65.972222 * width / 100) / 2);
+        mColoredCenterX = width / 2;
     }
 
     @Override
@@ -284,14 +303,51 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             mLocationMarker.remove();
         }
 
+        if (item.getColor() == 0) {
+            item.setColor(getRandomColor());
+        }
         mLocationMarker = mMap.addMarker(
                 new MarkerOptions()
                         .position((LatLng) geometry)
-                        .icon(BitmapDescriptorFactory.fromResource(
-                                R.drawable.ic_new_location))
+                        .icon(getColoredMarker(item.getDisplayedName(), item.getColor()))
         );
         mLocationMarker.setTag(item);
         showBottomSheet(item);
+    }
+
+    private BitmapDescriptor getColoredMarker(@NonNull String text, int fillColor) {
+        Bitmap mutableBitmap = mEmptyMarkerBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        Paint paint;
+        paint = new Paint();
+        paint.setColor(fillColor);
+        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+        canvas.drawCircle(mColoredCenterX, mColoredCenterY, mColoredRadius, paint);
+
+        paint.setColor(Color.BLACK);
+
+        if (!text.isEmpty()) {
+            TextPaint textPaint = new TextPaint();
+            textPaint.setColor(Color.WHITE);
+            textPaint.setTextSize(mColoredMarkerFontSize);
+            textPaint.setTextAlign(Paint.Align.CENTER);
+            float textHeight = textPaint.descent() - textPaint.ascent();
+            float textOffset = (textHeight / 2) - textPaint.descent();
+
+            canvas.drawText(String.valueOf(text.charAt(0)), mColoredCenterX, mColoredCenterY + textOffset, textPaint);
+        }
+
+        Paint p = new Paint();
+        canvas.drawBitmap(mutableBitmap, 0, 0, p);
+
+        return BitmapDescriptorFactory.fromBitmap(mutableBitmap);
+    }
+
+    private int getRandomColor() {
+        int randomNum = ThreadLocalRandom.current().nextInt(1, 17 + 1);
+        int colorResId = getResources().getIdentifier("r" + randomNum, "color", getPackageName());
+        return ContextCompat.getColor(this, colorResId);
     }
 
     @Override
@@ -302,11 +358,13 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                 continue;
             }
 
+            if (item.getColor() == 0) {
+                item.setColor(getRandomColor());
+            }
             Marker marker = mMap.addMarker(
                     new MarkerOptions()
                             .position((LatLng) geometry)
-                            .icon(BitmapDescriptorFactory.fromResource(
-                                    R.drawable.ic_new_location))
+                            .icon(getColoredMarker(item.getDisplayedName(), item.getColor()))
             );
             marker.setTag(item);
         }
@@ -336,8 +394,21 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void setAddress(String formattedAddress) {
+    public void setAddress(String formattedAddress, String title) {
         mBottomSheetTitleText.setText(formattedAddress);
+        if (mLocationMarker != null) {
+            LocationItem item = (LocationItem) mLocationMarker.getTag();
+            mLocationMarker.remove();
+            if (item == null) {
+                return;
+            }
+            mLocationMarker = mMap.addMarker(
+                    new MarkerOptions()
+                            .position(mLocationMarker.getPosition())
+                            .icon(getColoredMarker(title, item.getColor()))
+            );
+            mLocationMarker.setTag(item);
+        }
     }
 
     @Override

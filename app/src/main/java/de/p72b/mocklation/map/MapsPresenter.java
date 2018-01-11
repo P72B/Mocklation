@@ -179,7 +179,7 @@ public class MapsPresenter implements IMapsPresenter {
         if (mAddressRequestedLatLng != null && mAddressRequestedLatLng.latitude == latLng.latitude
             && mAddressRequestedLatLng.longitude == latLng.longitude) {
             // cached result
-            mView.setAddress(mAddressResult);
+            mView.setAddress(mAddressResult, mAddressOutput.getLocality());
             return;
         }
         mAddressRequestedLatLng = latLng;
@@ -231,7 +231,7 @@ public class MapsPresenter implements IMapsPresenter {
                 resultMessage = getFormattedAddress(mAddressOutput);
             }
             mAddressResult = resultMessage;
-            mView.setAddress(mAddressResult);
+            mView.setAddress(mAddressResult, mAddressOutput.getLocality());
 
             mAddressRequested = false;
             updateUIWidgets();

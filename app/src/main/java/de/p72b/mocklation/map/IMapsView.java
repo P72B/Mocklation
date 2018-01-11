@@ -15,7 +15,7 @@ public interface IMapsView {
 
     void showSnackbar(int message, int action, View.OnClickListener listener, int duration);
 
-    void setAddress(String formattedAddress);
+    void setAddress(String formattedAddress, String title);
 
     void setAddressProgressbarVisibility(int visibility);
 

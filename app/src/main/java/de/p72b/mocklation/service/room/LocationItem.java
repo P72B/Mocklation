@@ -45,6 +45,9 @@ public class LocationItem implements Parcelable {
     @ColumnInfo(name = "favorite")
     private boolean mIsFavorite;
 
+    @ColumnInfo(name = "color")
+    private int mColor;
+
     public static final Parcelable.Creator<LocationItem> CREATOR = new Parcelable.Creator<LocationItem>() {
         public LocationItem createFromParcel(Parcel in) {
             return new LocationItem(in);
@@ -182,5 +185,13 @@ public class LocationItem implements Parcelable {
 
     private int getTransparentColor(int color) {
         return Color.argb(100, Color.red(color), Color.green(color), Color.blue(color));
+    }
+
+    public int getColor() {
+        return mColor;
+    }
+
+    public void setColor(int color) {
+        mColor = color;
     }
 }
