@@ -180,7 +180,7 @@ public class MapsPresenter implements IMapsPresenter {
         if (mAddressRequestedLatLng != null && mAddressRequestedLatLng.latitude == latLng.latitude
             && mAddressRequestedLatLng.longitude == latLng.longitude) {
             // cached result
-            mView.setAddress(mAddressResult, mAddressOutput.getLocality());
+            mView.setAddress(mAddressResult, getMarkerText(mAddressOutput));
             return;
         }
         mAddressRequestedLatLng = latLng;
@@ -189,6 +189,14 @@ public class MapsPresenter implements IMapsPresenter {
         location.setLatitude(latLng.latitude);
         location.setLongitude(latLng.longitude);
         startGeocoderIntentService(location);
+    }
+
+    private @NonNull String getMarkerText(@Nullable Address mAddressOutput) {
+        String markerText = "?";
+        if (mAddressOutput != null) {
+            markerText = mAddressOutput.getLocality();
+        }
+        return markerText;
     }
 
     private void startGeocoderIntentService(@NonNull Location location) {
@@ -232,7 +240,7 @@ public class MapsPresenter implements IMapsPresenter {
                 resultMessage = getFormattedAddress(mAddressOutput);
             }
             mAddressResult = resultMessage;
-            mView.setAddress(mAddressResult, mAddressOutput.getLocality());
+            mView.setAddress(mAddressResult, getMarkerText(mAddressOutput));
 
             mAddressRequested = false;
             updateUIWidgets();
