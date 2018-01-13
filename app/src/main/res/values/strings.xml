@@ -20,6 +20,7 @@
     <string name="action_pause">Pause</string>
     <string name="action_stop">Stop</string>
     <string name="action_play">Play</string>
+    <string name="dialog_edit_title">Edit location</string>
     <string name="dialog_edit_item_title">Confirm data</string>
     <string name="dialog_edit_item_message">Please confirm location name and location coordinates. You can edit the location later by choosing the item from the list. Changing latitude of longitude will may result in location change. So if you're not familiar with hoe these coordinates work don't change them.</string>
     <string name="dialog_edit_item_displayed_name">Name</string>

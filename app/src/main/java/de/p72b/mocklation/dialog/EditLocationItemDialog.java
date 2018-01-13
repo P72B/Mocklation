@@ -98,7 +98,7 @@ public class EditLocationItemDialog extends DialogFragment {
         View rootView = inflater.inflate(R.layout.dialog_edit_item, container, false);
 
         Toolbar toolbar = rootView.findViewById(R.id.dialog_edit_item_toolbar);
-        toolbar.setTitle("Edit location");
+        toolbar.setTitle(R.string.dialog_edit_title);
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
@@ -109,7 +109,7 @@ public class EditLocationItemDialog extends DialogFragment {
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setHomeButtonEnabled(true);
-                actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_clear_black_24dp);
             }
             setHasOptionsMenu(true);
         }
