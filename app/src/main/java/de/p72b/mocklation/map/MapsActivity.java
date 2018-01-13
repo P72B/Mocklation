@@ -201,7 +201,9 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                //mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                if (mStateMapItems == View.INVISIBLE) {
+                    toggleAnimationOverlayItems();
+                }
                 mPresenter.onMarkerClicked(marker);
                 return true;
             }
