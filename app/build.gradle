@@ -60,7 +60,7 @@ android {
             versionCode appVersionCode
             versionName "${appVersionName} develop"
 
-            resValue "string", "google_maps_api_key", "AIzaSyCJLHqOmx3jGtWAUPirtc-txObMhy0orjE"
+            resValue "string", "google_maps_api_key", "AIzaSyBxVIw01td__Do5hlvcloetCNg8kZcne9I"
         }
         store {
             dimension "default"
@@ -68,7 +68,7 @@ android {
             versionCode appVersionCode
             versionName appVersionName
 
-            resValue "string", "google_maps_api_key", "AIzaSyCnobnVT618t6ZjAvXgHBOIr2XpLi60-Ds"
+            resValue "string", "google_maps_api_key", "AIzaSyAGYs7CMyEDSh9Rxvce_cg6qfnnvIZikh8"
         }
     }
 }
