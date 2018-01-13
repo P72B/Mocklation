@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -18,13 +19,17 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+
+import de.p72b.mocklation.service.room.LocationItem;
 
 public class AppUtil {
     private static final String COORDINATE_DECIMAL_FORMAT = "%.6f";
@@ -222,6 +227,22 @@ public class AppUtil {
         }
         textView.setText(s);
         return textView;
+    }
+
+    public static @Nullable LatLngBounds getBounds(@Nullable List<LocationItem> locationItems) {
+        if (locationItems == null || locationItems.size() <= 1) {
+            return null;
+        }
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LocationItem item: locationItems) {
+            Object geometry = item.getGeometry();
+            if (!(geometry instanceof LatLng)) {
+                break;
+            }
+            LatLng point = (LatLng) geometry;
+            builder.include(point);
+        }
+        return builder.build();
     }
 
     private static class URLSpanNoUnderline extends URLSpan {

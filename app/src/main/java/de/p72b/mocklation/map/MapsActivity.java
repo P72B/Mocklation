@@ -46,6 +46,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -85,8 +86,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private boolean mShouldMarkerDisappearOnHideBottomSheet;
     private TextView mBottomSheetSubTitleText;
     private TextView mBottomSheetTitleText;
-    private boolean mInitCameraPositionSet = false;
-    private boolean mOnInitialLocationDetermined = false;
     private int mMyLocationNotCenterColor;
     private int mMyLocationCenterColor;
     private View mBottomSheetTitleTextProgressBar;
@@ -231,10 +230,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             }
         });
 
-        if (mOnInitialLocationDetermined) {
-            tryToInitCameraPostion();
-        }
-
         mPresenter.onMapReady();
     }
 
@@ -271,8 +266,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void onInitialLocationDetermined(Location location) {
         Log.d(TAG, "onInitialLocationDetermined:" + location.getLatitude() + "/" + location.getLongitude());
-        mOnInitialLocationDetermined = true;
-        tryToInitCameraPostion();
     }
 
     @Override
@@ -371,15 +364,37 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void showMyLocation() {
+    public void showMyLocation(boolean shouldMove) {
         Location location = mLocationService.getLastKnownLocation();
         if (mMap == null || location == null) {
             return;
         }
         LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                lastKnowLocation, DEFAULT_ZOOM_LEVEL));
+        showLocation(lastKnowLocation, DEFAULT_ZOOM_LEVEL, shouldMove);
         setFollowGps(true);
+    }
+
+    @Override
+    public void showLatLngBounds(LatLngBounds bounds, boolean shouldMove) {
+        int padding = 150;
+        if (shouldMove) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(
+                    bounds, padding));
+        } else {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(
+                    bounds, padding));
+        }
+    }
+
+    @Override
+    public void showLocation(LatLng point, float zoom, boolean shouldMove) {
+        if (shouldMove) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    point, zoom));
+        } else {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    point, zoom));
+        }
     }
 
     @Override
@@ -391,6 +406,20 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             snackbar.setAction(action, listener);
         }
         snackbar.show();
+    }
+
+    @Override
+    public void tryToInitCameraPosition() {
+        if (mMap == null) {
+            return;
+        }
+
+        Location location = mLocationService.getLastKnownLocation();
+        if (location != null) {
+            Log.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
+            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, DEFAULT_ZOOM_LEVEL));
+        }
     }
 
     @Override
@@ -450,21 +479,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         if (mLocationMarker != null) {
             AppUtil.removeMarkerAnimated(mLocationMarker, MARKER_REMOVE_MILLISECONDS);
             mLocationMarker = null;
-        }
-    }
-
-    private void tryToInitCameraPostion() {
-        Log.d(TAG, "tryToInitCameraPostion mInitCameraPositionSet: " + mInitCameraPositionSet);
-        if (mInitCameraPositionSet || mMap == null) {
-            return;
-        }
-
-        Location location = mLocationService.getLastKnownLocation();
-        if (location != null) {
-            Log.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
-            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 15.0f));
-            mInitCameraPositionSet = true;
         }
     }
 

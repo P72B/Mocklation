@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class MapsPresenter implements IMapsPresenter {
                 showEditLocationItemDialog();
                 break;
             case R.id.location:
-                mView.showMyLocation();
+                mView.showMyLocation(false);
                 break;
             default:
                 // do nothing;
@@ -250,7 +251,21 @@ public class MapsPresenter implements IMapsPresenter {
     private class FetchAllLocationItemObserver implements Consumer<List<LocationItem>> {
         @Override
         public void accept(List<LocationItem> locationItems) throws Exception {
+            LatLngBounds bounds = AppUtil.getBounds(locationItems);
             mView.addMarkers(locationItems);
+            if (bounds != null) {
+                mView.showLatLngBounds(bounds, true);
+            } else if (locationItems.size() == 1) {
+                Object geometry = locationItems.get(0).getGeometry();
+                if (geometry instanceof LatLng) {
+                    LatLng point = (LatLng) geometry;
+                    mView.showLocation(point, 8L, true);
+                } else {
+                    mView.tryToInitCameraPosition();
+                }
+            } else {
+                mView.tryToInitCameraPosition();
+            }
             mDisposables.remove(mDisposableGetAll);
         }
     }
