@@ -264,16 +264,25 @@ public class EditLocationItemDialog extends DialogFragment {
             mDisplayedName.setError(getString(R.string.error_1010));
             return false;
         }
-        if (mLatitude.getText().toString().length() == 0) {
-            mLatitude.setError(getString(R.string.error_1013));
+        float latitude;
+        float longitude;
+        try {
+            longitude = Float.valueOf(mLongitude.getText().toString());
+        } catch (NumberFormatException exception){
+            mLongitude.setError(getString(R.string.error_1017));
             return false;
         }
-        if (mLongitude.getText().toString().length() == 0) {
+        try {
+            latitude = Float.valueOf(mLatitude.getText().toString());
+        } catch (NumberFormatException exception){
+            mLatitude.setError(getString(R.string.error_1017));
+            return false;
+        }
+        if (mLongitude.getText().toString().length() == 0 ||
+                mLatitude.getText().toString().length() == 0) {
             mLongitude.setError(getString(R.string.error_1013));
             return false;
         }
-        float latitude = Float.valueOf(mLatitude.getText().toString());
-        float longitude = Float.valueOf(mLongitude.getText().toString());
         if (latitude > 90 || latitude < -90) {
             mLatitude.setError(getString(R.string.error_1014));
             return false;
