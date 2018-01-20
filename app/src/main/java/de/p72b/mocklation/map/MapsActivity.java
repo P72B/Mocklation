@@ -16,6 +16,7 @@ import android.support.animation.DynamicAnimation;
 import android.support.animation.SpringAnimation;
 import android.support.animation.SpringForce;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -310,7 +311,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         showBottomSheet(item);
     }
 
-    private BitmapDescriptor getColoredMarker(@NonNull String text, int fillColor) {
+    private BitmapDescriptor getColoredMarker(@Nullable String text, int fillColor) {
         Bitmap mutableBitmap = mEmptyMarkerBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         Canvas canvas = new Canvas(mutableBitmap);
@@ -322,7 +323,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
         paint.setColor(Color.BLACK);
 
-        if (!text.isEmpty()) {
+        if (text != null && !text.isEmpty()) {
             TextPaint textPaint = new TextPaint();
             textPaint.setColor(Color.WHITE);
             textPaint.setTextSize(mColoredMarkerFontSize);
@@ -425,7 +426,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void setAddress(String formattedAddress, String title) {
+    public void setAddress(String formattedAddress, @Nullable String title) {
         mBottomSheetTitleText.setText(formattedAddress);
         if (mLocationMarker != null) {
             LocationItem item = (LocationItem) mLocationMarker.getTag();

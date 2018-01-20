@@ -195,6 +195,15 @@ public class MapsPresenter implements IMapsPresenter {
         String markerText = "?";
         if (mAddressOutput != null) {
             markerText = mAddressOutput.getLocality();
+            if (markerText == null) {
+                markerText = mAddressOutput.getSubAdminArea();
+            }
+            if (markerText == null) {
+                markerText = mAddressOutput.getAdminArea();
+            }
+            if (markerText == null) {
+                markerText = mAddressOutput.getCountryName();
+            }
         }
         return markerText;
     }
