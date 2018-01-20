@@ -88,6 +88,7 @@
     <string name="error_1015">Invalid longitude. Range 180 to -180 degree.</string>
     <string name="error_1016">Coming soon. Stay tuned.</string>
     <string name="error_1017">Provide numbers only.</string>
+    <string name="error_1018">Service is already killed.</string>
 
     <string name="apache_2_license" tools:ignore="TypographyOther">Apache License
 \nVersion 2.0, January 2004
