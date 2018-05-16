@@ -4,6 +4,8 @@
 /.idea/workspace.xml
 /.idea/libraries
 /.idea/dictionaries/p72b.xml
+/.idea/*
+/.idea
 .DS_Store
 /build
 /captures
