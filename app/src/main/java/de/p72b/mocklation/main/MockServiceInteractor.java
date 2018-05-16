@@ -186,7 +186,11 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mSetting.setMockLocationItemCode(mLocationItemCode);
-        mActivity.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mActivity.startForegroundService(intent);
+        } else {
+            mActivity.startService(intent);
+        }
         mState = SERVICE_STATE_RUNNING;
         if (mListener != null) {
             mListener.onStart();

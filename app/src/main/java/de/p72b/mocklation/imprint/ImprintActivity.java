@@ -1,8 +1,6 @@
 package de.p72b.mocklation.imprint;
 
 import android.annotation.SuppressLint;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,13 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
-import android.text.style.URLSpan;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;

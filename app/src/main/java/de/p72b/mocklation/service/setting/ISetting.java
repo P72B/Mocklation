@@ -20,11 +20,11 @@ public interface ISetting {
 
     boolean getPermissionDecision(String permission);
 
-    void setMockLocationItemCode(String code);
-
     void saveLastPressedLocation(String code);
 
     String getLastPressedLocationCode();
 
     String getMockLocationItemCode();
+
+    void setMockLocationItemCode(String code);
 }

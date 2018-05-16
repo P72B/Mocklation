@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -86,6 +87,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private LocationUpdateInterval mMockLocationUpdateInterval;
     private LocationItem mLocationItem;
     private IAnalyticsService mAnalyticsService;
+    private String mCachedLocationId = null;
     private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
@@ -304,9 +306,10 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         } else {
             mNotifyBuilder.setAutoCancel(false);
         }
-        Notification notification = mNotifyBuilder.build();
+        final Notification notification = mNotifyBuilder.build();
         notification.defaults = 0;
-        mNotificationManager.notify(NOTIFICATION_ID, notification);
+
+        notify(notification);
     }
 
     private NotificationCompat.Action getPauseAction() {
@@ -342,9 +345,17 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private void updateNotification(Location location) {
         mNotifyBuilder.setContentText(location.getLatitude() + " / " + location.getLongitude())
                 .setNumber(++mNumMessages);
-        mNotificationManager.notify(
-                NOTIFICATION_ID,
-                mNotifyBuilder.build());
+        notify(mNotifyBuilder.build());
+    }
+
+    private void notify(@NonNull final Notification notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(NOTIFICATION_ID, notification);
+        } else {
+            mNotificationManager.notify(
+                    NOTIFICATION_ID,
+                    notification);
+        }
     }
 
     private void dismissNotification() {
@@ -450,14 +461,19 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         public void onNext(Long value) {
             Log.d(TAG, " onNext : value : " + value);
             LatLng nextLatLng = mLatLngList.get(0);
-            Location location = new Location(MOCKLOCATION_PROVIDER_NAME);
+            final Location location = new Location(MOCKLOCATION_PROVIDER_NAME);
             location.setLatitude(nextLatLng.latitude);
             location.setLongitude(nextLatLng.longitude);
             location.setAccuracy(6);
             location.setTime(Calendar.getInstance().getTimeInMillis());
             location.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
 
-            updateNotification(location);
+            final String latestMockedLocationId = location.getLatitude() + "_" + location.getLongitude() + "_"
+                    + location.getAltitude() + "_" + location.getAccuracy();
+            if (!latestMockedLocationId.equals(mCachedLocationId)) {
+                mCachedLocationId = latestMockedLocationId;
+                updateNotification(location);
+            }
 
             mLocationManager.setTestProviderEnabled(MOCKLOCATION_PROVIDER_NAME, true);
             mLocationManager.setTestProviderStatus(MOCKLOCATION_PROVIDER_NAME, LocationProvider.AVAILABLE, null, System.currentTimeMillis());

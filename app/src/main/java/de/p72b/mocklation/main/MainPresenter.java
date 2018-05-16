@@ -204,11 +204,10 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
-        if (mSetting.getMockLocationItemCode() != null) {
+        if (mSetting.getMockLocationItemCode() != null && mMockServiceInteractor.isServiceRunning()) {
             mMockServiceInteractor.stopMockLocationService();
         } else {
             mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
-
         }
     }
 
