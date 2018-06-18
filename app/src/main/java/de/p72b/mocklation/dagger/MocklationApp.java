@@ -5,10 +5,12 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
+import io.fabric.sdk.android.Fabric;
 
 
 public final class MocklationApp extends Application {
@@ -18,6 +20,7 @@ public final class MocklationApp extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         sInstance = this;
 
         mainComponent = DaggerMocklationComponent.builder().mocklationModule(new MocklationModule(this)).build();
