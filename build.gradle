@@ -7,8 +7,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.google.gms:google-services:3.1.1'
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.google.gms:google-services:4.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.3'
     }
     repositories {
         google()
@@ -30,21 +30,21 @@ task clean(type: Delete) {
 ext {
     // version numbers
     appVersionName = '1.0.2'
-    appVersionCode = 13
+    appVersionCode = 14
 
     appMinSdk = 21
     appCompileSdk = 27
-    appBuildTools = "25.0.2"
+    appBuildTools = "27.0.3"
 
-    supportLibVersion = "27.0.2"
-    playServicesVersion = "11.8.0"
+    supportLibVersion = "27.1.1"
+    playServicesVersion = "15.0.1"
     gsonVersion = "2.8.1"
-    mapsUtilsVersion = "0.4.3"
+    mapsUtilsVersion = "0.4.4"
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
-    roomVersion = '1.0.0'
-    firebaseVersion = '11.8.0'
+    roomVersion = '1.1.0'
+    firebaseVersion = '16.0.0'
 
     rxjavaVersion = "2.1.2"
-    rxandroidVersion = "2.0.1"
+    rxandroidVersion = "2.0.2"
 }

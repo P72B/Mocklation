@@ -1,11 +1,14 @@
 *.iml
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
-/.idea/dictionaries/p72b.xml
-/.idea/*
-/.idea
+
+# IDEA/Android Studio ignores
+*.iml
+*.ipr
+*.iws
+**/.idea/**/*
+!.idea/codeStyles/**/*
+
 .DS_Store
 /build
 /captures
