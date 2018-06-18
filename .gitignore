@@ -8,6 +8,7 @@
 *.iws
 **/.idea/**/*
 !.idea/codeStyles/**/*
+.idea
 
 .DS_Store
 /build
