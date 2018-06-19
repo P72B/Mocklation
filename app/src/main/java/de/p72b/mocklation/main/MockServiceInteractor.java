@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AppOpsManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.p72b.mocklation.BuildConfig;
+import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.location.MockLocationService;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
@@ -232,12 +235,15 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     private void checkDefaultMockLocationApp() {
         Log.d(TAG, "checkDefaultMockLocationApp");
         if (isMockLocationEnabled()) {
-            Log.d(TAG, "MockLocations is enabled APP for Mockloctaion");
+            Log.d(TAG, "MockLocations is enabled APP for Mocklation");
             startMockLocationService(MockLocationService.class);
         } else {
-            Log.d(TAG, "Change settings and set Mocklation as APP for MockLocations!");
             // TODO: tutorial how to enable default permission app.
-            mActivity.startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+            try {
+                mActivity.startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+            } catch (ActivityNotFoundException activityNotFound) {
+                Toast.makeText(mContext, R.string.error_1019, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
