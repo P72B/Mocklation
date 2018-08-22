@@ -1,6 +1,5 @@
 package de.p72b.mocklation.service.geocoder;
 
-
 import android.app.IntentService;
 import android.content.Intent;
 import android.location.Address;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.util.Logger;
 
 /**
  * Asynchronously handles an intent using a worker thread. Receives a ResultReceiver object and a
@@ -59,10 +59,10 @@ public class GeocoderIntentService extends IntentService {
                     1);
         } catch (IOException ioException) {
             errorMessage = getString(R.string.error_1004);
-            Log.e(TAG, errorMessage, ioException);
+            Logger.e(TAG, errorMessage, ioException);
         } catch (IllegalArgumentException illegalArgumentException) {
             errorMessage = getString(R.string.error_1005);
-            Log.e(TAG, errorMessage + ". " +
+            Logger.e(TAG, errorMessage + ". " +
                     "Latitude = " + location.getLatitude() +
                     ", Longitude = " + location.getLongitude(), illegalArgumentException);
         }
@@ -70,11 +70,11 @@ public class GeocoderIntentService extends IntentService {
         if (addresses == null || addresses.size()  == 0) {
             if (errorMessage.isEmpty()) {
                 errorMessage = getString(R.string.error_1006);
-                Log.e(TAG, errorMessage);
+                Logger.e(TAG, errorMessage);
             }
             deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage, null);
         } else {
-            Log.i(TAG, "Address found");
+            Logger.i(TAG, "Address found");
             deliverResultToReceiver(Constants.SUCCESS_RESULT, null, addresses.get(0));
         }
     }

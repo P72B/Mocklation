@@ -6,7 +6,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -20,6 +19,7 @@ import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.Logger;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,7 +47,7 @@ public class MainPresenter implements IMainPresenter {
     private List<LocationItem> mLocationItems;
 
     MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics) {
-        Log.d(TAG, "new MainPresenter");
+        Logger.d(TAG, "new MainPresenter");
         mActivity = activity;
         mView = (IMainView) activity;
         mSetting = setting;
@@ -66,7 +66,7 @@ public class MainPresenter implements IMainPresenter {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        Logger.d(TAG, "onDestroy");
         mDisposables.clear();
     }
 
@@ -371,19 +371,19 @@ public class MainPresenter implements IMainPresenter {
     private class MockServiceListener implements MockServiceInteractor.MockServiceListener {
         @Override
         public void onStart() {
-            Log.d(TAG, "MockServiceListener onStart()");
+            Logger.d(TAG, "MockServiceListener onStart()");
             mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
         }
 
         @Override
         public void onStop() {
-            Log.d(TAG, "MockServiceListener onStop()");
+            Logger.d(TAG, "MockServiceListener onStop()");
             mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
         }
 
         @Override
         public void onUpdate() {
-            Log.d(TAG, "MockServiceListener onUpdate()");
+            Logger.d(TAG, "MockServiceListener onUpdate()");
             mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
         }
     }

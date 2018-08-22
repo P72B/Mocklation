@@ -5,8 +5,6 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import de.p72b.mocklation.R;
@@ -14,7 +12,7 @@ import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.location.MockLocationService;
 import de.p72b.mocklation.service.setting.Setting;
 import de.p72b.mocklation.util.AppUtil;
-
+import de.p72b.mocklation.util.Logger;
 
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
@@ -34,15 +32,15 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         }
         switch (action) {
             case MockLocationService.NOTIFICATION_ACTION_PAUSE:
-                Log.d(TAG, "Pause service");
+                Logger.d(TAG, "Pause service");
                 AppUtil.sendLocalBroadcast(context, new Intent(MockLocationService.EVENT_PAUSE));
                 break;
             case MockLocationService.NOTIFICATION_ACTION_PLAY:
-                Log.d(TAG, "Play service");
+                Logger.d(TAG, "Play service");
                 AppUtil.sendLocalBroadcast(context, new Intent(MockLocationService.EVENT_PLAY));
                 break;
             case MockLocationService.NOTIFICATION_ACTION_STOP:
-                Log.d(TAG, "Stop service");
+                Logger.d(TAG, "Stop service");
                 AppUtil.sendLocalBroadcast(context, new Intent(MockLocationService.EVENT_STOP));
                 break;
         }

@@ -23,7 +23,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.TextPaint;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -62,6 +61,7 @@ import de.p72b.mocklation.service.location.ILocationService;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
+import de.p72b.mocklation.util.Logger;
 
 public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyCallback,
         View.OnClickListener, LocationSource, LocationSource.OnLocationChangedListener,
@@ -107,7 +107,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
+        Logger.d(TAG, "onCreate");
         initViews(savedInstanceState);
 
         mLocationService = (ILocationService) AppServices.getService(AppServices.LOCATION);
@@ -129,7 +129,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart");
+        Logger.d(TAG, "onStart");
         mLocationService.onStartCommand(this, mPermissionService, mSetting);
         mPresenter.onStart();
         mMapView.onStart();
@@ -138,7 +138,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
+        Logger.d(TAG, "onResume");
         mLocationService.onResume();
         mLocationService.subscribeToLocationChanges(this);
         mMapView.onResume();
@@ -146,7 +146,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause");
+        Logger.d(TAG, "onPause");
         mLocationService.unSubscribeToLocationChanges(this);
         mMapView.onPause();
         super.onPause();
@@ -154,7 +154,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "onStop");
+        Logger.d(TAG, "onStop");
         mPresenter.onStop();
         mMapView.onStop();
         super.onStop();
@@ -162,7 +162,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        Logger.d(TAG, "onDestroy");
         mPresenter.onDestroy();
         mMapView.onDestroy();
         mLocationService.onDestroyCommand();
@@ -190,7 +190,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @SuppressWarnings("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady");
+        Logger.d(TAG, "onMapReady");
         mMap = googleMap;
 
         mMap.setLocationSource(this);
@@ -238,7 +238,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick");
+        Logger.d(TAG, "onClick");
         switch (view.getId()) {
             default:
                 mPresenter.onClick(view);
@@ -257,7 +257,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged:" + location.getLatitude() + "/" + location.getLongitude());
+        Logger.d(TAG, "onLocationChanged:" + location.getLatitude() + "/" + location.getLongitude());
 
         if (mMapLocationListener != null) {
             mMapLocationListener.onLocationChanged(location);
@@ -268,7 +268,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     public void onInitialLocationDetermined(Location location) {
-        Log.d(TAG, "onInitialLocationDetermined:" + location.getLatitude() + "/" + location.getLongitude());
+        Logger.d(TAG, "onInitialLocationDetermined:" + location.getLatitude() + "/" + location.getLongitude());
     }
 
     @Override
@@ -419,7 +419,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
         Location location = mLocationService.getLastKnownLocation();
         if (location != null) {
-            Log.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
+            Logger.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
             LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, DEFAULT_ZOOM_LEVEL));
         }
@@ -569,7 +569,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         mAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                Log.i(TAG, "Place: " + place.getName());
+                Logger.i(TAG, "Place: " + place.getName());
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         place.getLatLng(), DEFAULT_ZOOM_LEVEL));
                 mPresenter.onMapLongClicked(place.getLatLng());
@@ -577,7 +577,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
             @Override
             public void onError(Status status) {
-                Log.i(TAG, "An error occurred: " + status);
+                Logger.i(TAG, "An error occurred: " + status);
             }
         });
         View view = mAutocompleteFragment.getView();

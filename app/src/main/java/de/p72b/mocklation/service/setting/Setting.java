@@ -4,7 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.util.Log;
+
+import de.p72b.mocklation.util.Logger;
 
 public class Setting implements ISetting{
 
@@ -63,7 +64,7 @@ public class Setting implements ISetting{
 
     @Override
     public void setMockLocationItemCode(String code) {
-        Log.d(TAG, "setMockLocationItemCode: " + code);
+        Logger.d(TAG, "setMockLocationItemCode: " + code);
         if (mPreferences == null) {
             return;
         }
@@ -74,7 +75,7 @@ public class Setting implements ISetting{
 
     @Override
     public void saveLastPressedLocation(String code) {
-        Log.d(TAG, "saveLastPressedLocation: " + code);
+        Logger.d(TAG, "saveLastPressedLocation: " + code);
         if (mPreferences == null) {
             return;
         }
@@ -85,7 +86,7 @@ public class Setting implements ISetting{
 
     @Override
     public String getLastPressedLocationCode() {
-        Log.d(TAG, "getLastPressedLocationCode mPreferences is null: " + (mPreferences != null));
+        Logger.d(TAG, "getLastPressedLocationCode mPreferences is null: " + (mPreferences != null));
         if (mPreferences == null) {
             return null;
         }
@@ -94,7 +95,7 @@ public class Setting implements ISetting{
 
     @Override
     public String getMockLocationItemCode() {
-        Log.d(TAG, "getMockLocationItemCode mPreferences is null: " + (mPreferences != null));
+        Logger.d(TAG, "getMockLocationItemCode mPreferences is null: " + (mPreferences != null));
         if (mPreferences == null) {
             return null;
         }

@@ -14,7 +14,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.lang.annotation.Retention;
@@ -27,6 +26,7 @@ import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.location.MockLocationService;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
+import de.p72b.mocklation.util.Logger;
 
 public class MockServiceInteractor implements IMockServiceInteractor {
 
@@ -46,22 +46,22 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            Log.d(TAG, "Received local broadcast: " + AppUtil.toString(intent));
+            Logger.d(TAG, "Received local broadcast: " + AppUtil.toString(intent));
             final String action = intent.getAction();
             if (action == null) {
                 return;
             }
             switch (action) {
                 case MockLocationService.EVENT_PAUSE:
-                    Log.d(TAG, "Pause service");
+                    Logger.d(TAG, "Pause service");
                     mState = SERVICE_STATE_PAUSE;
                     break;
                 case MockLocationService.EVENT_PLAY:
-                    Log.d(TAG, "Play service");
+                    Logger.d(TAG, "Play service");
                     mState = SERVICE_STATE_RUNNING;
                     break;
                 case MockLocationService.EVENT_STOP:
-                    Log.d(TAG, "Stop service");
+                    Logger.d(TAG, "Stop service");
                     mState = SERVICE_STATE_STOP;
                     if (mRunningServices.contains(MockLocationService.class)) {
                         mRunningServices.remove(MockLocationService.class);
@@ -131,7 +131,7 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     @Override
     public void startMockLocation(@NonNull String locationItemCode) {
         mLocationItemCode = locationItemCode;
-        Log.d(TAG, "startMockLocation");
+        Logger.d(TAG, "startMockLocation");
         String[] permissionsToBeRequired = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION
         };
@@ -139,14 +139,14 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
         for (String permission : permissionsToBeRequired) {
             if (!hasPermission(permission)) {
-                Log.d(TAG, permission + " not granted.");
+                Logger.d(TAG, permission + " not granted.");
                 shouldRequestPermission = true;
                 break;
             }
         }
 
         if (shouldRequestPermission) {
-            Log.d(TAG, "Some permissions aren't granted.");
+            Logger.d(TAG, "Some permissions aren't granted.");
 
             /*// Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissionsToBeRequired)) {
@@ -162,7 +162,7 @@ public class MockServiceInteractor implements IMockServiceInteractor {
                     permissionsToBeRequired,
                     PERMISSIONS_MOCKING);
         } else {
-            Log.d(TAG, "All permissions are granted.");
+            Logger.d(TAG, "All permissions are granted.");
             checkDefaultMockLocationApp();
         }
     }
@@ -178,13 +178,13 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         }
 
         if (isServiceRunning(service)) {
-            Log.d(TAG, service.getSimpleName() + " is already running");
+            Logger.d(TAG, service.getSimpleName() + " is already running");
             return;
         }
 
 
         mRunningServices.add(service);
-        Log.d(TAG, "START: " + service.getSimpleName());
+        Logger.d(TAG, "START: " + service.getSimpleName());
         Intent intent = new Intent(mContext, service);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -202,11 +202,11 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
     private void stopMockLocationService(Class<?> service) {
         if (!isServiceRunning(service)) {
-            Log.d(TAG, service.getSimpleName() + " not running");
+            Logger.d(TAG, service.getSimpleName() + " not running");
             return;
         }
 
-        Log.d(TAG, "STOP: " + service.getSimpleName());
+        Logger.d(TAG, "STOP: " + service.getSimpleName());
         mActivity.stopService(new Intent(mContext, service));
 
         if (mRunningServices.contains(service)) {
@@ -233,9 +233,9 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     }
 
     private void checkDefaultMockLocationApp() {
-        Log.d(TAG, "checkDefaultMockLocationApp");
+        Logger.d(TAG, "checkDefaultMockLocationApp");
         if (isMockLocationEnabled()) {
-            Log.d(TAG, "MockLocations is enabled APP for Mocklation");
+            Logger.d(TAG, "MockLocations is enabled APP for Mocklation");
             startMockLocationService(MockLocationService.class);
         } else {
             // TODO: tutorial how to enable default permission app.

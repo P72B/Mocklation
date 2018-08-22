@@ -36,6 +36,7 @@ import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.util.AppUtil;
+import de.p72b.mocklation.util.Logger;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -194,7 +195,7 @@ public class EditLocationItemDialog extends DialogFragment {
     private void checkUpdateOrCreateMode() {
         checkDbConnection();
 
-        Log.d(TAG, "requestLocationItem");
+        Logger.d(TAG, "requestLocationItem");
         mDisposableFindByCode = mDb.locationItemDao().findByCode(mLocationItem.getCode())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -206,7 +207,7 @@ public class EditLocationItemDialog extends DialogFragment {
                             saveItem();
                             return;
                         }
-                        Log.d(TAG, "Error on getting DEvents - " + Log.getStackTraceString(throwable));
+                        Logger.d(TAG, "Error on getting DEvents - " + Log.getStackTraceString(throwable));
                         retry();
                     }
                 });
@@ -299,7 +300,7 @@ public class EditLocationItemDialog extends DialogFragment {
     }
 
     private void requestLocationItem(String displayedName) {
-        Log.d(TAG, "requestLocationItem");
+        Logger.d(TAG, "requestLocationItem");
         mDisposableFindByDisplayedName = mDb.locationItemDao().findByDisplayedName(displayedName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -13,9 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import android.util.Log;
-
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.Logger;
 
 public class PermissionService implements IPermissionService {
     private static final String TAG = PermissionService.class.getSimpleName();
@@ -31,13 +30,13 @@ public class PermissionService implements IPermissionService {
 
     @Override
     public void requestPermission(FragmentActivity activity, String permission, int requestCode) {
-        Log.d(TAG, "requestPermission permission:" + permission);
+        Logger.d(TAG, "requestPermission permission:" + permission);
         requestPermissions(activity, new String[]{permission}, requestCode);
     }
 
     @Override
     public void requestPermissions(FragmentActivity activity, String[] permissions, int requestCode) {
-        Log.d(TAG, "requestPermission permissions");
+        Logger.d(TAG, "requestPermission permissions");
         ActivityCompat.requestPermissions(activity, permissions, requestCode);
     }
 
@@ -111,7 +110,7 @@ public class PermissionService implements IPermissionService {
     }
 
     private void dispatch(String permission, boolean isGranted, int requestCode) {
-        Log.d(TAG, "dispatch permission:" + permission);
+        Logger.d(TAG, "dispatch permission:" + permission);
 
         // Save the user decision if the requested permission is given or denied.
         mSettings.setPermissionDecision(permission, isGranted);
