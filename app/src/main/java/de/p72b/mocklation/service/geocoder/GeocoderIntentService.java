@@ -36,7 +36,7 @@ public class GeocoderIntentService extends IntentService {
         mReceiver = intent.getParcelableExtra(Constants.RECEIVER);
 
         if (mReceiver == null) {
-            Log.wtf(TAG, "No receiver received. There is nowhere to send the results.");
+            Logger.d(TAG, "No receiver received. There is nowhere to send the results.");
             return;
         }
 
@@ -44,7 +44,7 @@ public class GeocoderIntentService extends IntentService {
 
         if (location == null) {
             errorMessage = getString(R.string.error_1003);
-            Log.wtf(TAG, errorMessage);
+            Logger.d(TAG, errorMessage);
             deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage, null);
             return;
         }

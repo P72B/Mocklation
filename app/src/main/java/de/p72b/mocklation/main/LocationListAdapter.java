@@ -15,6 +15,7 @@ import java.util.List;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.room.LocationItem;
+import de.p72b.mocklation.util.Logger;
 
 public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
         SwipeAndTouchHelper.ActionCompletionContract {
