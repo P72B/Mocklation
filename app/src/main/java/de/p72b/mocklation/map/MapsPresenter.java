@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -34,6 +33,7 @@ import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.util.AppUtil;
+import de.p72b.mocklation.util.Logger;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -56,7 +56,7 @@ public class MapsPresenter implements IMapsPresenter {
     private String mAddressResult;
 
     MapsPresenter(FragmentActivity activity) {
-        Log.d(TAG, "new MapsPresenter");
+        Logger.d(TAG, "new MapsPresenter");
         mActivity = activity;
         mView = (IMapsView) activity;
         mAddressRequested = false;
@@ -69,24 +69,24 @@ public class MapsPresenter implements IMapsPresenter {
 
     @Override
     public void onStart() {
-        Log.d(TAG, "onStart");
+        Logger.d(TAG, "onStart");
     }
 
     @Override
     public void onStop() {
-        Log.d(TAG, "onStop");
+        Logger.d(TAG, "onStop");
     }
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        Logger.d(TAG, "onDestroy");
         mDisposables.clear();
     }
 
     @Override
     public void onMapLongClicked(LatLng latLng) {
         LatLng roundedLatLng = AppUtil.roundLatLng(latLng);
-        Log.d(TAG, "onMapLongClicked LatLng: " + roundedLatLng.latitude + " / " + roundedLatLng.longitude);
+        Logger.d(TAG, "onMapLongClicked LatLng: " + roundedLatLng.latitude + " / " + roundedLatLng.longitude);
 
         String code = AppUtil.createLocationItemCode(roundedLatLng);
         String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}";
@@ -99,7 +99,7 @@ public class MapsPresenter implements IMapsPresenter {
 
     @Override
     public void onMarkerClicked(Marker marker) {
-        Log.d(TAG, "onMarkerClicked marker id: " + marker.getId());
+        Logger.d(TAG, "onMarkerClicked marker id: " + marker.getId());
 
         LocationItem item = (LocationItem) marker.getTag();
         if (item != null && item.getDisplayedName().length() == 0) {
@@ -110,7 +110,7 @@ public class MapsPresenter implements IMapsPresenter {
 
     @Override
     public void setLastKnownLocation(Location location) {
-        Log.d(TAG, "setLastKnownLocation location:" + location.getProvider() + " "
+        Logger.d(TAG, "setLastKnownLocation location:" + location.getProvider() + " "
                 + location.getLatitude() + " / " + location.getLongitude() + " isMocked: "
                 + location.isFromMockProvider());
     }

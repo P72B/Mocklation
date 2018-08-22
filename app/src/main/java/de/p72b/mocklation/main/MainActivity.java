@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +40,7 @@ import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.Logger;
 import de.p72b.mocklation.util.VisibilityAnimationListener;
 
 public class MainActivity extends AppCompatActivity implements IMainView, View.OnClickListener,
@@ -94,7 +94,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionsResult requestCode: " + requestCode);
+        Logger.d(TAG, "onRequestPermissionsResult requestCode: " + requestCode);
         switch (requestCode) {
             case MockServiceInteractor.PERMISSIONS_MOCKING: {
                 mPresenter.onMockPermissionsResult(grantResults);
@@ -186,7 +186,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick");
+        Logger.d(TAG, "onClick");
         switch (view.getId()) {
             case R.id.fab:
                 startActivity(new Intent(this, MapsActivity.class));
@@ -305,13 +305,13 @@ private static final String TAG = MainActivity.class.getSimpleName();
         public void onClick(View view) {
             int position = mRecyclerView.getChildLayoutPosition(view);
             LocationItem item = mAdapter.getItemAt(position);
-            Log.d(TAG, "onClick item: " + item.getCode());
+            Logger.d(TAG, "onClick item: " + item.getCode());
             mPresenter.locationItemPressed(item);
         }
 
         @Override
         public void onItemRemoved(LocationItem item) {
-            Log.d(TAG, "onItemRemoved item: " + item.getCode());
+            Logger.d(TAG, "onItemRemoved item: " + item.getCode());
             mPresenter.locationItemRemoved(item);
         }
     }

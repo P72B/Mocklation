@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.util.Logger;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -52,7 +52,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(TAG, "onConnected");
+        Logger.d(TAG, "onConnected");
 
         if (mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {
             checkIfLocationSniffingShouldStart();
@@ -61,12 +61,12 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(TAG, "onConnectionSuspended");
+        Logger.d(TAG, "onConnectionSuspended");
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "onLocationChanged:" + location.getLatitude() + "/" + location.getLongitude());
+        Logger.d(TAG, "onLocationChanged:" + location.getLatitude() + "/" + location.getLongitude());
         mLastKnownLocation = location;
         mSettings.saveLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
@@ -76,12 +76,12 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed");
+        Logger.d(TAG, "onConnectionFailed");
     }
 
     @Override
     public void onPermissionChanged(String permission, boolean granted, int code) {
-        Log.d(TAG, "onPermissionChanged permission: " + permission + " granted: " + granted);
+        Logger.d(TAG, "onPermissionChanged permission: " + permission + " granted: " + granted);
         if (!Manifest.permission.ACCESS_FINE_LOCATION.equals(permission) || PERMISSION_REQUEST_CODE != code) {
             return;
         }
@@ -129,7 +129,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
         if (mGoogleApiClient != null
                 && mGoogleApiClient.isConnected()
                 && mSubscribers.size() == 1) {
-            Log.d(TAG, "stop location sniffing");
+            Logger.d(TAG, "stop location sniffing");
             // Nobody is listening anymore. Stop getting updates to save battery.
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
@@ -139,7 +139,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
     @Override
     public void onStartCommand(FragmentActivity activity, IPermissionService permissions,
                                ISetting setting) {
-        Log.d(TAG, "onStartCommand");
+        Logger.d(TAG, "onStartCommand");
 
         mFragmentActivity = activity;
         mPermissions = permissions;
@@ -157,11 +157,11 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
     @Override
     public void onDestroyCommand() {
-        Log.d(TAG, "onDestroyCommand");
+        Logger.d(TAG, "onDestroyCommand");
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            Log.d(TAG, "do mGoogleApiClient disconnect");
+            Logger.d(TAG, "do mGoogleApiClient disconnect");
             mGoogleApiClient.disconnect();
         }
         mPermissions.unSubscribeToPermissionChanges(this);
@@ -170,7 +170,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume");
+        Logger.d(TAG, "onResume");
 
         if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
@@ -187,7 +187,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
     }
 
     private void initLocationUpdateSniffing() {
-        Log.d(TAG, "initLocationUpdateSniffing");
+        Logger.d(TAG, "initLocationUpdateSniffing");
         // We can start directly to listen on location changes.
         requestLocationUpdates();
 
@@ -201,7 +201,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (location != null) {
-            Log.d(TAG, "initial last known location set");
+            Logger.d(TAG, "initial last known location set");
             mLastKnownLocation = location;
             mSettings.saveLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
@@ -209,7 +209,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
             dispatchInitialLocation(mLastKnownLocation);
         } else {
             // from time to time on second retry a last known location can be found
-            Log.d(TAG, "retry initial last known location set");
+            Logger.d(TAG, "retry initial last known location set");
             if (mInitLocationRetry) {
                 // automated retry
                 mInitLocationRetry = false;
@@ -230,17 +230,17 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
             @Override
             public void onNext(Object value) {
-                Log.d(TAG, " onNext : value : " + value);
+                Logger.d(TAG, " onNext : value : " + value);
             }
 
             @Override
             public void onError(Throwable e) {
-                Log.d(TAG, " onError : " + e.getMessage());
+                Logger.d(TAG, " onError : " + e.getMessage());
             }
 
             @Override
             public void onComplete() {
-                Log.d(TAG, " onComplete");
+                Logger.d(TAG, " onComplete");
                 // Ok it can happen that during DELAY_FOR_RETRY_LAST_KNOWN_LOCATION
                 // the location permission is removed (very unlikely)
                 if (mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {

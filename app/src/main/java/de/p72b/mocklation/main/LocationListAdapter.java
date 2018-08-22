@@ -87,7 +87,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     public void setData(List<LocationItem> items) {
-        Log.d(TAG, "LocationItems list size: " + items.size());
+        Logger.d(TAG, "LocationItems list size: " + items.size());
         mDataset = items;
 
         Collections.sort(mDataset, new Comparator<LocationItem>() {

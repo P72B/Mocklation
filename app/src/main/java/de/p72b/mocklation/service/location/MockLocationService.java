@@ -48,6 +48,7 @@ import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.service.setting.Setting;
 import de.p72b.mocklation.util.AppUtil;
+import de.p72b.mocklation.util.Logger;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -91,14 +92,14 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private final BroadcastReceiver mLocalAppBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            Log.d(TAG, "Received local broadcast: " + AppUtil.toString(intent));
+            Logger.d(TAG, "Received local broadcast: " + AppUtil.toString(intent));
             final String action = intent.getAction();
             if (action == null) {
                 return;
             }
             switch (action) {
                 case EVENT_PAUSE:
-                    Log.d(TAG, "Pause service");
+                    Logger.d(TAG, "Pause service");
                     mNotifyBuilder.mActions.clear();
                     mNotifyBuilder.setColor(getResources().getColor(R.color.mouth));
                     mNotifyBuilder.addAction(getPlayAction());
@@ -109,7 +110,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                             mNotifyBuilder.build());
                     break;
                 case EVENT_PLAY:
-                    Log.d(TAG, "Play service");
+                    Logger.d(TAG, "Play service");
                     mNotifyBuilder.mActions.clear();
                     mNotifyBuilder.setColor(getResources().getColor(R.color.dark_green));
                     mNotifyBuilder.addAction(getPauseAction());
@@ -120,7 +121,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                             mNotifyBuilder.build());
                     break;
                 case EVENT_STOP:
-                    Log.d(TAG, "Stop service");
+                    Logger.d(TAG, "Stop service");
                     stopService(new Intent(getApplication(), MockLocationService.class));
                     break;
             }
@@ -156,23 +157,23 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(TAG, "onConnected");
+        Logger.d(TAG, "onConnected");
         checkPermissionAndStart();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(TAG, "onConnectionSuspended");
+        Logger.d(TAG, "onConnectionSuspended");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed");
+        Logger.d(TAG, "onConnectionFailed");
     }
 
     @Override
     public void onPermissionChanged(String permission, boolean granted, int code) {
-        Log.d(TAG, "onPermissionChanged permission: " + permission + " granted: " + granted);
+        Logger.d(TAG, "onPermissionChanged permission: " + permission + " granted: " + granted);
         if (!Manifest.permission.ACCESS_FINE_LOCATION.equals(permission) || PERMISSION_REQUEST_CODE != code) {
             return;
         }
@@ -189,7 +190,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
+        Logger.d(TAG, "onStartCommand");
 
         if (mGoogleApiClient.isConnected()) {
             checkPermissionAndStart();
@@ -207,14 +208,14 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "onDestroy");
+        Logger.d(TAG, "onDestroy");
         mAnalyticsService.trackEvent(AnalyticsService.Event.STOP_MOCK_LOCATION_SERVICE);
         mSetting.setMockLocationItemCode(null);
         dismissNotification();
 
         reset();
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-            Log.d(TAG, "do mGoogleApiClient disconnect");
+            Logger.d(TAG, "do mGoogleApiClient disconnect");
             mGoogleApiClient.disconnect();
         }
         mPermissions.unSubscribeToPermissionChanges(this);
@@ -230,7 +231,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     @SuppressWarnings("MissingPermission")
     private void checkPermissionAndStart() {
         final String code = mSetting.getMockLocationItemCode();
-        Log.d(TAG, "code: " + code + " hasPermission: " + mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION));
+        Logger.d(TAG, "code: " + code + " hasPermission: " + mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION));
         if (mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 && code != null) {
             requestLocationItem(code);
@@ -238,7 +239,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     }
 
     private void requestLocationItem(String code) {
-        Log.d(TAG, "requestLocationItem");
+        Logger.d(TAG, "requestLocationItem");
         mDisposableFindByCode = mDb.locationItemDao().findByCode(code)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -247,7 +248,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     }
 
     private void reset() {
-        Log.d(TAG, "reset()");
+        Logger.d(TAG, "reset()");
 
         mDisposables.clear();
 
@@ -258,7 +259,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     }
 
     private void processLocationItem() {
-        Log.d(TAG, "processLocationItem");
+        Logger.d(TAG, "processLocationItem");
         reset();
 
         play();
@@ -405,22 +406,22 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private class GpsLocationListener implements LocationListener {
         @Override
         public void onLocationChanged(Location location) {
-            Log.d(TAG, "GpsLocationListener onLocationChanged Location: " + location.getLatitude() + " / " + location.getLongitude());
+            Logger.d(TAG, "GpsLocationListener onLocationChanged Location: " + location.getLatitude() + " / " + location.getLongitude());
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-            Log.d(TAG, "GpsLocationListener onStatusChanged provider: " + provider);
+            Logger.d(TAG, "GpsLocationListener onStatusChanged provider: " + provider);
         }
 
         @Override
         public void onProviderEnabled(String provider) {
-            Log.d(TAG, "GpsLocationListener onProviderEnabled provider: " + provider);
+            Logger.d(TAG, "GpsLocationListener onProviderEnabled provider: " + provider);
         }
 
         @Override
         public void onProviderDisabled(String provider) {
-            Log.d(TAG, "GpsLocationListener onProviderDisabled provider: " + provider);
+            Logger.d(TAG, "GpsLocationListener onProviderDisabled provider: " + provider);
         }
     }
 
@@ -433,7 +434,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                 return;
             }
 
-            Log.d(TAG, " item: " + mLocationItem.getCode() + "\n" + mLocationItem.getGeoJson());
+            Logger.d(TAG, " item: " + mLocationItem.getCode() + "\n" + mLocationItem.getGeoJson());
 
             // parse geojson feature
             LocationItemFeature feature = mLocationItem.deserialize();
@@ -459,7 +460,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         @SuppressWarnings("MissingPermission")
         @Override
         public void onNext(Long value) {
-            Log.d(TAG, " onNext : value : " + value);
+            Logger.d(TAG, " onNext : value : " + value);
             LatLng nextLatLng = mLatLngList.get(0);
             final Location location = new Location(MOCKLOCATION_PROVIDER_NAME);
             location.setLatitude(nextLatLng.latitude);
@@ -483,12 +484,12 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
 
         @Override
         public void onError(Throwable e) {
-            Log.d(TAG, " onError : " + e.getMessage());
+            Logger.d(TAG, " onError : " + e.getMessage());
         }
 
         @Override
         public void onComplete() {
-            Log.d(TAG, " onComplete");
+            Logger.d(TAG, " onComplete");
         }
     }
 }
