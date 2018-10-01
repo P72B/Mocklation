@@ -27,4 +27,8 @@ public interface ISetting {
     String getMockLocationItemCode();
 
     void setMockLocationItemCode(String code);
+
+    boolean isPrivacyStatementAccepted();
+
+    void acceptCurrentPrivacyStatement();
 }

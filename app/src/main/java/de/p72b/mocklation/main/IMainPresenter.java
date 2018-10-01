@@ -15,7 +15,7 @@ public interface IMainPresenter {
 
     void onMockPermissionsResult(int[] grantedResults);
 
-    void onClick(View view);
+    void onClick(int viewId);
 
     void locationItemRemoved(LocationItem item);
 }

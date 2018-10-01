@@ -18,6 +18,7 @@ public class Setting implements ISetting{
     private static final String LAST_POSITION_LNG = "LAST_POSITION_LNG";
     private static final String ACTIVE_MOCK_LOCATION_CODE = "ACTIVE_MOCK_LOCATION_CODE";
     private static final String LAST_SELECTED_LOCATION_CODE = "LAST_SELECTED_LOCATION_CODE";
+    private static final String PRIVACY_UPDATE_ACCEPTED = "PRIVACY_UPDATE_ACCEPTED";
 
     private SharedPreferences mPreferences;
 
@@ -100,5 +101,21 @@ public class Setting implements ISetting{
             return null;
         }
         return mPreferences.getString(ACTIVE_MOCK_LOCATION_CODE, null);
+    }
+
+    @Override
+    public boolean isPrivacyStatementAccepted() {
+        return mPreferences != null && mPreferences.getBoolean(
+                PRIVACY_UPDATE_ACCEPTED, false);
+    }
+
+    @Override
+    public void acceptCurrentPrivacyStatement() {
+        if (mPreferences == null) {
+            return;
+        }
+        SharedPreferences.Editor edit = mPreferences.edit();
+        edit.putBoolean(PRIVACY_UPDATE_ACCEPTED, true);
+        edit.apply();
     }
 }

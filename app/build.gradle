@@ -95,6 +95,7 @@ dependencies {
     compile "com.android.support:cardview-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
     compile "com.android.support:support-dynamic-animation:${supportLibVersion}"
+    compile "com.android.support:customtabs:${supportLibVersion}"
     compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
     annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
     compile "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"

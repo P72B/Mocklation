@@ -1,6 +1,8 @@
 package de.p72b.mocklation.main;
 
 import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -14,6 +16,8 @@ import java.util.List;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
+import de.p72b.mocklation.dialog.PrivacyUpdateDialog;
+import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.analytics.AnalyticsService;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.AppDatabase;
@@ -91,8 +95,15 @@ public class MainPresenter implements IMainPresenter {
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
+    public void onClick(int viewId) {
+        switch (viewId) {
+            case R.id.fab:
+                if (!mSetting.isPrivacyStatementAccepted()) {
+                    showPrivacyUpdateDialog();
+                    return;
+                }
+                mActivity.startActivity(new Intent(mActivity, MapsActivity.class));
+                break;
             case R.id.play_stop:
                 onPlayStopClicked();
                 break;
@@ -199,6 +210,10 @@ public class MainPresenter implements IMainPresenter {
     }
 
     private void onPlayStopClicked() {
+        if (!mSetting.isPrivacyStatementAccepted()) {
+            showPrivacyUpdateDialog();
+            return;
+        }
         if (mSelectedItem == null) {
             // TODO show error missing location item to start mocking.
             return;
@@ -209,6 +224,24 @@ public class MainPresenter implements IMainPresenter {
         } else {
             mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
         }
+    }
+
+    private void showPrivacyUpdateDialog() {
+        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+        PrivacyUpdateDialog dialog = PrivacyUpdateDialog.newInstance(
+                new PrivacyUpdateDialog.PrivacyUpdateDialogListener() {
+                    @Override
+                    public void onAcceptClick() {
+                        mSetting.acceptCurrentPrivacyStatement();
+                        onPlayStopClicked();
+                    }
+                    @Override
+                    public void onDeclineClick() {
+                        mView.showSnackbar(R.string.error_1020, -1, null, Snackbar.LENGTH_LONG);
+                    }
+                });
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+        dialog.show(fragmentManager, PrivacyUpdateDialog.TAG);
     }
 
     private void showEditLocationItemDialog() {

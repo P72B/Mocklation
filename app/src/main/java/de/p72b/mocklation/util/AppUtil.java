@@ -6,9 +6,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -29,6 +36,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.room.LocationItem;
 
 public class AppUtil {
@@ -243,6 +251,23 @@ public class AppUtil {
             builder.include(point);
         }
         return builder.build();
+    }
+
+    public static void openInCustomTab(@NonNull final Context context, @NonNull final String url, final boolean shareable) {
+        final Resources resources = context.getResources();
+        final Bitmap icon = BitmapFactory.decodeResource(resources, R.drawable.ic_arrow_back_black_24dp);
+
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder()
+                .setToolbarColor(ContextCompat.getColor(context, R.color.face))
+                .enableUrlBarHiding()
+                .setCloseButtonIcon(icon)
+                .setShowTitle(true);
+
+        if (shareable) {
+            builder.addDefaultShareMenuItem();
+        }
+
+        builder.build().launchUrl(context, Uri.parse(url));
     }
 
     private static class URLSpanNoUnderline extends URLSpan {

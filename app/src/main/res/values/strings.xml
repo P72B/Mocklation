@@ -26,6 +26,10 @@
     <string name="dialog_edit_item_displayed_name">Name</string>
     <string name="dialog_edit_item_latitude">Latitude</string>
     <string name="dialog_edit_item_longitude">Longitude</string>
+    <string name="dialog_privacy_update_title">Privacy policy</string>
+    <string name="dialog_privacy_update_sub_title">Update of the privacy policy</string>
+    <string name="dialog_privacy_update_message">Mocklation has updated the privacy policy to match the requirements by google and the European Union. Please read and accept the privacy statement. It explains usage of your data. You can decline the policy but you will be unable to use the mocking service.</string>
+    <string name="dialog_privacy_update_checkbox">Yes, I accept</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_divider_readings">Readings</string>
@@ -90,6 +94,7 @@
     <string name="error_1017">Provide numbers only.</string>
     <string name="error_1018">Service is already killed.</string>
     <string name="error_1019">Change settings and set Mocklation as APP for MockLocations for you phone.</string>
+    <string name="error_1020">Privacy policy declined</string>
 
     <string name="apache_2_license" tools:ignore="TypographyOther">Apache License
 \nVersion 2.0, January 2004

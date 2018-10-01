@@ -186,14 +186,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     public void onClick(View view) {
-        Logger.d(TAG, "onClick");
-        switch (view.getId()) {
-            case R.id.fab:
-                startActivity(new Intent(this, MapsActivity.class));
-                break;
-            default:
-                mPresenter.onClick(view);
-        }
+        mPresenter.onClick(view.getId());
     }
 
     @Override
