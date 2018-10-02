@@ -47,7 +47,9 @@
     <string name="android_design_library">Android Design Support Library</string>
     <string name="android_design_library_link">https://developer.android.com/topic/libraries/support-library/index.html</string>
     <string name="v7_support_dynamic_animation_library">support dynamic animation library</string>
+    <string name="v7_support_custom_tabs_library">support custom tabs library</string>
     <string name="v7_support_dynamic_animation_library_link">https://developer.android.com/topic/libraries/support-library/index.html</string>
+    <string name="v7_support_custom_tabs_library_link">https://developer.android.com/reference/android/support/customtabs/package-summary</string>
     <string name="room_library">Google Room</string>
     <string name="room_library_link">https://developer.android.com/topic/libraries/architecture/room.html</string>
     <string name="room_rxjava2_library">Google Room RxJava2</string>

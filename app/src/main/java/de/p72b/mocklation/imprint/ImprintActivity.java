@@ -131,6 +131,14 @@ public class ImprintActivity extends AppCompatActivity {
                         getString(R.string.apache_license)))
         );
         items.add(new DependencyItem(
+                R.string.v7_support_custom_tabs_library,
+                R.string.v7_support_custom_tabs_library_link,
+                String.format(getString(R.string.imprint_dependencies_version),
+                        BuildConfig.SUPPORT_LIB_VERSION),
+                String.format(getString(R.string.imprint_dependencies_license),
+                        getString(R.string.apache_license)))
+        );
+        items.add(new DependencyItem(
                 R.string.room_library,
                 R.string.room_library_link,
                 String.format(getString(R.string.imprint_dependencies_version),
