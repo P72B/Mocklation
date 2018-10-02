@@ -4,16 +4,22 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.List;
 
+import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog;
@@ -36,6 +42,8 @@ import io.reactivex.schedulers.Schedulers;
 public class MainPresenter implements IMainPresenter {
 
     private static final String TAG = MainPresenter.class.getSimpleName();
+    private static final String REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY = "url_privacy_policy";
+
     private IMainView mView;
     private AppDatabase mDb;
     private FragmentActivity mActivity;
@@ -49,6 +57,7 @@ public class MainPresenter implements IMainPresenter {
     private Disposable mDisposableUpdateItem;
     private IAnalyticsService mAnalyticsService;
     private List<LocationItem> mLocationItems;
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
     MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics) {
         Logger.d(TAG, "new MainPresenter");
@@ -61,6 +70,7 @@ public class MainPresenter implements IMainPresenter {
                 new MockServiceListener());
 
         mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
+        setupRemoteConfig();
     }
 
     @Override
@@ -239,7 +249,7 @@ public class MainPresenter implements IMainPresenter {
                     public void onDeclineClick() {
                         mView.showSnackbar(R.string.error_1020, -1, null, Snackbar.LENGTH_LONG);
                     }
-                });
+                }, mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY));
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
         dialog.show(fragmentManager, PrivacyUpdateDialog.TAG);
     }
@@ -290,6 +300,34 @@ public class MainPresenter implements IMainPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new UpdateLocationItemObserver(item));
+    }
+
+    private void setupRemoteConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build();
+        mFirebaseRemoteConfig.setConfigSettings(configSettings);
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
+
+        fetchRemoteConfig();
+    }
+
+    private void fetchRemoteConfig() {
+        long cacheExpiration = 3600; // 1 hour in seconds.
+        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
+            cacheExpiration = 0;
+        }
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnCompleteListener(mActivity, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            mFirebaseRemoteConfig.activateFetched();
+                        }
+                    }
+                });
     }
 
     private class FetchAllLocationItemObserver implements Consumer<List<LocationItem>> {

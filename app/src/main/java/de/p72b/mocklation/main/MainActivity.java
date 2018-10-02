@@ -35,7 +35,6 @@ import java.util.List;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.imprint.ImprintActivity;
-import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.LocationItem;

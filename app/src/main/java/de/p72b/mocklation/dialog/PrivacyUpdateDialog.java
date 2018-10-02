@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.util.AppUtil;
@@ -34,13 +35,16 @@ public class PrivacyUpdateDialog extends DialogFragment {
     private PrivacyUpdateDialogListener mListener;
     private boolean mIsAccepted = false;
     private CheckBox mCheckBox;
+    private String mUrl;
 
     public PrivacyUpdateDialog() {
     }
 
-    public static PrivacyUpdateDialog newInstance(PrivacyUpdateDialogListener listener) {
+    public static PrivacyUpdateDialog newInstance(PrivacyUpdateDialogListener listener,
+                                                  @NonNull final String url) {
         PrivacyUpdateDialog dialogFragment = new PrivacyUpdateDialog();
         dialogFragment.setListener(listener);
+        dialogFragment.setUrl(url);
         return dialogFragment;
     }
 
@@ -94,14 +98,19 @@ public class PrivacyUpdateDialog extends DialogFragment {
                                                 }
                                             }
                 );
-        mRootView.findViewById(R.id.privacyPolicyMessage).setOnClickListener(new View.OnClickListener() {
+        final TextView message = mRootView.findViewById(R.id.privacyPolicyMessage);
+        final Context context = getContext();
+        if (context != null) {
+            message.setText(AppUtil.underline(context, R.string.dialog_privacy_update_message, R.string.dialog_privacy_update_title));
+        }
+        message.findViewById(R.id.privacyPolicyMessage).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final Context context = getContext();
                 if (context == null) {
                     return;
                 }
-                AppUtil.openInCustomTab(context, "https://sites.google.com/view/p72b/startseite", false);
+                AppUtil.openInCustomTab(context, mUrl, false);
             }
         });
     }
@@ -156,11 +165,14 @@ public class PrivacyUpdateDialog extends DialogFragment {
         mListener = listener;
     }
 
+    public void setUrl(String url) {
+        mUrl = url;
+    }
+
     public void setCheckBoxHintVisibility(boolean checkBoxHintVisibility) {
         mCheckBox.setTextColor(ContextCompat.getColor(getContext(), checkBoxHintVisibility
                 ? R.color.colorPrimary : R.color.eye));
     }
-
 
     public interface PrivacyUpdateDialogListener {
         void onAcceptClick();

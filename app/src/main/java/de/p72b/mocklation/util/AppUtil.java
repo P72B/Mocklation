@@ -20,7 +20,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextPaint;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
+import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -268,6 +270,17 @@ public class AppUtil {
         }
 
         builder.build().launchUrl(context, Uri.parse(url));
+    }
+
+    @NonNull
+    public static SpannableString underline(@NonNull final Context context, final int master, final int snipped) {
+        final String highlight = context.getString(snipped);
+        final String messageContent = String.format(context.getString(master), highlight);
+        final SpannableString content = new SpannableString(messageContent);
+        final int start = messageContent.indexOf(highlight);
+        final int end = start + highlight.length();
+        content.setSpan(new ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorAccent)), start, end, 0);
+        return content;
     }
 
     private static class URLSpanNoUnderline extends URLSpan {

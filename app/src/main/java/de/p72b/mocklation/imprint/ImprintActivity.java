@@ -36,7 +36,6 @@ public class ImprintActivity extends AppCompatActivity {
     private static final String REMOTE_CONFIG_KEY_PRODUCER_MAIL = "imprint_producer_contact_mail";
     private static final String REMOTE_CONFIG_KEY_GITHUB_REPO = "imprint_github_project_repository";
 
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
     private TextView mProducer;
     private TextView mRepoLink;
     private TextView mProducerName;
@@ -49,8 +48,8 @@ public class ImprintActivity extends AppCompatActivity {
         setContentView(R.layout.activity_imprint);
         setupAppBar();
         initViews();
-        setupRemoteConfig();
         setupDependencies();
+        setTextViewsFromRemoteConfig();
     }
 
     /**
@@ -85,44 +84,14 @@ public class ImprintActivity extends AppCompatActivity {
         mWrapperDependencies = findViewById(R.id.wrapper_dependencies);
     }
 
-    private void setupRemoteConfig() {
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettings(configSettings);
-        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
-
-        fetchRemoteConfig();
-    }
-
-    private void fetchRemoteConfig() {
-        setTextViewsFromRemoteConfig();
-
-        long cacheExpiration = 3600; // 1 hour in seconds.
-        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
-            cacheExpiration = 0;
-        }
-        mFirebaseRemoteConfig.fetch(cacheExpiration)
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            mFirebaseRemoteConfig.activateFetched();
-                            setTextViewsFromRemoteConfig();
-                        }
-                    }
-                });
-    }
-
     private void setTextViewsFromRemoteConfig() {
-        mProducer.setText(mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_PRODUCER));
-        mRepoLink.setText(mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_GITHUB_REPO));
-        mProducerName.setText(mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_PRODUCER_NAME));
-        mProducerMail.setText(mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_PRODUCER_MAIL));
-        String address = mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_PRODUCER_CITY) + " " +
-                mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_PRODUCER_COUNTRY);
+        final FirebaseRemoteConfig config = FirebaseRemoteConfig.getInstance();
+        mProducer.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER));
+        mRepoLink.setText(config.getString(REMOTE_CONFIG_KEY_GITHUB_REPO));
+        mProducerName.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER_NAME));
+        mProducerMail.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER_MAIL));
+        String address = config.getString(REMOTE_CONFIG_KEY_PRODUCER_CITY) + " " +
+                config.getString(REMOTE_CONFIG_KEY_PRODUCER_COUNTRY);
         mProducerAddress.setText(address);
     }
 

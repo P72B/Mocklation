@@ -28,7 +28,7 @@
     <string name="dialog_edit_item_longitude">Longitude</string>
     <string name="dialog_privacy_update_title">Privacy policy</string>
     <string name="dialog_privacy_update_sub_title">Update of the privacy policy</string>
-    <string name="dialog_privacy_update_message">Mocklation has updated the privacy policy to match the requirements by google and the European Union. Please read and accept the privacy statement. It explains usage of your data. You can decline the policy but you will be unable to use the mocking service.</string>
+    <string name="dialog_privacy_update_message">Mocklation has updated the %1$s to match the requirements by google and the European Union. Please read and accept the privacy statement. It explains usage of your data. You can decline the policy but you will be unable to use the mocking service.</string>
     <string name="dialog_privacy_update_checkbox">Yes, I accept</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

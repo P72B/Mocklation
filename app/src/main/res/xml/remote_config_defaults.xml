@@ -25,5 +25,9 @@
         <key>imprint_github_project_repository</key>
         <value>...</value>
     </entry>
+    <entry>
+        <key>url_privacy_policy</key>
+        <value>https://google.com</value>
+    </entry>
 </defaultsMap>
 <!-- END xml_defaults -->
