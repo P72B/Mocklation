@@ -171,7 +171,7 @@ public class PrivacyUpdateDialog extends DialogFragment {
 
     public void setCheckBoxHintVisibility(boolean checkBoxHintVisibility) {
         mCheckBox.setTextColor(ContextCompat.getColor(getContext(), checkBoxHintVisibility
-                ? R.color.colorPrimary : R.color.eye));
+                ? R.color.colorAccent : R.color.eye));
     }
 
     public interface PrivacyUpdateDialogListener {

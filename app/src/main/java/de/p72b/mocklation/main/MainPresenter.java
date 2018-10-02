@@ -277,15 +277,10 @@ public class MainPresenter implements IMainPresenter {
     }
 
     private void onFavoriteClicked() {
-        Bundle bundle = new Bundle();
+        final Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, mSelectedItem.getCode());
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, mSelectedItem.getDisplayedName());
-        if (mSelectedItem.isIsFavorite()) {
-            mAnalyticsService.trackEvent(AnalyticsService.Event.REMOVE_FAVORITE, bundle);
-        } else {
-            mAnalyticsService.trackEvent(AnalyticsService.Event.ADD_FAVORITE, bundle);
-        }
-
+        mAnalyticsService.trackEvent(mSelectedItem.isIsFavorite() ?
+                AnalyticsService.Event.REMOVE_FAVORITE : AnalyticsService.Event.ADD_FAVORITE, bundle);
         mSelectedItem.setIsFavorite(!mSelectedItem.isIsFavorite());
         updateItem(mSelectedItem);
     }
