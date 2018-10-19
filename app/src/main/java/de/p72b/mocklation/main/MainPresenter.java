@@ -238,7 +238,7 @@ public class MainPresenter implements IMainPresenter {
 
     private void showPrivacyUpdateDialog() {
         FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
-        PrivacyUpdateDialog dialog = PrivacyUpdateDialog.newInstance(
+        PrivacyUpdateDialog dialog = PrivacyUpdateDialog.Companion.newInstance(
                 new PrivacyUpdateDialog.PrivacyUpdateDialogListener() {
                     @Override
                     public void onAcceptClick() {
@@ -251,7 +251,7 @@ public class MainPresenter implements IMainPresenter {
                     }
                 }, mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY));
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-        dialog.show(fragmentManager, PrivacyUpdateDialog.TAG);
+        dialog.show(fragmentManager, PrivacyUpdateDialog.Companion.getTAG());
     }
 
     private void showEditLocationItemDialog() {
