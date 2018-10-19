@@ -8,21 +8,23 @@ buildscript {
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    mavenCentral()
 }
 
 
 android {
     compileSdkVersion appCompileSdk
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         multiDexEnabled true
         applicationId "de.p72b.mocklation"
         minSdkVersion appMinSdk
-        targetSdkVersion 27
+        targetSdkVersion 29
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "SUPPORT_LIB_VERSION", '"' + supportLibVersion + '"'
         buildConfigField "String", "ROOM_VERSION", '"' + rootProject.roomVersion + '"'
@@ -106,13 +108,14 @@ dependencies {
     compile "com.google.code.gson:gson:${gsonVersion}"
     compile "com.google.dagger:dagger:${daggerVersion}"
     compile "com.google.firebase:firebase-core:${firebaseVersion}"
-    compile "com.google.firebase:firebase-config:${firebaseVersion}"
+    compile 'com.google.firebase:firebase-config:16.1.0'
     annotationProcessor rootProject.ext.daggerCompiler
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
     compile "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
     testCompile 'junit:junit:4.12'
     compile('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
-        transitive = true;
+        transitive = true
     }
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 apply plugin: 'com.google.gms.google-services'

@@ -1,6 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext.kotlin_version = '1.2.71'
     repositories {
         jcenter()
         maven { url 'https://maven.google.com' }
@@ -9,6 +10,7 @@ buildscript {
     dependencies {
         classpath 'com.google.gms:google-services:4.0.1'
         classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
     repositories {
         google()
@@ -34,16 +36,16 @@ ext {
 
     appMinSdk = 21
     appCompileSdk = 27
-    appBuildTools = "27.0.3"
+    appBuildTools = "28.0.3"
 
     supportLibVersion = "27.1.1"
-    playServicesVersion = "15.0.1"
+    playServicesVersion = "16.0.0"
     gsonVersion = "2.8.1"
     mapsUtilsVersion = "0.4.4"
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
-    roomVersion = '1.1.0'
-    firebaseVersion = '16.0.0'
+    roomVersion = '1.1.1'
+    firebaseVersion = '16.0.4'
 
     rxjavaVersion = "2.1.2"
     rxandroidVersion = "2.0.2"
