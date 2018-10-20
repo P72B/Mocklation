@@ -113,5 +113,6 @@ dependencies {
         transitive = true
     }
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    api 'ru.bullyboo.ecryption:encoder:1.0.3'
 }
 apply plugin: 'com.google.gms.google-services'

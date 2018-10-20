@@ -17,3 +17,5 @@
 app/google-services.json
 /playstore
 
+app/src/main/java/de/p72b/mocklation/util/SecuredConstants.kt
+
