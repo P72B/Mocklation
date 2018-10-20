@@ -18,6 +18,25 @@ repositories {
 
 
 android {
+    def fabricApiKey = ""
+    def googleMapsApiKeyDevelop = ""
+    def googleMapsApiKeyStore = ""
+
+    Properties props = new Properties()
+    def propFile = file('../signing.properties')
+    if (propFile.canRead() && props != null){
+        props.load(new FileInputStream(propFile))
+        if (props.containsKey('FABRIC_API_KEY')) {
+            fabricApiKey = file(props['FABRIC_API_KEY'])
+        }
+        if (props.containsKey('GOOGLE_MAPS_API_KEY_DEVELOP')) {
+            googleMapsApiKeyDevelop = file(props['GOOGLE_MAPS_API_KEY_DEVELOP'])
+        }
+        if (props.containsKey('GOOGLE_MAPS_API_KEY_STORE')) {
+            googleMapsApiKeyStore = file(props['GOOGLE_MAPS_API_KEY_STORE'])
+        }
+    }
+
     compileSdkVersion appCompileSdk
     buildToolsVersion '28.0.3'
     defaultConfig {
@@ -26,6 +45,7 @@ android {
         minSdkVersion appMinSdk
         targetSdkVersion 29
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [ fabricApiKey:fabricApiKey]
         buildConfigField "String", "SUPPORT_LIB_VERSION", '"' + supportLibVersion + '"'
         buildConfigField "String", "ROOM_VERSION", '"' + rootProject.roomVersion + '"'
         buildConfigField "String", "PLAY_SERVICES_VERSION", '"' + playServicesVersion + '"'
@@ -75,7 +95,7 @@ android {
             versionCode appVersionCode
             versionName "${appVersionName} develop"
 
-            resValue "string", "google_maps_api_key", "AIzaSyBxVIw01td__Do5hlvcloetCNg8kZcne9I"
+            resValue "string", "google_maps_api_key", googleMapsApiKeyDevelop
         }
         store {
             dimension "default"
@@ -83,7 +103,7 @@ android {
             versionCode appVersionCode
             versionName appVersionName
 
-            resValue "string", "google_maps_api_key", "AIzaSyAGYs7CMyEDSh9Rxvce_cg6qfnnvIZikh8"
+            resValue "string", "google_maps_api_key", googleMapsApiKeyStore
         }
     }
 }

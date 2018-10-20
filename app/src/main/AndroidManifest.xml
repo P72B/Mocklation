@@ -76,7 +76,7 @@
             android:exported="false"/>
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="a6991485f22b790e6547f473679aa2bd19cadd23" />
+            android:value="${fabricApiKey}" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
