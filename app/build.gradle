@@ -89,29 +89,29 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
-    compile "com.android.support:cardview-v7:${supportLibVersion}"
-    compile "com.android.support:design:${supportLibVersion}"
-    compile "com.android.support:support-dynamic-animation:${supportLibVersion}"
-    compile "com.android.support:customtabs:${supportLibVersion}"
-    compile "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    api "com.android.support:appcompat-v7:${supportLibVersion}"
+    api "com.android.support:cardview-v7:${supportLibVersion}"
+    api "com.android.support:design:${supportLibVersion}"
+    api "com.android.support:support-dynamic-animation:${supportLibVersion}"
+    api "com.android.support:customtabs:${supportLibVersion}"
+    api "android.arch.persistence.room:runtime:$rootProject.roomVersion"
     annotationProcessor "android.arch.persistence.room:compiler:$rootProject.roomVersion"
-    compile "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"
-    compile "com.google.android.gms:play-services-maps:${playServicesVersion}"
-    compile "com.google.android.gms:play-services-places:${playServicesVersion}"
-    compile "com.google.android.gms:play-services-location:${playServicesVersion}"
-    compile "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
-    compile "com.google.code.gson:gson:${gsonVersion}"
-    compile "com.google.dagger:dagger:${daggerVersion}"
-    compile "com.google.firebase:firebase-core:${firebaseVersion}"
-    compile 'com.google.firebase:firebase-config:16.1.0'
+    api "android.arch.persistence.room:rxjava2:$rootProject.roomVersion"
+    api "com.google.android.gms:play-services-maps:${playServicesVersion}"
+    api "com.google.android.gms:play-services-places:${playServicesVersion}"
+    api "com.google.android.gms:play-services-location:${playServicesVersion}"
+    api "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
+    api "com.google.code.gson:gson:${gsonVersion}"
+    api "com.google.dagger:dagger:${daggerVersion}"
+    api "com.google.firebase:firebase-core:${firebaseVersion}"
+    api 'com.google.firebase:firebase-config:16.1.0'
     annotationProcessor rootProject.ext.daggerCompiler
-    compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
-    compile "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
-    compile('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
+    api "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
+    api "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
+    api('com.crashlytics.sdk.android:crashlytics:2.9.4@aar') {
         transitive = true
     }
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 apply plugin: 'com.google.gms.google-services'
