@@ -5,11 +5,11 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_fixed_mode"
+            android:id="@+id/vNavFixedMode"
             android:icon="@drawable/ic_location_fixed_black_24px"
             android:title="@string/title_activity_fixed_mode" />
         <item
-            android:id="@+id/nav_route_mode"
+            android:id="@+id/vNavRouteMode"
             android:icon="@drawable/ic_location_route_black_24px"
             android:title="@string/title_activity_route_mode" />
     </group>
@@ -17,7 +17,7 @@
     <item android:title="@string/nav_divider_readings">
         <menu>
             <item
-                android:id="@+id/nav_imprint"
+                android:id="@+id/vNavImprint"
                 android:icon="@drawable/ic_info_outline_black_24dp"
                 android:title="@string/title_activity_imprint" />
         </menu>

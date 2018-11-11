@@ -39,6 +39,7 @@ ext {
     appCompileSdk = 29
     appBuildTools = "28.0.3"
 
+    supportConstraintLayout = "1.1.3"
     playServicesVersion = "16.0.0"
     gsonVersion = "2.8.1"
     mapsUtilsVersion = "0.4.4"

@@ -109,7 +109,7 @@ public class MainPresenter implements IMainPresenter {
     @Override
     public void onClick(int viewId) {
         switch (viewId) {
-            case R.id.fab:
+            case R.id.vFab:
                 if (!mSetting.isPrivacyStatementAccepted()) {
                     showPrivacyUpdateDialog();
                     return;

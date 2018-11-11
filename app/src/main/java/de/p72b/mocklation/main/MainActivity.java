@@ -170,12 +170,12 @@ private static final String TAG = MainActivity.class.getSimpleName();
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         switch(item.getItemId()) {
-            case R.id.nav_fixed_mode:
+            case R.id.vNavFixedMode:
                 break;
-            case R.id.nav_route_mode:
+            case R.id.vNavRouteMode:
                 Toast.makeText(this, R.string.error_1016, Toast.LENGTH_LONG).show();
                 return false;
-            case R.id.nav_imprint:
+            case R.id.vNavImprint:
                 startActivity(new Intent(this, ImprintActivity.class));
                 break;
         }
@@ -208,7 +208,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     public void showSnackbar(int message, int action, View.OnClickListener listener, int duration) {
-        Snackbar snackbar = Snackbar.make(findViewById(R.id.main_root), message, duration);
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.vMainRoot), message, duration);
         if (action != -1) {
             snackbar.setAction(action, listener);
         }
@@ -230,17 +230,17 @@ private static final String TAG = MainActivity.class.getSimpleName();
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        mNavigationView = findViewById(R.id.nav_view);
+        mNavigationView = findViewById(R.id.vNavView);
         mNavigationView.setNavigationItemSelectedListener(this);
-        mNavigationView.setCheckedItem(R.id.nav_fixed_mode);
-        ((TextView) findViewById(R.id.nav_footer_item)).setText(BuildConfig.VERSION_NAME);
+        mNavigationView.setCheckedItem(R.id.vNavFixedMode);
+        ((TextView) findViewById(R.id.vNavFooterItem)).setText(BuildConfig.VERSION_NAME);
 
         mDataView = findViewById(R.id.data_view);
         mDataEmpty = findViewById(R.id.data_empty);
         mDataView.setVisibility(View.INVISIBLE);
         mDataEmpty.setVisibility(View.INVISIBLE);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.vFab);
         fab.setOnClickListener(this);
 
         mSelectedLocationName = findViewById(R.id.card_view_selected_location_name);
@@ -268,7 +268,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
         findViewById(R.id.edit).setOnClickListener(this);
 
-        final View root = findViewById(R.id.main_root);
+        final View root = findViewById(R.id.vMainRoot);
         root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
