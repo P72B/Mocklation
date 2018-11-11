@@ -217,7 +217,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
     private void initViews() {
         setContentView(R.layout.activity_main);
-        final Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.vToolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();

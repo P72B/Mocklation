@@ -52,7 +52,7 @@ public class ImprintActivity extends AppCompatActivity {
      * Setup the material toolbar.
      */
     private void setupAppBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.vToolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
