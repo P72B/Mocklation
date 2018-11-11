@@ -1,9 +1,11 @@
 package de.p72b.mocklation.main
 
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -31,8 +33,6 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val actionBar = supportActionBar
-        actionBar?.title = getString(R.string.title_activity_fixed_mode)
         drawer = findViewById(R.id.drawer_layout)
         val toggle = ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -62,8 +62,27 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     }
 
     private fun show(fragment: Fragment) {
+        updateAppBar(fragment)
+
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.vMainContainer, fragment)
         fragmentTransaction.commit()
+    }
+
+    private fun updateAppBar(fragment: Fragment) {
+        var title = ""
+        var color = ContextCompat.getColor(this, R.color.colorPrimary)
+        when (fragment) {
+            is FixedFragment -> {
+                title = getString(R.string.title_activity_fixed_mode)
+                color = ContextCompat.getColor(this, R.color.r1)
+            }
+            is RouteFragment -> {
+                title = getString(R.string.title_activity_route_mode)
+                color = ContextCompat.getColor(this, R.color.r2)
+            }
+        }
+        supportActionBar?.title = title
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(color))
     }
 }
