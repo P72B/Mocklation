@@ -142,7 +142,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mSetting = (Setting) AppServices.getService(AppServices.SETTINGS);
         mDb = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
