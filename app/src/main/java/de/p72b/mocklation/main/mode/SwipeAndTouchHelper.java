@@ -1,4 +1,4 @@
-package de.p72b.mocklation.main;
+package de.p72b.mocklation.main.mode;
 
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,7 +7,7 @@ public class SwipeAndTouchHelper extends ItemTouchHelper.Callback {
 
     private ActionCompletionContract mContract;
 
-    SwipeAndTouchHelper(ActionCompletionContract contract) {
+    public SwipeAndTouchHelper(ActionCompletionContract contract) {
         mContract = contract;
     }
 

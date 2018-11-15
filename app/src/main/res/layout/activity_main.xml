@@ -37,5 +37,4 @@
                 tools:text="1.0.2 (develop)" />
         </LinearLayout>
     </com.google.android.material.navigation.NavigationView>
-
 </androidx.drawerlayout.widget.DrawerLayout>

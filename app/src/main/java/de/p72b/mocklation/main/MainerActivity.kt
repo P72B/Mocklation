@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -21,12 +22,15 @@ import de.p72b.mocklation.R
 import de.p72b.mocklation.imprint.ImprintActivity
 import de.p72b.mocklation.main.mode.fixed.FixedFragment
 import de.p72b.mocklation.main.mode.route.RouteFragment
+import de.p72b.mocklation.map.MapsActivity
 
 
-class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+        View.OnClickListener {
 
     private lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
+    private lateinit var fabAddNewLocationItem: FloatingActionButton
     private lateinit var fixedFragment: FixedFragment
     private lateinit var routeFragment: RouteFragment
     private lateinit var toolbarLayout: View
@@ -53,10 +57,12 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         (findViewById<View>(R.id.vNavFooterItem) as TextView).text = BuildConfig.VERSION_NAME
         toolbarLayout = findViewById(R.id.vToolbarLayout)
         val actionBar = supportActionBar
-        actionBar?.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM)
+        actionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         actionBar?.setCustomView(R.layout.custom_action_bar)
         actionBarTitle = actionBar?.customView!!.findViewById(R.id.vCustomActionBarTitle)
 
+        fabAddNewLocationItem = findViewById(R.id.vFab)
+        fabAddNewLocationItem.setOnClickListener(this)
 
         fixedFragment = FixedFragment()
         routeFragment = RouteFragment()
@@ -78,6 +84,15 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
         drawer.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onClick(view: View?) {
+        if (view == null) {
+            return
+        }
+        when (view.id) {
+            R.id.vFab -> startActivity(Intent(baseContext, MapsActivity::class.java))
+        }
     }
 
     private fun show(fragment: Fragment) {
@@ -106,7 +121,7 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
         actionBarTitle?.text = title
 
-        toolbarLayout.setBackground(transitionDrawable)
+        toolbarLayout.background = transitionDrawable
         transitionDrawable.startTransition(1500)
 
         colorLeft = color

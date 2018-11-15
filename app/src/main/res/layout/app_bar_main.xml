@@ -2,10 +2,10 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/vMainRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:id="@+id/vMainRoot"
     tools:context="de.p72b.mocklation.main.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -56,7 +56,6 @@
         app:layout_anchor="@id/vAppBar"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_add_black_24dp" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

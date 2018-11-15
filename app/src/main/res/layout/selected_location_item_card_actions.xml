@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/eye"
+    android:padding="10dp">
+
+    <ImageButton
+        android:id="@+id/vPlayStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/ic_play_arrow_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/vPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/selected_item_action_items_padding"
+        android:layout_toStartOf="@+id/vPlayStop"
+        android:background="@drawable/ic_pause_black_24dp"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:id="@+id/vEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="@dimen/selected_item_action_items_padding"
+        android:background="@drawable/ic_edit_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/vFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/selected_item_action_items_padding"
+        android:layout_toEndOf="@id/edit"
+        android:background="@drawable/ic_favorite_border_black_24dp" />
+</RelativeLayout>

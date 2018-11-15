@@ -1,15 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/vDataEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="12dp"
-        android:text="Fixed content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/empty_data"
+        android:textSize="@dimen/text_size_middle"
+        android:visibility="invisible"
+        tools:visibility="invisible" />
+
+    <LinearLayout
+        android:id="@+id/vDataView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/face"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        tools:visibility="visible">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/vCardViewSelectedLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            card_view:cardCornerRadius="@dimen/card_view_corner_radius">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/card_view_selected_location_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:text="@string/selected_location_title"
+                        android:textAllCaps="true" />
+
+                    <TextView
+                        android:id="@+id/card_view_selected_location_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:textSize="@dimen/text_size_large"
+                        tools:text="Name" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/card_view_selected_location_latitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@android:color/transparent"
+                                android:editable="false"
+                                android:focusable="false"
+                                android:hint="@string/latitude"
+                                android:inputType="none"
+                                tools:text="13.123456" />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <android.support.design.widget.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <android.support.design.widget.TextInputEditText
+                                android:id="@+id/card_view_selected_location_longitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@android:color/transparent"
+                                android:editable="false"
+                                android:focusable="false"
+                                android:hint="@string/longitude"
+                                android:inputType="none"
+                                tools:text="52.123456" />
+                        </android.support.design.widget.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <include
+                    layout="@layout/selected_location_item_card_actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/vTextViewSavedLocations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:paddingStart="10dp"
+            android:text="@string/location_list_title"
+            android:textAllCaps="true" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/vLocationList"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+</RelativeLayout>

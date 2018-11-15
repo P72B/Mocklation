@@ -1,4 +1,4 @@
-package de.p72b.mocklation.main;
+package de.p72b.mocklation.main.mode;
 
 
 import android.view.LayoutInflater;
@@ -20,7 +20,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         SwipeAndTouchHelper.ActionCompletionContract {
     private static final String TAG = LocationListAdapter.class.getSimpleName();
     private List<LocationItem> mDataset;
-    private final MainActivity.IAdapterListener mListener;
+    private final IAdapterListener mListener;
     private LocationItem mSelectedItem;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -38,7 +38,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    LocationListAdapter(MainActivity.IAdapterListener listener) {
+    public LocationListAdapter(IAdapterListener listener) {
         mDataset = new ArrayList<>();
         mListener = listener;
     }
@@ -82,7 +82,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         mListener.onItemRemoved(item);
     }
 
-    LocationItem getItemAt(int position) {
+    public LocationItem getItemAt(int position) {
         return mDataset.get(position);
     }
 
@@ -111,7 +111,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         notifyDataSetChanged();
     }
 
-    void flagItem(LocationItem item) {
+    public void flagItem(LocationItem item) {
         mSelectedItem = item;
         notifyDataSetChanged();
     }
