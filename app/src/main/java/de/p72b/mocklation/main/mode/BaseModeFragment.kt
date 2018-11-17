@@ -1,13 +1,14 @@
 package de.p72b.mocklation.main.mode
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.TypedValue
+import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import de.p72b.mocklation.R
@@ -83,6 +84,32 @@ abstract class BaseModeFragment : Fragment() {
 
         val touchHelper = ItemTouchHelper(SwipeAndTouchHelper(adapter))
         touchHelper.attachToRecyclerView(recyclerView)
+
+        if (activity == null) {
+            return
+        }
+        val toolbar = activity!!.findViewById<Toolbar>(R.id.vToolbar)
+        val root = activity!!.findViewById<View>(R.id.vMainRoot)
+        root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                val rectangle = Rect()
+                activity!!.window.decorView.getWindowVisibleDisplayFrame(rectangle)
+                val statusBarHeight = rectangle.top
+                val rootHeight = root.height
+                val selectedLocationCardHeight = rootView.findViewById<View>(R.id.vCardViewSelectedLocation).height
+                val toolbarHeight = toolbar.height
+                val padding15dp = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                        15f, resources.displayMetrics))
+
+                val newHeight = rootHeight - statusBarHeight - toolbarHeight - selectedLocationCardHeight - 4 * padding15dp
+
+                val params = recyclerView.layoutParams
+                params.height = newHeight
+                recyclerView.layoutParams = params
+            }
+        })
     }
 
     private fun toggleDataViewTo(state: Int) {
