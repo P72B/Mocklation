@@ -34,6 +34,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/selected_item_action_items_padding"
-        android:layout_toEndOf="@id/edit"
+        android:layout_toEndOf="@id/vEdit"
         android:background="@drawable/ic_favorite_border_black_24dp" />
 </RelativeLayout>

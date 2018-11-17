@@ -37,6 +37,7 @@ import de.p72b.mocklation.R;
 import de.p72b.mocklation.imprint.ImprintActivity;
 import de.p72b.mocklation.main.mode.IAdapterListener;
 import de.p72b.mocklation.main.mode.LocationListAdapter;
+import de.p72b.mocklation.main.MockServiceInteractor;
 import de.p72b.mocklation.main.mode.SwipeAndTouchHelper;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
@@ -118,11 +119,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
     public void selectLocation(LocationItem item) {
         mSelectedLocationName.setText(LocationItem.getNameToBeDisplayed(item));
 
-        if (item.isIsFavorite()) {
-            mFavorite.setBackground(getDrawable(R.drawable.ic_favorite_black_24dp));
-        } else {
-            mFavorite.setBackground(getDrawable(R.drawable.ic_favorite_border_black_24dp));
-        }
+        mFavorite.setBackground(getDrawable(item.isIsFavorite() ? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp));
 
         Object geometry = item.getGeometry();
         if (geometry instanceof LatLng) {

@@ -2,6 +2,7 @@ package de.p72b.mocklation.main.mode
 
 import android.graphics.Rect
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -11,12 +12,14 @@ import android.util.TypedValue
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.ImageButton
+import android.widget.ImageView
 import de.p72b.mocklation.R
 import de.p72b.mocklation.service.room.LocationItem
 import de.p72b.mocklation.util.VisibilityAnimationListener
 
 
-abstract class BaseModeFragment : Fragment() {
+abstract class BaseModeFragment : Fragment(), View.OnClickListener {
 
     private lateinit var rootView: View
     private lateinit var dataView: View
@@ -25,6 +28,9 @@ abstract class BaseModeFragment : Fragment() {
     private lateinit var fadeOutAnimation: Animation
     private lateinit var recyclerView: RecyclerView
     private lateinit var presenter: BaseModePresenter
+    private lateinit var buttonPlayStop: ImageButton
+    private lateinit var buttonPausePlay: ImageButton
+    private lateinit var favorite: ImageButton
     private var adapter = LocationListAdapter(AdapterListener())
     private val fadeOutListener = VisibilityAnimationListener()
     private val fadeInListener = VisibilityAnimationListener()
@@ -47,6 +53,7 @@ abstract class BaseModeFragment : Fragment() {
         rootView = provideBaseFragmentView(inflater, parent, savedInstanseState)
         presenter = provideBaseModePresenter()
         initBaseView()
+        initServiceItemBar()
         return rootView
     }
 
@@ -59,6 +66,12 @@ abstract class BaseModeFragment : Fragment() {
         presenter.onDestroy()
         super.onDestroy()
     }
+    override fun onClick(view: View?) {
+        if (view == null) {
+            return
+        }
+        presenter.onClick(view.id)
+    }
 
     fun showEmptyPlaceholder() {
         toggleDataViewTo(View.INVISIBLE)
@@ -69,9 +82,32 @@ abstract class BaseModeFragment : Fragment() {
         adapter.setData(locationItems)
     }
 
+    fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener, duration: Int) {
+        val snackbar = Snackbar.make(rootView, message, duration)
+        if (action != -1) {
+            snackbar.setAction(action, listener)
+        }
+        snackbar.show()
+    }
+
+    fun setPlayPauseStopStatus(@MockServiceInteractor.ServiceStatus state: Int) {
+        when (state) {
+            MockServiceInteractor.SERVICE_STATE_RUNNING -> {
+                buttonPlayStop.setBackgroundResource(R.drawable.ic_stop_black_24dp)
+                buttonPausePlay.setBackgroundResource(R.drawable.ic_pause_black_24dp)
+                buttonPausePlay.setVisibility(View.VISIBLE)
+            }
+            MockServiceInteractor.SERVICE_STATE_STOP -> {
+                buttonPlayStop.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp)
+                buttonPausePlay.setVisibility(View.INVISIBLE)
+            }
+            MockServiceInteractor.SERVICE_STATE_PAUSE -> buttonPausePlay.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp)
+        }
+    }
+
     private fun initBaseView() {
-        dataView = rootView.findViewById<View>(R.id.vDataView)
-        dataEmpty = rootView.findViewById<View>(R.id.vDataEmpty)
+        dataView = rootView.findViewById(R.id.vDataView)
+        dataEmpty = rootView.findViewById(R.id.vDataEmpty)
         dataView.visibility = View.INVISIBLE
         dataEmpty.visibility = View.INVISIBLE
 
@@ -112,6 +148,19 @@ abstract class BaseModeFragment : Fragment() {
         })
     }
 
+    private fun initServiceItemBar() {
+        buttonPlayStop = rootView.findViewById(R.id.vPlayStop)
+        buttonPlayStop.setOnClickListener(this)
+
+        buttonPausePlay = rootView.findViewById(R.id.vPause)
+        buttonPausePlay.setOnClickListener(this)
+
+        favorite = rootView.findViewById(R.id.vFavorite)
+        favorite.setOnClickListener(this)
+
+        rootView.findViewById<View>(R.id.vEdit).setOnClickListener(this)
+    }
+
     private fun toggleDataViewTo(state: Int) {
         if (View.INVISIBLE == state) {
             if (dataEmpty.visibility != View.VISIBLE) {
@@ -135,6 +184,9 @@ abstract class BaseModeFragment : Fragment() {
     }
 
     fun selectLocation(item: LocationItem) {
+        favorite.background = activity!!.getDrawable(if (item.isIsFavorite)
+            R.drawable.ic_favorite_black_24dp else R.drawable.ic_favorite_border_black_24dp)
+
         adapter.flagItem(item)
     }
 
