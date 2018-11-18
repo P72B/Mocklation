@@ -2,12 +2,17 @@ package de.p72b.mocklation.main.mode
 
 import android.arch.persistence.room.Room
 import android.support.design.widget.Snackbar
+import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentManager
 import android.view.View
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.p72b.mocklation.R
 import de.p72b.mocklation.dagger.MocklationApp
+import de.p72b.mocklation.dialog.PrivacyUpdateDialog
 import de.p72b.mocklation.service.room.AppDatabase
 import de.p72b.mocklation.service.room.LocationItem
 import de.p72b.mocklation.service.setting.ISetting
+import de.p72b.mocklation.util.Constants
 import io.reactivex.Completable
 import io.reactivex.CompletableObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,10 +21,12 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
-open class BaseModePresenter(private val view: BaseModeFragment,
+open class BaseModePresenter(private val supportFragmentManager: FragmentManager?,
+                             private val view: BaseModeFragment,
                              private val setting: ISetting) {
 
     private lateinit var locationItemList: List<LocationItem>
+    private val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
     private var selectedItem: LocationItem? = null
     private var db: AppDatabase = Room.databaseBuilder(MocklationApp.getInstance(),
             AppDatabase::class.java, AppDatabase.DB_NAME_LOCATIONS).build()
@@ -94,11 +101,34 @@ open class BaseModePresenter(private val view: BaseModeFragment,
 
     fun onClick(id: Int) {
         when(id) {
-            R.id.vPlayStop -> {}
+            R.id.vPlayStop -> {
+                if (!setting.isPrivacyStatementAccepted) {
+                    showPrivacyUpdateDialog()
+                    return
+                }
+                // TODO
+            }
             R.id.vPause -> {}
             R.id.vFavorite -> onFavoriteClicked()
             R.id.vEdit -> {}
         }
+    }
+
+    private fun showPrivacyUpdateDialog() {
+        val dialog = PrivacyUpdateDialog.newInstance(
+                object : PrivacyUpdateDialog.PrivacyUpdateDialogListener {
+                    override fun onAcceptClick() {
+                        setting.acceptCurrentPrivacyStatement()
+                        // TODO
+                    }
+
+                    override fun onDeclineClick() {
+                        view.showSnackbar(R.string.error_1020, -1, null,
+                                Snackbar.LENGTH_LONG)
+                    }
+                }, firebaseRemoteConfig.getString(Constants.REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY))
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme)
+        dialog.show(supportFragmentManager, PrivacyUpdateDialog.TAG)
     }
 
     private fun onFavoriteClicked() {

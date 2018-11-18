@@ -82,7 +82,7 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
         adapter.setData(locationItems)
     }
 
-    fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener, duration: Int) {
+    fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener?, duration: Int) {
         val snackbar = Snackbar.make(rootView, message, duration)
         if (action != -1) {
             snackbar.setAction(action, listener)

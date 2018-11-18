@@ -37,7 +37,6 @@ import de.p72b.mocklation.R;
 import de.p72b.mocklation.imprint.ImprintActivity;
 import de.p72b.mocklation.main.mode.IAdapterListener;
 import de.p72b.mocklation.main.mode.LocationListAdapter;
-import de.p72b.mocklation.main.MockServiceInteractor;
 import de.p72b.mocklation.main.mode.SwipeAndTouchHelper;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;

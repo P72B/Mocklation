@@ -1,11 +1,11 @@
 package de.p72b.mocklation.main
 
-import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -19,10 +19,10 @@ import android.view.View
 import android.widget.TextView
 import de.p72b.mocklation.BuildConfig
 import de.p72b.mocklation.R
-import de.p72b.mocklation.imprint.ImprintActivity
 import de.p72b.mocklation.main.mode.fixed.FixedFragment
 import de.p72b.mocklation.main.mode.route.RouteFragment
-import de.p72b.mocklation.map.MapsActivity
+import de.p72b.mocklation.service.AppServices
+import de.p72b.mocklation.service.setting.ISetting
 
 
 class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
@@ -31,8 +31,6 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     private lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var fabAddNewLocationItem: FloatingActionButton
-    private lateinit var fixedFragment: FixedFragment
-    private lateinit var routeFragment: RouteFragment
     private lateinit var toolbarLayout: View
     private lateinit var presenter: MainerPresenter
     private var actionBarTitle: TextView? = null
@@ -43,7 +41,8 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        presenter = MainerPresenter(this)
+        val setting = AppServices.getService(AppServices.SETTINGS) as ISetting
+        presenter = MainerPresenter(this, this, setting)
         val toolbar = findViewById<Toolbar>(R.id.vToolbar)
         setSupportActionBar(toolbar)
 
@@ -66,23 +65,18 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         fabAddNewLocationItem = findViewById(R.id.vFab)
         fabAddNewLocationItem.setOnClickListener(this)
 
-        fixedFragment = FixedFragment()
-        routeFragment = RouteFragment()
-
         colorFixedFragment = ContextCompat.getColor(this, R.color.colorPrimary)
         colorRouteFragment = ContextCompat.getColor(this, R.color.r1)
         colorLeft = colorFixedFragment
+    }
 
-        show(fixedFragment)
+    override fun onStart() {
+        super.onStart()
+        presenter.onStart()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.vNavFixedMode -> show(fixedFragment)
-            R.id.vNavRouteMode -> show(routeFragment)
-            R.id.vNavImprint -> startActivity(Intent(this, ImprintActivity::class.java))
-        }
+        presenter.onNavigationItemSelected(item.itemId)
 
         drawer.closeDrawer(GravityCompat.START)
         return true
@@ -92,17 +86,23 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         if (view == null) {
             return
         }
-        when (view.id) {
-            R.id.vFab -> startActivity(Intent(baseContext, MapsActivity::class.java))
-        }
+        presenter.onClick(view.id)
     }
 
-    private fun show(fragment: Fragment) {
+    fun show(fragment: Fragment) {
         updateAppBar(fragment)
 
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.vMainContainer, fragment)
         fragmentTransaction.commit()
+    }
+
+    fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener?, duration: Int) {
+        val snackbar = Snackbar.make(findViewById(R.id.vMainRoot), message, duration)
+        if (action != -1) {
+            snackbar.setAction(action, listener)
+        }
+        snackbar.show()
     }
 
     private fun updateAppBar(fragment: Fragment) {
