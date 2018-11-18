@@ -2,7 +2,6 @@ package de.p72b.mocklation.main.mode
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -15,7 +14,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import de.p72b.mocklation.R
 import de.p72b.mocklation.service.room.LocationItem
-import de.p72b.mocklation.util.Logger
 import de.p72b.mocklation.util.VisibilityAnimationListener
 
 
@@ -39,6 +37,15 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
                                          savedInstanceState: Bundle?): View
 
     abstract fun provideBaseModePresenter(): BaseModePresenter
+
+    abstract fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener?, duration: Int)
+
+    open fun selectLocation(item: LocationItem) {
+        favorite.background = activity!!.getDrawable(if (item.isIsFavorite)
+            R.drawable.ic_favorite_black_24dp else R.drawable.ic_favorite_border_black_24dp)
+
+        adapter.flagItem(item)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,14 +101,6 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
     fun showSavedLocations(locationItems: List<LocationItem>) {
         toggleDataViewTo(View.VISIBLE)
         adapter.setData(locationItems)
-    }
-
-    fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener?, duration: Int) {
-        val snackbar = Snackbar.make(rootView, message, duration)
-        if (action != -1) {
-            snackbar.setAction(action, listener)
-        }
-        snackbar.show()
     }
 
     fun setPlayPauseStopStatus(state: Int) {
@@ -195,13 +194,6 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
                 dataView.startAnimation(fadeInAnimation)
             }
         }
-    }
-
-    fun selectLocation(item: LocationItem) {
-        favorite.background = activity!!.getDrawable(if (item.isIsFavorite)
-            R.drawable.ic_favorite_black_24dp else R.drawable.ic_favorite_border_black_24dp)
-
-        adapter.flagItem(item)
     }
 
     private inner class AdapterListener : IAdapterListener {
