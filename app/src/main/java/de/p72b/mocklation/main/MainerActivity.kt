@@ -34,6 +34,7 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     private lateinit var fixedFragment: FixedFragment
     private lateinit var routeFragment: RouteFragment
     private lateinit var toolbarLayout: View
+    private lateinit var presenter: MainerPresenter
     private var actionBarTitle: TextView? = null
     private var colorLeft = 0
     private var colorFixedFragment = 0
@@ -42,6 +43,7 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        presenter = MainerPresenter(this)
         val toolbar = findViewById<Toolbar>(R.id.vToolbar)
         setSupportActionBar(toolbar)
 
