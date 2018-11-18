@@ -83,7 +83,7 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         mListener = listener;
         mState = isServiceRunning() ? SERVICE_STATE_RUNNING : SERVICE_STATE_STOP;
         AppUtil.registerLocalBroadcastReceiver(
-                mActivity,
+                mContext,
                 mLocalAppBroadcastReceiver,
                 MockLocationService.EVENT_PAUSE,
                 MockLocationService.EVENT_PLAY,

@@ -1,5 +1,6 @@
 package de.p72b.mocklation.main.mode
 
+import android.app.Activity
 import android.arch.persistence.room.Room
 import android.support.design.widget.Snackbar
 import android.support.v4.app.DialogFragment
@@ -21,17 +22,19 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
-open class BaseModePresenter(private val supportFragmentManager: FragmentManager?,
+open class BaseModePresenter(activity: Activity?,
+                             private val supportFragmentManager: FragmentManager?,
                              private val view: BaseModeFragment,
                              private val setting: ISetting) {
 
-    private lateinit var locationItemList: List<LocationItem>
+    private lateinit var locationItemList: MutableList<LocationItem>
     private val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
     private var selectedItem: LocationItem? = null
     private var db: AppDatabase = Room.databaseBuilder(MocklationApp.getInstance(),
             AppDatabase::class.java, AppDatabase.DB_NAME_LOCATIONS).build()
     private var disposableGetAll: Disposable? = null
     private val disposables = CompositeDisposable()
+    private val mockServiceInteractor = MockServiceInteractor(activity, setting, MockServiceListener())
 
 
     fun onResume() {
@@ -60,11 +63,26 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
     }
 
     fun locationItemRemoved(item: LocationItem) {
+        if (mockServiceInteractor.isServiceRunning() && item.code == setting.mockLocationItemCode) {
+            // don't remove the actual mocked location
+            locationItemList.add(item)
+            handleLocationItems(locationItemList)
+            view.showSnackbar(R.string.error_1001, R.string.stop, View.OnClickListener {
+                mockServiceInteractor.stopMockLocationService()
+                setting.saveLastPressedLocation(item.code)
+                view.selectLocation(item)
+            }, Snackbar.LENGTH_LONG)
+            return
+        }
 
+        Completable.fromAction { db.locationItemDao().delete(item) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(DeleteLocationItemObserver(item))
     }
 
     private fun fetchAll() {
-       val disposable = db.locationItemDao().all
+        val disposable = db.locationItemDao().all
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(FetchAllLocationItemObserver())
@@ -72,7 +90,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
         disposables.add(disposable)
     }
 
-    private fun handleLocationItems(locationItems: List<LocationItem>) {
+    private fun handleLocationItems(locationItems: MutableList<LocationItem>) {
         locationItemList = locationItems
         if (locationItemList.isEmpty()) {
             view.showEmptyPlaceholder()
@@ -100,7 +118,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
     }
 
     fun onClick(id: Int) {
-        when(id) {
+        when (id) {
             R.id.vPlayStop -> {
                 if (!setting.isPrivacyStatementAccepted) {
                     showPrivacyUpdateDialog()
@@ -108,9 +126,11 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
                 }
                 // TODO
             }
-            R.id.vPause -> {}
+            R.id.vPause -> {
+            }
             R.id.vFavorite -> onFavoriteClicked()
-            R.id.vEdit -> {}
+            R.id.vEdit -> {
+            }
         }
     }
 
@@ -147,9 +167,16 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
                 .subscribe(UpdateLocationItemObserver(item))
     }
 
-    private inner class FetchAllLocationItemObserver : Consumer<List<LocationItem>> {
+    private fun saveLocationItem(item: LocationItem) {
+        Completable.fromAction { db.locationItemDao().insertAll(item) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(SaveLocationItemObserver(item))
+    }
+
+    private inner class FetchAllLocationItemObserver : Consumer<MutableList<LocationItem>> {
         @Throws(Exception::class)
-        override fun accept(locationItems: List<LocationItem>) {
+        override fun accept(locationItems: MutableList<LocationItem>) {
             handleLocationItems(locationItems)
             disposableGetAll?.let { disposables.remove(it) }
         }
@@ -172,6 +199,62 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
         override fun onError(e: Throwable) {
             view.showSnackbar(R.string.error_1012, R.string.snackbar_action_retry,
                     View.OnClickListener { updateItem(mItem) }, Snackbar.LENGTH_LONG)
+        }
+    }
+
+    private inner class DeleteLocationItemObserver internal constructor(private val item: LocationItem) : CompletableObserver {
+        private var disposableDeleteItem: Disposable? = null
+
+        override fun onSubscribe(disposable: Disposable) {
+            disposableDeleteItem = disposable
+            disposables.add(disposableDeleteItem!!)
+        }
+
+        override fun onComplete() {
+            disposables.remove(disposableDeleteItem!!)
+            locationItemList.remove(item)
+            handleLocationItems(locationItemList)
+            view.showSnackbar(R.string.message_location_item_removed, R.string.snackbar_action_undo,
+                    View.OnClickListener { saveLocationItem(item) }, Snackbar.LENGTH_LONG)
+        }
+
+        override fun onError(e: Throwable) {
+            view.showSnackbar(R.string.error_1008, R.string.snackbar_action_retry,
+                    View.OnClickListener { locationItemRemoved(item) }, Snackbar.LENGTH_LONG)
+        }
+    }
+
+    private inner class SaveLocationItemObserver internal constructor(private val mItem: LocationItem) : CompletableObserver {
+        private var disposableInsertAll: Disposable? = null
+
+        override fun onSubscribe(disposable: Disposable) {
+            disposableInsertAll = disposable
+            disposables.add(disposableInsertAll!!)
+        }
+
+        override fun onComplete() {
+            disposables.remove(disposableInsertAll!!)
+            locationItemList.add(mItem)
+            handleLocationItems(locationItemList)
+        }
+
+        override fun onError(e: Throwable) {
+            view.showSnackbar(R.string.error_1009, R.string.snackbar_action_retry,
+                    View.OnClickListener { saveLocationItem(mItem) }, Snackbar.LENGTH_LONG)
+        }
+    }
+
+    private inner class MockServiceListener : MockServiceInteractor.MockServiceListener {
+        override fun onStart() {
+            view.setPlayPauseStopStatus(mockServiceInteractor.state)
+        }
+
+        override fun onStop() {
+            view.setPlayPauseStopStatus(mockServiceInteractor.state)
+        }
+
+        override fun onUpdate() {
+            view.setPlayPauseStopStatus(mockServiceInteractor.state)
         }
     }
 }

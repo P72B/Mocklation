@@ -19,6 +19,6 @@ class FixedFragment : BaseModeFragment() {
 
     override fun provideBaseModePresenter(): BaseModePresenter {
         val setting = AppServices.getService(AppServices.SETTINGS) as ISetting
-        return FixedPresenter(this, setting)
+        return FixedPresenter(activity, this, setting)
     }
 }
