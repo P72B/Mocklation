@@ -9,6 +9,7 @@ import android.view.View
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.p72b.mocklation.R
 import de.p72b.mocklation.dagger.MocklationApp
+import de.p72b.mocklation.dialog.EditLocationItemDialog
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog
 import de.p72b.mocklation.service.room.AppDatabase
 import de.p72b.mocklation.service.room.LocationItem
@@ -77,6 +78,27 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
                 .subscribe(DeleteLocationItemObserver(item))
     }
 
+    fun onClick(id: Int) {
+        when (id) {
+            R.id.vPlayStop -> onPlayStopClicked()
+            R.id.vPause -> onPauseClicked()
+            R.id.vFavorite  -> onFavoriteClicked()
+            R.id.vEdit -> showEditLocationItemDialog()
+        }
+    }
+
+    fun setActivity(activity: FragmentActivity) {
+        mockServiceInteractor = MockServiceInteractor(activity, setting, MockServiceListener())
+    }
+
+    private fun showEditLocationItemDialog() {
+        val dialog = EditLocationItemDialog.newInstance(
+                { fetchAll() }, selectedItem
+        )
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme)
+        dialog.show(supportFragmentManager, EditLocationItemDialog.TAG)
+    }
+
     private fun fetchAll() {
         val disposable = db.locationItemDao().all
                 .subscribeOn(Schedulers.io())
@@ -111,16 +133,6 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
 
         view.showSavedLocations(locationItemList)
         view.selectLocation(selectedItem!!)
-    }
-
-    fun onClick(id: Int) {
-        when (id) {
-            R.id.vPlayStop -> onPlayStopClicked()
-            R.id.vPause -> onPauseClicked()
-            R.id.vFavorite  -> onFavoriteClicked()
-            R.id.vEdit -> {
-            }
-        }
     }
 
     private fun onPlayStopClicked() {
@@ -191,10 +203,6 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(SaveLocationItemObserver(item))
-    }
-
-    fun setActivity(activity: FragmentActivity) {
-        mockServiceInteractor = MockServiceInteractor(activity, setting, MockServiceListener())
     }
 
     private inner class FetchAllLocationItemObserver : Consumer<MutableList<LocationItem>> {
