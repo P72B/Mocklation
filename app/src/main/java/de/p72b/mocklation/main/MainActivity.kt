@@ -25,14 +25,14 @@ import de.p72b.mocklation.service.AppServices
 import de.p72b.mocklation.service.setting.ISetting
 
 
-class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener {
 
     private lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var fabAddNewLocationItem: FloatingActionButton
     private lateinit var toolbarLayout: View
-    private lateinit var presenter: MainerPresenter
+    private lateinit var presenter: MainPresenter
     private var actionBarTitle: TextView? = null
     private var colorLeft = 0
     private var colorFixedFragment = 0
@@ -42,7 +42,7 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val setting = AppServices.getService(AppServices.SETTINGS) as ISetting
-        presenter = MainerPresenter(this, this, setting)
+        presenter = MainPresenter(this, this, setting)
         val toolbar = findViewById<Toolbar>(R.id.vToolbar)
         setSupportActionBar(toolbar)
 

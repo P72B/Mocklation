@@ -10,25 +10,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.support.annotation.IntDef
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.widget.Toast
 import de.p72b.mocklation.BuildConfig
 import de.p72b.mocklation.R
-import de.p72b.mocklation.main.IMockServiceInteractor
 import de.p72b.mocklation.service.location.MockLocationService
 import de.p72b.mocklation.service.setting.ISetting
 import de.p72b.mocklation.util.AppUtil
 import de.p72b.mocklation.util.Logger
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
 import java.util.*
 
 class MockServiceInteractor constructor(private val activity: Activity,
                                                  private val setting: ISetting,
-                                                 private val listener: MockServiceListener?)
-    : IMockServiceInteractor {
+                                                 private val listener: MockServiceListener?) {
 
     companion object {
         internal val PERMISSIONS_MOCKING = 115
@@ -88,7 +83,7 @@ class MockServiceInteractor constructor(private val activity: Activity,
         }
 
     init {
-        state = if (isServiceRunning) SERVICE_STATE_RUNNING else SERVICE_STATE_STOP
+        state = if (isServiceRunning()) SERVICE_STATE_RUNNING else SERVICE_STATE_STOP
         AppUtil.registerLocalBroadcastReceiver(
                 context,
                 localAppBroadcastReceiver,
@@ -97,7 +92,7 @@ class MockServiceInteractor constructor(private val activity: Activity,
                 MockLocationService.EVENT_STOP)
     }
 
-    override fun onMockPermissionsResult(grantResults: IntArray) {
+    fun onMockPermissionsResult(grantResults: IntArray) {
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             checkDefaultMockLocationApp()
         } else {
@@ -105,33 +100,33 @@ class MockServiceInteractor constructor(private val activity: Activity,
         }
     }
 
-    override fun pauseMockLocationService() {
-        if (isServiceRunning) {
+    fun pauseMockLocationService() {
+        if (isServiceRunning()) {
             AppUtil.sendLocalBroadcast(context, Intent(
                     MockLocationService.EVENT_PAUSE))
             state = SERVICE_STATE_PAUSE
         }
     }
 
-    override fun playMockLocationService() {
-        if (isServiceRunning) {
+    fun playMockLocationService() {
+        if (isServiceRunning()) {
             AppUtil.sendLocalBroadcast(context, Intent(
                     MockLocationService.EVENT_PLAY))
             state = SERVICE_STATE_RUNNING
         }
     }
 
-    override fun stopMockLocationService() {
-        if (isServiceRunning) {
+    fun stopMockLocationService() {
+        if (isServiceRunning()) {
             stopMockLocationService(MockLocationService::class.java)
         }
     }
 
-    override fun isServiceRunning(): Boolean {
+    fun isServiceRunning(): Boolean {
         return isServiceRunning(MockLocationService::class.java)
     }
 
-    override fun startMockLocation(code: String) {
+    fun startMockLocation(code: String) {
         locationItemCode = code
         Logger.d(TAG, "startMockLocation")
         val permissionsToBeRequired = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -167,7 +162,7 @@ class MockServiceInteractor constructor(private val activity: Activity,
         }
     }
 
-    override fun getState(): Int {
+    fun getState(): Int {
         return state
     }
 

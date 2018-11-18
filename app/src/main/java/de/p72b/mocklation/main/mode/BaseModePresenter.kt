@@ -46,7 +46,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
 
     fun locationItemPressed(item: LocationItem) {
         selectedItem = item
-        if (mockServiceInteractor.isServiceRunning && item.code != setting.mockLocationItemCode) {
+        if (mockServiceInteractor.isServiceRunning() && item.code != setting.mockLocationItemCode) {
             view.showSnackbar(R.string.error_1001, R.string.stop, View.OnClickListener {
                 mockServiceInteractor.stopMockLocationService()
                 setting.saveLastPressedLocation(item.code)
@@ -60,7 +60,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
     }
 
     fun locationItemRemoved(item: LocationItem) {
-        if (mockServiceInteractor.isServiceRunning && item.code == setting.mockLocationItemCode) {
+        if (mockServiceInteractor.isServiceRunning() && item.code == setting.mockLocationItemCode) {
             // don't remove the actual mocked location
             locationItemList.add(item)
             handleLocationItems(locationItemList)
@@ -149,7 +149,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
             return
         }
 
-        if (setting.mockLocationItemCode != null && mockServiceInteractor.isServiceRunning) {
+        if (setting.mockLocationItemCode != null && mockServiceInteractor.isServiceRunning()) {
             mockServiceInteractor.stopMockLocationService()
         } else {
             mockServiceInteractor.startMockLocation(selectedItem!!.code)
@@ -160,7 +160,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
         if (setting.mockLocationItemCode == null) {
             return
         }
-        val state = mockServiceInteractor.state
+        val state = mockServiceInteractor.getState()
         when (state) {
             MockServiceInteractor.SERVICE_STATE_RUNNING -> mockServiceInteractor.pauseMockLocationService()
             MockServiceInteractor.SERVICE_STATE_PAUSE -> mockServiceInteractor.playMockLocationService()
@@ -281,15 +281,15 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
 
     private inner class MockServiceListener : MockServiceInteractor.MockServiceListener {
         override fun onStart() {
-            view.setPlayPauseStopStatus(mockServiceInteractor.state)
+            view.setPlayPauseStopStatus(mockServiceInteractor.getState())
         }
 
         override fun onStop() {
-            view.setPlayPauseStopStatus(mockServiceInteractor.state)
+            view.setPlayPauseStopStatus(mockServiceInteractor.getState())
         }
 
         override fun onUpdate() {
-            view.setPlayPauseStopStatus(mockServiceInteractor.state)
+            view.setPlayPauseStopStatus(mockServiceInteractor.getState())
         }
     }
 }

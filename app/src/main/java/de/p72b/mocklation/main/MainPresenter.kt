@@ -16,8 +16,8 @@ import de.p72b.mocklation.map.MapsActivity
 import de.p72b.mocklation.service.setting.ISetting
 import de.p72b.mocklation.util.Constants
 
-class MainerPresenter(private val activity: Activity, private val view: MainerActivity,
-                      private val setting: ISetting) {
+class MainPresenter(private val activity: Activity, private val view: MainActivity,
+                    private val setting: ISetting) {
 
     private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     private var fixedFragment: FixedFragment = FixedFragment()

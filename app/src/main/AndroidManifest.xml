@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:resizeableActivity="true"
         android:theme="@style/AppTheme"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
@@ -28,12 +28,6 @@
 
         <activity
             android:name=".main.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-
-        <activity
-            android:name=".main.MainerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
