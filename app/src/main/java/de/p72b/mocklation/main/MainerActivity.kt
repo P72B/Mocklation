@@ -89,6 +89,15 @@ class MainerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
         presenter.onClick(view.id)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        supportFragmentManager?.fragments.let { fragmentList ->
+            fragmentList?.forEach {
+                it.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
+
     fun show(fragment: Fragment) {
         updateAppBar(fragment)
 

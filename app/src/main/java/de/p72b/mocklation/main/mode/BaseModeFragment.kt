@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import de.p72b.mocklation.R
 import de.p72b.mocklation.service.room.LocationItem
+import de.p72b.mocklation.util.Logger
 import de.p72b.mocklation.util.VisibilityAnimationListener
 
 
@@ -60,6 +61,13 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
         presenter = provideBaseModePresenter()
         activity?.let{
             presenter.setActivity(it)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+        when (requestCode) {
+            MockServiceInteractor.PERMISSIONS_MOCKING -> presenter.onMockPermissionsResult(grantResults)
         }
     }
 

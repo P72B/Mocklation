@@ -91,6 +91,10 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
         mockServiceInteractor = MockServiceInteractor(activity, setting, MockServiceListener())
     }
 
+    fun onMockPermissionsResult(grantedResults: IntArray) {
+        mockServiceInteractor.onMockPermissionsResult(grantedResults)
+    }
+
     private fun showEditLocationItemDialog() {
         val dialog = EditLocationItemDialog.newInstance(
                 { fetchAll() }, selectedItem
