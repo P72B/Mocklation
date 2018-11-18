@@ -1,9 +1,9 @@
 package de.p72b.mocklation.main.mode
 
-import android.app.Activity
 import android.arch.persistence.room.Room
 import android.support.design.widget.Snackbar
 import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
 import android.view.View
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -22,20 +22,18 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
-open class BaseModePresenter(activity: Activity?,
-                             private val supportFragmentManager: FragmentManager?,
+open class BaseModePresenter(private val supportFragmentManager: FragmentManager?,
                              private val view: BaseModeFragment,
                              private val setting: ISetting) {
 
     private lateinit var locationItemList: MutableList<LocationItem>
+    private lateinit var mockServiceInteractor: MockServiceInteractor
     private val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
     private var selectedItem: LocationItem? = null
     private var db: AppDatabase = Room.databaseBuilder(MocklationApp.getInstance(),
             AppDatabase::class.java, AppDatabase.DB_NAME_LOCATIONS).build()
     private var disposableGetAll: Disposable? = null
     private val disposables = CompositeDisposable()
-    private val mockServiceInteractor = MockServiceInteractor(activity, setting, MockServiceListener())
-
 
     fun onResume() {
         fetchAll()
@@ -47,8 +45,7 @@ open class BaseModePresenter(activity: Activity?,
 
     fun locationItemPressed(item: LocationItem) {
         selectedItem = item
-        /*
-        if (mockServiceInteractor.isServiceRunning() && item.code != setting.mockLocationItemCode) {
+        if (mockServiceInteractor.isServiceRunning && item.code != setting.mockLocationItemCode) {
             view.showSnackbar(R.string.error_1001, R.string.stop, View.OnClickListener {
                 mockServiceInteractor.stopMockLocationService()
                 setting.saveLastPressedLocation(item.code)
@@ -56,14 +53,13 @@ open class BaseModePresenter(activity: Activity?,
             }, Snackbar.LENGTH_LONG)
             return
         }
-        */
 
         setting.saveLastPressedLocation(item.code)
         view.selectLocation(item)
     }
 
     fun locationItemRemoved(item: LocationItem) {
-        if (mockServiceInteractor.isServiceRunning() && item.code == setting.mockLocationItemCode) {
+        if (mockServiceInteractor.isServiceRunning && item.code == setting.mockLocationItemCode) {
             // don't remove the actual mocked location
             locationItemList.add(item)
             handleLocationItems(locationItemList)
@@ -119,19 +115,42 @@ open class BaseModePresenter(activity: Activity?,
 
     fun onClick(id: Int) {
         when (id) {
-            R.id.vPlayStop -> {
-                if (!setting.isPrivacyStatementAccepted) {
-                    showPrivacyUpdateDialog()
-                    return
-                }
-                // TODO
-            }
-            R.id.vPause -> {
-            }
-            R.id.vFavorite -> onFavoriteClicked()
+            R.id.vPlayStop -> onPlayStopClicked()
+            R.id.vPause -> onPauseClicked()
+            R.id.vFavorite  -> onFavoriteClicked()
             R.id.vEdit -> {
             }
         }
+    }
+
+    private fun onPlayStopClicked() {
+        if (!setting.isPrivacyStatementAccepted) {
+            showPrivacyUpdateDialog()
+            return
+        }
+        if (selectedItem == null) {
+            // TODO show error missing location item to start mocking.
+            return
+        }
+
+        if (setting.mockLocationItemCode != null && mockServiceInteractor.isServiceRunning) {
+            mockServiceInteractor.stopMockLocationService()
+        } else {
+            mockServiceInteractor.startMockLocation(selectedItem!!.code)
+        }
+    }
+
+    private fun onPauseClicked() {
+        if (setting.mockLocationItemCode == null) {
+            return
+        }
+        val state = mockServiceInteractor.state
+        when (state) {
+            MockServiceInteractor.SERVICE_STATE_RUNNING -> mockServiceInteractor.pauseMockLocationService()
+            MockServiceInteractor.SERVICE_STATE_PAUSE -> mockServiceInteractor.playMockLocationService()
+            MockServiceInteractor.SERVICE_STATE_STOP -> { }
+        }
+        view.setPlayPauseStopStatus(state)
     }
 
     private fun showPrivacyUpdateDialog() {
@@ -139,7 +158,7 @@ open class BaseModePresenter(activity: Activity?,
                 object : PrivacyUpdateDialog.PrivacyUpdateDialogListener {
                     override fun onAcceptClick() {
                         setting.acceptCurrentPrivacyStatement()
-                        // TODO
+                        onPlayStopClicked()
                     }
 
                     override fun onDeclineClick() {
@@ -172,6 +191,10 @@ open class BaseModePresenter(activity: Activity?,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(SaveLocationItemObserver(item))
+    }
+
+    fun setActivity(activity: FragmentActivity) {
+        mockServiceInteractor = MockServiceInteractor(activity, setting, MockServiceListener())
     }
 
     private inner class FetchAllLocationItemObserver : Consumer<MutableList<LocationItem>> {

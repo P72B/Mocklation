@@ -13,7 +13,6 @@ import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
-import android.widget.ImageView
 import de.p72b.mocklation.R
 import de.p72b.mocklation.service.room.LocationItem
 import de.p72b.mocklation.util.VisibilityAnimationListener
@@ -51,10 +50,17 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, savedInstanseState: Bundle?): View? {
         rootView = provideBaseFragmentView(inflater, parent, savedInstanseState)
-        presenter = provideBaseModePresenter()
         initBaseView()
         initServiceItemBar()
         return rootView
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        presenter = provideBaseModePresenter()
+        activity?.let{
+            presenter.setActivity(it)
+        }
     }
 
     override fun onResume() {
@@ -90,16 +96,16 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
         snackbar.show()
     }
 
-    fun setPlayPauseStopStatus(@MockServiceInteractor.ServiceStatus state: Int) {
+    fun setPlayPauseStopStatus(state: Int) {
         when (state) {
             MockServiceInteractor.SERVICE_STATE_RUNNING -> {
                 buttonPlayStop.setBackgroundResource(R.drawable.ic_stop_black_24dp)
                 buttonPausePlay.setBackgroundResource(R.drawable.ic_pause_black_24dp)
-                buttonPausePlay.setVisibility(View.VISIBLE)
+                buttonPausePlay.visibility = View.VISIBLE
             }
             MockServiceInteractor.SERVICE_STATE_STOP -> {
                 buttonPlayStop.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp)
-                buttonPausePlay.setVisibility(View.INVISIBLE)
+                buttonPausePlay.visibility = View.INVISIBLE
             }
             MockServiceInteractor.SERVICE_STATE_PAUSE -> buttonPausePlay.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp)
         }

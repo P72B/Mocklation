@@ -1,5 +1,7 @@
 package de.p72b.mocklation.service.setting;
 
+import android.support.annotation.Nullable;
+
 public interface ISetting {
 
     /**
@@ -26,7 +28,7 @@ public interface ISetting {
 
     String getMockLocationItemCode();
 
-    void setMockLocationItemCode(String code);
+    void setMockLocationItemCode(@Nullable final String code);
 
     boolean isPrivacyStatementAccepted();
 

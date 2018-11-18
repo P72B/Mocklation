@@ -1,6 +1,8 @@
 package de.p72b.mocklation.main.mode.fixed
 
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +21,6 @@ class FixedFragment : BaseModeFragment() {
 
     override fun provideBaseModePresenter(): BaseModePresenter {
         val setting = AppServices.getService(AppServices.SETTINGS) as ISetting
-        return FixedPresenter(activity, this, setting)
+        return FixedPresenter(this, setting)
     }
 }
