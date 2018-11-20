@@ -6,20 +6,33 @@ repositories {
     mavenCentral()
 }
 
-
 android {
     def googleMapsApiKeyDevelop = ""
     def googleMapsApiKeyStore = ""
 
     Properties props = new Properties()
-    def propFile = file('../signing.properties')
+    def propFile = file('./signing.properties')
     if (propFile.canRead() && props != null){
+        def KEY_FABRIC_API_KEY = "FABRIC_API_KEY"
+        def KEY_GOOGLE_MAPS_API_KEY_DEVELOP = "GOOGLE_MAPS_API_KEY_DEVELOP"
+        def KEY_GOOGLE_MAPS_API_KEY_STORE = "GOOGLE_MAPS_API_KEY_STORE"
+        def KEY_PASSWORD_DEBUG = "KEY_PASSWORD_DEBUG"
+        def KEY_ALIAS_DEBUG = "KEY_ALIAS_DEBUG"
+        def STORE_FILE_DEBUG = "STORE_FILE_DEBUG"
+
         props.load(new FileInputStream(propFile))
-        if (props.containsKey('GOOGLE_MAPS_API_KEY_DEVELOP')) {
-            googleMapsApiKeyDevelop = file(props['GOOGLE_MAPS_API_KEY_DEVELOP'])
+        if (props.containsKey(KEY_GOOGLE_MAPS_API_KEY_DEVELOP)) {
+            googleMapsApiKeyDevelop = props[KEY_GOOGLE_MAPS_API_KEY_DEVELOP]
         }
-        if (props.containsKey('GOOGLE_MAPS_API_KEY_STORE')) {
-            googleMapsApiKeyStore = file(props['GOOGLE_MAPS_API_KEY_STORE'])
+        if (props.containsKey(KEY_GOOGLE_MAPS_API_KEY_STORE)) {
+            googleMapsApiKeyStore = props[KEY_GOOGLE_MAPS_API_KEY_STORE]
+        }
+        if (props.containsKey(STORE_FILE_DEBUG) && props.containsKey(KEY_PASSWORD_DEBUG)
+                && props.containsKey(KEY_ALIAS_DEBUG)) {
+            android.signingConfigs.debug.storeFile = file(props[STORE_FILE_DEBUG])
+            android.signingConfigs.debug.storePassword = props[KEY_PASSWORD_DEBUG]
+            android.signingConfigs.debug.keyAlias = props[KEY_ALIAS_DEBUG]
+            android.signingConfigs.debug.keyPassword = props[KEY_PASSWORD_DEBUG]
         }
     }
 
@@ -47,31 +60,13 @@ android {
         buildConfigField "String", "RX_ANDROID_VERSION", '"' + rxandroidVersion + '"'
     }
 
-    signingConfigs {
-        release {
-            storeFile file('../mocklation-release-key.keystore')
-            storePassword ' '
-            keyAlias "mocklation"
-            keyPassword ' '
-        }
-        debug {
-            storeFile file('../mocklation-debug-key.keystore')
-            storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-        debug {
-            signingConfig signingConfigs.debug
         }
     }
+
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
     }
