@@ -106,7 +106,7 @@ dependencies {
     api "com.google.android.gms:play-services-maps:${playServicesVersion}"
     api "com.google.android.gms:play-services-places:${playServicesVersion}"
     api "com.google.android.gms:play-services-location:${playServicesVersion}"
-    api "com.google.maps.android:android-maps-utils:0.4.4"
+    implementation "com.github.p72b:android-maps-utils:488_geojson_fromjson-SNAPSHOT"
     api "com.google.code.gson:gson:${gsonVersion}"
     api "com.google.dagger:dagger:${daggerVersion}"
 

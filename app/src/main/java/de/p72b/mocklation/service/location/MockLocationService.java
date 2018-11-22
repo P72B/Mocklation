@@ -24,7 +24,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.geojson.GeoJsonPoint;
+import com.google.maps.android.data.geojson.GeoJsonPoint;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -459,7 +459,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
             // parse geojson feature
             LocationItemFeature feature = mLocationItem.deserialize();
 
-            switch (feature.getGeoJsonFeature().getGeometry().getType()) {
+            switch (feature.getGeoJsonFeature().getGeometry().getGeometryType()) {
                 case "Point":
                     GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
                     mLatLngList.add(point.getCoordinates());

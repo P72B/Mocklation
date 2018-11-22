@@ -1,7 +1,7 @@
 package de.p72b.mocklation.service.location;
 
 import com.google.gson.annotations.SerializedName;
-import com.google.maps.android.geojson.GeoJsonFeature;
+import com.google.maps.android.data.geojson.GeoJsonFeature;
 
 public class LocationItemFeature {
 

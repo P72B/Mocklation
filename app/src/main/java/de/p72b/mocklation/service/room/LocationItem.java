@@ -8,10 +8,10 @@ import android.text.TextUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.google.maps.android.geojson.GeoJsonFeature;
-import com.google.maps.android.geojson.GeoJsonLayer;
-import com.google.maps.android.geojson.GeoJsonPoint;
-import com.google.maps.android.geojson.GeoJsonPolygonStyle;
+import com.google.maps.android.data.geojson.GeoJsonFeature;
+import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.maps.android.data.geojson.GeoJsonPoint;
+import com.google.maps.android.data.geojson.GeoJsonPolygonStyle;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -135,7 +135,7 @@ public class LocationItem implements Parcelable {
     @Nullable
     public Object getGeometry() {
         LocationItemFeature feature = deserialize();
-        switch (feature.getGeoJsonFeature().getGeometry().getType()) {
+        switch (feature.getGeoJsonFeature().getGeometry().getGeometryType()) {
             case "Point":
                 GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
                 return new LatLng(point.getCoordinates().latitude,

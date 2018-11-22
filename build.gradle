@@ -13,9 +13,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
     }
-    repositories {
-        google()
-    }
 }
 
 allprojects {
@@ -23,6 +20,7 @@ allprojects {
         jcenter()
         maven { url 'https://maven.google.com' }
         google()
+        maven { url "https://jitpack.io" }
     }
 }
 
@@ -42,11 +40,11 @@ ext {
     supportConstraintLayout = "1.1.3"
     playServicesVersion = "16.0.0"
     gsonVersion = "2.8.1"
-    mapsUtilsVersion = "0.4.4"
+    mapsUtilsVersion = "0.5"
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
     roomVersion = '1.1.1'
-    firebaseVersion = '16.0.4'
+    firebaseVersion = '16.0.5'
 
     rxjavaVersion = "2.1.2"
     rxandroidVersion = "2.0.2"
