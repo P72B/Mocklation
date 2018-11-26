@@ -32,6 +32,7 @@ import de.p72b.mocklation.service.geocoder.Constants;
 import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
+import de.p72b.mocklation.service.room.Mode;
 import de.p72b.mocklation.util.AppUtil;
 import de.p72b.mocklation.util.Logger;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -62,7 +63,7 @@ public class MapsPresenter implements IMapsPresenter {
         mAddressRequested = false;
         mAddressOutput = null;
         mResultReceiver = new AddressResultReceiver(new Handler());
-        mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
+        mDb = AppDatabase.getLocationsDb().build();
 
         updateUIWidgets();
     }
@@ -90,7 +91,7 @@ public class MapsPresenter implements IMapsPresenter {
 
         String code = AppUtil.createLocationItemCode(roundedLatLng);
         String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}";
-        LocationItem item = new LocationItem(code, "", geoJson, 6, 0);
+        LocationItem item = new LocationItem(code, "", geoJson, 6, 0, Mode.FIXED.name());
         mOnTheMapItemPair = new Pair<>(code, item);
 
         resolveAddressFromLocation(latLng);

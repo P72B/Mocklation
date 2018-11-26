@@ -48,6 +48,9 @@ public class LocationItem implements Parcelable {
     @ColumnInfo(name = "color")
     private int mColor;
 
+    @ColumnInfo(name = "mode")
+    private String mMode;
+
     public static final Parcelable.Creator<LocationItem> CREATOR = new Parcelable.Creator<LocationItem>() {
         public LocationItem createFromParcel(Parcel in) {
             return new LocationItem(in);
@@ -59,13 +62,14 @@ public class LocationItem implements Parcelable {
     };
 
     public LocationItem(@NonNull String code, @NonNull String displayedName,
-                        @NonNull String geoJson, int accuracy, int speed) {
+                        @NonNull String geoJson, int accuracy, int speed, @NonNull final String mode) {
         mCode = code;
         mDisplayedName = displayedName;
         mGeoJson = geoJson;
         mAccuracy = accuracy;
         mSpeed = speed;
         mIsFavorite = false;
+        mMode = mode;
     }
 
     public String getCode() {
@@ -157,6 +161,7 @@ public class LocationItem implements Parcelable {
         out.writeString(mGeoJson);
         out.writeInt(mAccuracy);
         out.writeInt(mSpeed);
+        out.writeString(mMode);
     }
 
     public static String getNameToBeDisplayed(LocationItem item) {
@@ -173,6 +178,7 @@ public class LocationItem implements Parcelable {
         mGeoJson = in.readString();
         mAccuracy = in.readInt();
         mSpeed = in.readInt();
+        mMode = in.readString();
     }
 
     private GeoJsonPolygonStyle createStyle(String fillColor) {
@@ -193,5 +199,14 @@ public class LocationItem implements Parcelable {
 
     public void setColor(int color) {
         mColor = color;
+    }
+
+    @NonNull
+    public String getMode() {
+        return mMode;
+    }
+
+    public void setMode(@NonNull final String mode) {
+        mMode = mode;
     }
 }

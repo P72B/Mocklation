@@ -127,7 +127,7 @@ public class EditLocationItemDialog extends DialogFragment {
             return;
         }
         if (getContext() != null) {
-            mDb = Room.databaseBuilder(getContext(), AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
+            mDb = AppDatabase.getLocationsDb().build();
         }
         mDisplayedName = mRootView.findViewById(R.id.input_displayed_name);
         mLatitude = mRootView.findViewById(R.id.input_latitude);

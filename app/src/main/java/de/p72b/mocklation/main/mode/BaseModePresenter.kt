@@ -1,6 +1,5 @@
 package de.p72b.mocklation.main.mode
 
-import android.arch.persistence.room.Room
 import android.support.design.widget.Snackbar
 import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentActivity
@@ -8,7 +7,6 @@ import android.support.v4.app.FragmentManager
 import android.view.View
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.p72b.mocklation.R
-import de.p72b.mocklation.dagger.MocklationApp
 import de.p72b.mocklation.dialog.EditLocationItemDialog
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog
 import de.p72b.mocklation.service.room.AppDatabase
@@ -31,8 +29,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
     private lateinit var mockServiceInteractor: MockServiceInteractor
     private val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
     private var selectedItem: LocationItem? = null
-    private var db: AppDatabase = Room.databaseBuilder(MocklationApp.getInstance(),
-            AppDatabase::class.java, AppDatabase.DB_NAME_LOCATIONS).build()
+    private var db: AppDatabase = AppDatabase.getLocationsDb().build()
     private var disposableGetAll: Disposable? = null
     private val disposables = CompositeDisposable()
 

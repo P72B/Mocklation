@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
+import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -138,7 +139,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mSetting = (Setting) AppServices.getService(AppServices.SETTINGS);
-        mDb = Room.databaseBuilder(this, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
+        mDb = AppDatabase.getLocationsDb().build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
                 .addConnectionCallbacks(this)
