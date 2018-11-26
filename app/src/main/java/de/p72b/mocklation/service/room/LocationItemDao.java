@@ -16,6 +16,12 @@ public interface LocationItemDao {
     @Query("SELECT * FROM locations")
     Maybe<List<LocationItem>> getAll();
 
+    @Query("SELECT * FROM locations WHERE mode='FIXED'")
+    Maybe<List<LocationItem>> getAllFixed();
+
+    @Query("SELECT * FROM locations WHERE mode='ROUTE'")
+    Maybe<List<LocationItem>> getAllRoute();
+
     @Query("SELECT * FROM locations WHERE code IN (:locationItemIds)")
     Flowable<List<LocationItem>> loadAllByIds(int[] locationItemIds);
 

@@ -11,6 +11,7 @@ import de.p72b.mocklation.dialog.EditLocationItemDialog
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog
 import de.p72b.mocklation.service.room.AppDatabase
 import de.p72b.mocklation.service.room.LocationItem
+import de.p72b.mocklation.service.room.Mode
 import de.p72b.mocklation.service.setting.ISetting
 import de.p72b.mocklation.util.Constants
 import io.reactivex.Completable
@@ -21,17 +22,19 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
-open class BaseModePresenter(private val supportFragmentManager: FragmentManager?,
-                             private val view: BaseModeFragment,
-                             private val setting: ISetting) {
+abstract class BaseModePresenter(private val supportFragmentManager: FragmentManager?,
+                                 private val view: BaseModeFragment,
+                                 private val setting: ISetting) {
 
+    private var db: AppDatabase = AppDatabase.getLocationsDb().build()
+    private var disposableGetAll: Disposable? = null
+    private val disposables = CompositeDisposable()
     private lateinit var locationItemList: MutableList<LocationItem>
     private lateinit var mockServiceInteractor: MockServiceInteractor
     private val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
     private var selectedItem: LocationItem? = null
-    private var db: AppDatabase = AppDatabase.getLocationsDb().build()
-    private var disposableGetAll: Disposable? = null
-    private val disposables = CompositeDisposable()
+
+    abstract fun getMode(): Mode
 
     fun onResume() {
         fetchAll()
@@ -79,7 +82,7 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
         when (id) {
             R.id.vPlayStop -> onPlayStopClicked()
             R.id.vPause -> onPauseClicked()
-            R.id.vFavorite  -> onFavoriteClicked()
+            R.id.vFavorite -> onFavoriteClicked()
             R.id.vEdit -> showEditLocationItemDialog()
         }
     }
@@ -101,8 +104,13 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
     }
 
     private fun fetchAll() {
-        val disposable = db.locationItemDao().all
-                .subscribeOn(Schedulers.io())
+        val dao = db.locationItemDao()
+        val maybe = when (getMode()) {
+            Mode.FIXED -> dao.allFixed
+            Mode.ROUTE -> dao.allRoute
+            else -> return
+        }
+        val disposable = maybe.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(FetchAllLocationItemObserver())
         disposableGetAll = disposable
@@ -161,7 +169,8 @@ open class BaseModePresenter(private val supportFragmentManager: FragmentManager
         when (state) {
             MockServiceInteractor.SERVICE_STATE_RUNNING -> mockServiceInteractor.pauseMockLocationService()
             MockServiceInteractor.SERVICE_STATE_PAUSE -> mockServiceInteractor.playMockLocationService()
-            MockServiceInteractor.SERVICE_STATE_STOP -> { }
+            MockServiceInteractor.SERVICE_STATE_STOP -> {
+            }
         }
         view.setPlayPauseStopStatus(state)
     }
