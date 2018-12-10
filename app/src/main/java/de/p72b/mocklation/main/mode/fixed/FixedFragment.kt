@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.data.geojson.GeoJsonPoint
 import de.p72b.mocklation.R
 import de.p72b.mocklation.main.mode.BaseModeFragment
 import de.p72b.mocklation.main.mode.BaseModePresenter
@@ -55,9 +55,10 @@ class FixedFragment : BaseModeFragment() {
         selectedLocationName.text = LocationItem.getNameToBeDisplayed(item)
         item.geometry.let {
             when (it) {
-                is LatLng -> {
-                    selectedLocationLatitude.setText(it.latitude.toString())
-                    selectedLocationLongitude.setText(it.longitude.toString())
+                is GeoJsonPoint -> {
+                    val latLng = it.coordinates
+                    selectedLocationLatitude.setText(latLng.latitude.toString())
+                    selectedLocationLongitude.setText(latLng.longitude.toString())
                 }
                 else -> { }
             }

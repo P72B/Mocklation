@@ -31,6 +31,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.data.Geometry;
+import com.google.maps.android.data.geojson.GeoJsonPoint;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -265,14 +267,18 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     public void showBottomSheet(LocationItem item) {
-        Object geometry = item.getGeometry();
-        if (!(geometry instanceof LatLng)) {
+        Geometry geometry = item.getGeometry();
+        LatLng latLng = null;
+        if (geometry instanceof GeoJsonPoint) {
+            latLng = ((GeoJsonPoint) geometry).getCoordinates();
+        }
+        if (latLng == null) {
             return;
         }
         if (!item.getDisplayedName().isEmpty()) {
             mBottomSheetTitleText.setText(item.getDisplayedName());
         }
-        mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates((LatLng) geometry));
+        mBottomSheetSubTitleText.setText(AppUtil.getFormattedCoordinates(latLng));
         mTstamp.setText(AppUtil.getFormattedTimeStamp(Calendar.getInstance()));
         mBottomSheet.setVisibility(View.VISIBLE);
         if (BottomSheetBehavior.STATE_EXPANDED == mBottomSheetBehavior.getState()) {
@@ -283,8 +289,12 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
     @Override
     public void addNewMarker(LocationItem item) {
-        Object geometry = item.getGeometry();
-        if (!(geometry instanceof LatLng)) {
+        Geometry geometry = item.getGeometry();
+        LatLng latLng = null;
+        if (geometry instanceof GeoJsonPoint) {
+            latLng = ((GeoJsonPoint) geometry).getCoordinates();
+        }
+        if (latLng == null) {
             return;
         }
         if (mLocationMarker != null) {
@@ -296,7 +306,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         }
         mLocationMarker = mMap.addMarker(
                 new MarkerOptions()
-                        .position((LatLng) geometry)
+                        .position(latLng)
                         .icon(getColoredMarker(item.getDisplayedName(), item.getColor()))
         );
         mLocationMarker.setTag(item);
@@ -341,17 +351,20 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     @Override
     public void addMarkers(List<LocationItem> items) {
         for (LocationItem item : items) {
-            Object geometry = item.getGeometry();
-            if (!(geometry instanceof LatLng)) {
+            Geometry geometry = item.getGeometry();
+            LatLng latLng = null;
+            if (geometry instanceof GeoJsonPoint) {
+                latLng = ((GeoJsonPoint) geometry).getCoordinates();
+            }
+            if (latLng == null) {
                 continue;
             }
-
             if (item.getColor() == 0) {
                 item.setColor(getRandomColor());
             }
             Marker marker = mMap.addMarker(
                     new MarkerOptions()
-                            .position((LatLng) geometry)
+                            .position(latLng)
                             .icon(getColoredMarker(item.getDisplayedName(), item.getColor()))
             );
             marker.setTag(item);

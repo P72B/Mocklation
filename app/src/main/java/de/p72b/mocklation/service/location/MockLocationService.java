@@ -25,7 +25,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.data.Geometry;
 import com.google.maps.android.data.geojson.GeoJsonPoint;
+import com.google.maps.android.geometry.Point;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -454,26 +456,16 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
             if (mLocationItem == null) {
                 return;
             }
+            Geometry geometry = mLocationItem.getGeometry();
 
-            Logger.d(TAG, " item: " + mLocationItem.getCode() + "\n" + mLocationItem.getGeoJson());
-
-            // parse geojson feature
-            LocationItemFeature feature = mLocationItem.deserialize();
-
-            switch (feature.getGeoJsonFeature().getGeometry().getGeometryType()) {
-                case "Point":
-                    GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
-                    mLatLngList.add(point.getCoordinates());
-                    break;
-                default:
-                    // do nothing
+            if (geometry instanceof GeoJsonPoint) {
+                mLatLngList.add(((GeoJsonPoint) geometry).getCoordinates());
             }
 
-            if (mLatLngList.size() > 0) {
-                processLocationItem();
-            } else {
-                // TODO: no locations found
+            if (mLatLngList.size() == 0) {
+                return;
             }
+            processLocationItem();
         }
     }
 

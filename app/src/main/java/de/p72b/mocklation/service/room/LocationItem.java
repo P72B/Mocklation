@@ -8,8 +8,10 @@ import android.text.TextUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.google.maps.android.data.Geometry;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.maps.android.data.geojson.GeoJsonParser;
 import com.google.maps.android.data.geojson.GeoJsonPoint;
 import com.google.maps.android.data.geojson.GeoJsonPolygonStyle;
 
@@ -88,12 +90,12 @@ public class LocationItem implements Parcelable {
         mDisplayedName = firstName;
     }
 
-    public String getGeoJson() {
-        return mGeoJson;
+    public void setGeoJson(@NonNull final String geoJson) {
+        mGeoJson = geoJson;
     }
 
-    public void setGeoJson(String geoJson) {
-        mGeoJson = geoJson;
+    String getGeoJson() {
+        return mGeoJson;
     }
 
     int getAccuracy() {
@@ -137,15 +139,13 @@ public class LocationItem implements Parcelable {
     }
 
     @Nullable
-    public Object getGeometry() {
-        LocationItemFeature feature = deserialize();
-        switch (feature.getGeoJsonFeature().getGeometry().getGeometryType()) {
-            case "Point":
-                GeoJsonPoint point = (GeoJsonPoint) feature.getGeoJsonFeature().getGeometry();
-                return new LatLng(point.getCoordinates().latitude,
-                        point.getCoordinates().longitude);
+    public Geometry getGeometry() {
+        try {
+            return GeoJsonParser.parseGeometry(new JSONObject(mGeoJson));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     @Override

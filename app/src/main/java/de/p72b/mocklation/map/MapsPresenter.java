@@ -14,7 +14,10 @@ import android.widget.ProgressBar;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.gson.Gson;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.maps.android.data.Geometry;
+import com.google.maps.android.data.geojson.GeoJsonPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,12 +89,13 @@ public class MapsPresenter implements IMapsPresenter {
 
     @Override
     public void onMapLongClicked(LatLng latLng) {
-        LatLng roundedLatLng = AppUtil.roundLatLng(latLng);
-        Logger.d(TAG, "onMapLongClicked LatLng: " + roundedLatLng.latitude + " / " + roundedLatLng.longitude);
-
-        String code = AppUtil.createLocationItemCode(roundedLatLng);
-        String geoJson = "{'type':'Feature','properties':{},'geometry':{'type':'Point','coordinates':[" + roundedLatLng.longitude + "," + roundedLatLng.latitude + "]}}";
-        LocationItem item = new LocationItem(code, "", geoJson, 6, 0, Mode.FIXED.name());
+        final LatLng roundedLatLng = AppUtil.roundLatLng(latLng);
+        final String code = AppUtil.createLocationItemCode(roundedLatLng);
+        final String geometry = AppUtil.geometryToString(new GeoJsonPoint(roundedLatLng));
+        if (geometry == null) {
+            return;
+        }
+        final LocationItem item = new LocationItem(code, "", geometry, 6, 0, Mode.FIXED.name());
         mOnTheMapItemPair = new Pair<>(code, item);
 
         resolveAddressFromLocation(latLng);
@@ -274,9 +278,9 @@ public class MapsPresenter implements IMapsPresenter {
             if (bounds != null) {
                 mView.showLatLngBounds(bounds, true);
             } else if (locationItems.size() == 1) {
-                Object geometry = locationItems.get(0).getGeometry();
-                if (geometry instanceof LatLng) {
-                    LatLng point = (LatLng) geometry;
+                Geometry geometry = locationItems.get(0).getGeometry();
+                if (geometry instanceof GeoJsonPoint) {
+                    LatLng point = ((GeoJsonPoint) geometry).getCoordinates();
                     mView.showLocation(point, 8L, true);
                 } else {
                     mView.tryToInitCameraPosition();

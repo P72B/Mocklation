@@ -23,6 +23,8 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.maps.android.data.Geometry;
+import com.google.maps.android.data.geojson.GeoJsonPoint;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,7 +49,16 @@ public class AppUtil {
         return latLng.latitude + "_" + latLng.longitude + "_" + Calendar.getInstance().getTimeInMillis();
     }
 
-    public static LatLng roundLatLng(LatLng latLng) {
+    @Nullable
+    public static String geometryToString(@NonNull final Geometry geometry) {
+        if (geometry instanceof GeoJsonPoint) {
+            final LatLng latLng = ((GeoJsonPoint) geometry).getCoordinates();
+            return "{'type':'Point','coordinates':[" + latLng.longitude + "," + latLng.latitude + "]}";
+        }
+        return null;
+    }
+
+    public static LatLng roundLatLng(@NonNull final LatLng latLng) {
         Double lat = Double.parseDouble(String.format(Locale.ENGLISH, COORDINATE_DECIMAL_FORMAT,
                 latLng.latitude));
         Double lng = Double.parseDouble(String.format(Locale.ENGLISH, COORDINATE_DECIMAL_FORMAT,
@@ -67,7 +78,7 @@ public class AppUtil {
                 " GMT" + timeZone();
     }
 
-    public static String getFormattedCoordinates(LatLng latLng) {
+    public static String getFormattedCoordinates(@NonNull final LatLng latLng) {
         LatLng roundedLatLng = AppUtil.roundLatLng(latLng);
         return roundedLatLng.latitude + " / " + roundedLatLng.longitude;
     }
@@ -244,12 +255,10 @@ public class AppUtil {
         }
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LocationItem item: locationItems) {
-            Object geometry = item.getGeometry();
-            if (!(geometry instanceof LatLng)) {
-                break;
+            Geometry geometry = item.getGeometry();
+            if (geometry instanceof GeoJsonPoint) {
+                builder.include(((GeoJsonPoint) geometry).getCoordinates());
             }
-            LatLng point = (LatLng) geometry;
-            builder.include(point);
         }
         return builder.build();
     }
