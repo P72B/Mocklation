@@ -49,7 +49,7 @@ public class AppUtil {
         return latLng.latitude + "_" + latLng.longitude + "_" + Calendar.getInstance().getTimeInMillis();
     }
 
-    @Nullable
+    @Nullable // TODO: create pull request for the android-maps-utils lib
     public static String geometryToString(@NonNull final Geometry geometry) {
         if (geometry instanceof GeoJsonPoint) {
             final LatLng latLng = ((GeoJsonPoint) geometry).getCoordinates();
