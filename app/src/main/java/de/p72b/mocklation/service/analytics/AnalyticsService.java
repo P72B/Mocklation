@@ -11,7 +11,9 @@ import androidx.annotation.Nullable;
 public class AnalyticsService implements IAnalyticsService {
 
     public static class Event {
+        @Deprecated
         public static final String ADD_FAVORITE = "add_favorite";
+        @Deprecated
         public static final String REMOVE_FAVORITE = "remove_favorite";
         public static final String PAUSE_MOCK_LOCATION_SERVICE = "pause_mock_location_service";
         public static final String STOP_MOCK_LOCATION_SERVICE = "stop_mock_location_service";

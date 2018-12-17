@@ -41,6 +41,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import de.p72b.locator.location.ILocationUpdatesListener;
+import de.p72b.locator.location.LocationAwareAppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -48,18 +50,13 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
-import de.p72b.mocklation.BaseActivity;
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.service.AppServices;
-import de.p72b.mocklation.service.location.ILocationService;
 import de.p72b.mocklation.service.room.LocationItem;
-import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.AppUtil;
 import de.p72b.mocklation.util.Logger;
 
-public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyCallback,
-        View.OnClickListener, LocationSource, LocationSource.OnLocationChangedListener,
-        ILocationService.OnLocationChanged {
+public class MapsActivity extends LocationAwareAppCompatActivity implements IMapsView, OnMapReadyCallback,
+        View.OnClickListener, LocationSource, ILocationUpdatesListener {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final long MARKER_REMOVE_MILLISECONDS = 300;
@@ -69,8 +66,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private IMapsPresenter mPresenter;
     private OnLocationChangedListener mMapLocationListener = null;
     private GoogleMap mMap;
-    private ILocationService mLocationService;
-    private ISetting mSetting;
     private Marker mLocationMarker;
     private FloatingActionButton mFabActionLocation;
     private BottomSheetBehavior<View> mBottomSheetBehavior;
@@ -103,14 +98,10 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         super.onCreate(savedInstanceState);
         Logger.d(TAG, "onCreate");
         initViews(savedInstanceState);
-
-        mLocationService = (ILocationService) AppServices.getService(AppServices.LOCATION);
-        mSetting = (ISetting) AppServices.getService(AppServices.SETTINGS);
-
         mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
 
-        mPresenter = new MapsPresenter(this);
+        mPresenter = new MapsPresenter(this, getLocationManager());
 
         mEmptyMarkerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_new_location);
         mColoredMarkerFontSize = 18 * getResources().getDisplayMetrics().density;
@@ -121,35 +112,21 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Logger.d(TAG, "onStart");
-        mLocationService.onStartCommand(this, mPermissionService, mSetting);
-        mPresenter.onStart();
-        mMapView.onStart();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        Logger.d(TAG, "onResume");
-        mLocationService.onResume();
-        mLocationService.subscribeToLocationChanges(this);
+        getLocationManager().subscribeToLocationChanges(this);
         mMapView.onResume();
     }
 
     @Override
     protected void onPause() {
-        Logger.d(TAG, "onPause");
-        mLocationService.unSubscribeToLocationChanges(this);
+        getLocationManager().unSubscribeToLocationChanges(this);
         mMapView.onPause();
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        Logger.d(TAG, "onStop");
-        mPresenter.onStop();
         mMapView.onStop();
         super.onStop();
     }
@@ -159,7 +136,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         Logger.d(TAG, "onDestroy");
         mPresenter.onDestroy();
         mMapView.onDestroy();
-        mLocationService.onDestroyCommand();
         super.onDestroy();
     }
 
@@ -189,7 +165,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
 
         mMap.setLocationSource(this);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
-        if (hasLocationPermission()) {
+        if (getLocationManager().hasLocationPermission()) {
             mMap.setMyLocationEnabled(true);
         }
 
@@ -250,19 +226,15 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void onLocationChanged(Location location) {
-        Logger.d(TAG, "onLocationChanged:" + location.getLatitude() + "/" + location.getLongitude());
-
+    public void onLocationChanged(@NonNull final Location location) {
         if (mMapLocationListener != null) {
             mMapLocationListener.onLocationChanged(location);
         }
-
-        mPresenter.setLastKnownLocation(location);
     }
 
     @Override
-    public void onInitialLocationDetermined(Location location) {
-        Logger.d(TAG, "onInitialLocationDetermined:" + location.getLatitude() + "/" + location.getLongitude());
+    public void onLocationChangedError(int code, @Nullable String message) {
+        // nothing to do here
     }
 
     @Override
@@ -372,12 +344,11 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     @Override
-    public void showMyLocation(boolean shouldMove) {
-        Location location = mLocationService.getLastKnownLocation();
-        if (mMap == null || location == null) {
+    public void showMyLocation(boolean shouldMove, @NonNull final Location location) {
+        if (mMap == null) {
             return;
         }
-        LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        final LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
         showLocation(lastKnowLocation, DEFAULT_ZOOM_LEVEL, shouldMove);
         setFollowGps(true);
     }
@@ -414,20 +385,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             snackbar.setAction(action, listener);
         }
         snackbar.show();
-    }
-
-    @Override
-    public void tryToInitCameraPosition() {
-        if (mMap == null) {
-            return;
-        }
-
-        Location location = mLocationService.getLastKnownLocation();
-        if (location != null) {
-            Logger.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
-            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, DEFAULT_ZOOM_LEVEL));
-        }
     }
 
     @Override
@@ -493,10 +450,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     private void setFollowGps(boolean followGps) {
         int color = followGps ? mMyLocationCenterColor : mMyLocationNotCenterColor;
         DrawableCompat.setTint(mFabActionLocation.getDrawable(), color);
-    }
-
-    private boolean hasLocationPermission() {
-        return mPermissionService.hasPermission(this);
     }
 
     private void toggleAnimationOverlayItems() {

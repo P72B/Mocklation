@@ -1,6 +1,8 @@
 package de.p72b.mocklation.map;
 
 
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -14,7 +16,7 @@ public interface IMapsView {
 
     void showBottomSheet(LocationItem item);
 
-    void showMyLocation(boolean shouldMove);
+    void showMyLocation(boolean shouldMove, @NonNull final Location location);
 
     void showLatLngBounds(LatLngBounds bounds, boolean shouldMove);
 
@@ -29,6 +31,4 @@ public interface IMapsView {
     void addMarkers(List<LocationItem> items);
 
     void addNewMarker(LocationItem item);
-
-    void tryToInitCameraPosition();
 }
