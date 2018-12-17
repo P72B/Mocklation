@@ -44,7 +44,7 @@ ext {
     daggerVersion = "2.8"
     daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
     roomVersion = '1.1.1'
-    firebaseVersion = '16.0.5'
+    firebaseVersion = '16.0.6'
 
     rxjavaVersion = "2.1.2"
     rxandroidVersion = "2.0.2"
