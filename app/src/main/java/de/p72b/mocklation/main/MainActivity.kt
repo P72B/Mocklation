@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import de.p72b.locator.location.LocationAwareAppCompatActivity
 import de.p72b.mocklation.BuildConfig
 import de.p72b.mocklation.R
 import de.p72b.mocklation.main.mode.fixed.FixedFragment
@@ -25,7 +26,7 @@ import de.p72b.mocklation.service.AppServices
 import de.p72b.mocklation.service.setting.ISetting
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+class MainActivity : LocationAwareAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener {
 
     private lateinit var drawer: DrawerLayout
@@ -89,7 +90,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         presenter.onClick(view.id)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         supportFragmentManager?.fragments.let { fragmentList ->
             fragmentList?.forEach {

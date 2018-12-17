@@ -10,6 +10,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Process
+import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.widget.Toast
@@ -65,21 +67,16 @@ class MockServiceInteractor constructor(private val activity: Activity,
     // in marshmallow this will always return true
     val isMockLocationEnabled: Boolean
         get() {
-            var isMockLocation = false
-            try {
+            return try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val opsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-                    if (opsManager != null) {
-                        isMockLocation = opsManager.checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, android.os.Process.myUid(), BuildConfig.APPLICATION_ID) == AppOpsManager.MODE_ALLOWED
-                    }
+                    opsManager.checkOp(AppOpsManager.OPSTR_MOCK_LOCATION, Process.myUid(), BuildConfig.APPLICATION_ID) == AppOpsManager.MODE_ALLOWED
                 } else {
-                    isMockLocation = android.provider.Settings.Secure.getString(context.contentResolver, "mock_location") != "0"
+                    Settings.Secure.getString(context.contentResolver, "mock_location") != "0"
                 }
             } catch (e: Exception) {
                 return false
             }
-
-            return isMockLocation
         }
 
     init {
@@ -141,23 +138,11 @@ class MockServiceInteractor constructor(private val activity: Activity,
         }
 
         if (shouldRequestPermission) {
-            Logger.d(TAG, "Some permissions aren't granted.")
-
-            /*// Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissionsToBeRequired)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-
-            }
-            */
             ActivityCompat.requestPermissions(
                     activity,
                     permissionsToBeRequired,
                     PERMISSIONS_MOCKING)
         } else {
-            Logger.d(TAG, "All permissions are granted.")
             checkDefaultMockLocationApp()
         }
     }

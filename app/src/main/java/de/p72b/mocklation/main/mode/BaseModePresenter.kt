@@ -149,6 +149,7 @@ abstract class BaseModePresenter(private val supportFragmentManager: FragmentMan
             showPrivacyUpdateDialog()
             return
         }
+
         if (selectedItem == null) {
             // TODO show error missing location item to start mocking.
             return

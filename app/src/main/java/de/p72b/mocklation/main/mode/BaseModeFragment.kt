@@ -141,6 +141,9 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
         val root = activity!!.findViewById<View>(R.id.vMainRoot)
         root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
+                if (activity == null) {
+                    return
+                }
                 root.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
                 val rectangle = Rect()
