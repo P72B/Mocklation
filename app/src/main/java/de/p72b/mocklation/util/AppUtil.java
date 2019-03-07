@@ -11,6 +11,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextPaint;
@@ -33,6 +37,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsIntent;

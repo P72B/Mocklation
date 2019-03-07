@@ -1,6 +1,6 @@
 package de.p72b.mocklation.service.setting;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public interface ISetting {
 

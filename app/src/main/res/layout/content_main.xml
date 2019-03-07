@@ -34,7 +34,7 @@
             android:visibility="invisible"
             tools:visibility="visible">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_view_selected_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -152,7 +152,7 @@
                             android:background="@drawable/ic_favorite_border_black_24dp" />
                     </RelativeLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:id="@+id/text_view_saved_locations"

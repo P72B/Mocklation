@@ -1,3 +1,4 @@
+        classpath 'io.fabric.tools:gradle:1.26.1'
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.firebase.crashlytics'
@@ -49,7 +50,8 @@ android {
         applicationId "de.p72b.mocklation"
         minSdkVersion appMinSdk
         targetSdkVersion 29
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "ANDROID_X_VERSION", '"1.1.0"'
         buildConfigField "String", "ROOM_VERSION", '"' + rootProject.roomVersion + '"'
         buildConfigField "String", "PLAY_SERVICES_VERSION", '"' + playServicesVersion + '"'
         buildConfigField "String", "MAP_UTILITIES_VERSION", '"' + mapsUtilsVersion + '"'
@@ -106,8 +108,8 @@ dependencies {
     api "com.google.android.gms:play-services-maps:${playServicesVersion}"
     api "com.google.android.gms:play-services-places:${playServicesVersion}"
     api "com.google.android.gms:play-services-location:${playServicesVersion}"
-    api "com.github.p72b:android-maps-utils:0.6.0"
-    api "com.github.p72b:locator-library:1.0.3"
+    api "com.github.p72b:android-maps-utils:0.6.3"
+    api "com.github.p72b:locator-library:1.4.0"
     api "com.google.code.gson:gson:${gsonVersion}"
     api "com.google.dagger:dagger:${daggerVersion}"
 

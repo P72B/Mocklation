@@ -4,6 +4,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,6 +21,8 @@ import android.view.Window;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.maps.android.data.Geometry;
 import com.google.maps.android.data.geojson.GeoJsonPoint;
 import com.google.android.material.snackbar.Snackbar;
@@ -24,13 +30,13 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.room.EmptyResultSetException;
 import androidx.fragment.app.FragmentManager;
 import androidx.room.EmptyResultSetException;
 import androidx.room.Room;

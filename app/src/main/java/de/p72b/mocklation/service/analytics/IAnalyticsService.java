@@ -1,8 +1,8 @@
 package de.p72b.mocklation.service.analytics;
 
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.Nullable;
 
 public interface IAnalyticsService {

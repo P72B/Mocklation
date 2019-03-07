@@ -1,12 +1,12 @@
 package de.p72b.mocklation.main.mode.fixed
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import com.google.android.material.snackbar.Snackbar
 import com.google.maps.android.data.geojson.GeoJsonPoint
 import de.p72b.mocklation.R
 import de.p72b.mocklation.main.mode.BaseModeFragment

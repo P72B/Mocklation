@@ -2,19 +2,23 @@ package de.p72b.mocklation.service.room;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.migration.Migration;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.maps.android.data.Geometry;
 import com.google.maps.android.data.geojson.GeoJsonFeature;
 import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.maps.android.data.geojson.GeoJsonParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 import de.p72b.mocklation.dagger.MocklationApp;
 import de.p72b.mocklation.util.AppUtil;
 
@@ -45,12 +49,8 @@ public abstract class AppDatabase extends RoomDatabase {
     private static String migrateFeatureToGeometry(@NonNull final String itemGeoJson) {
         String result = null;
         try {
-            // The geoJSON parser is hidden inside GeoJsonLayer ^^
-            GeoJsonLayer layer = new GeoJsonLayer(null, new JSONObject(itemGeoJson));
-            for (GeoJsonFeature feature : layer.getFeatures()) {
-                result = AppUtil.geometryToString(feature.getGeometry());
-            }
-
+            final Geometry geometry = GeoJsonParser.parseGeometry(new JSONObject(itemGeoJson));
+            result = AppUtil.geometryToString(geometry);
         } catch (JSONException e) {
             e.printStackTrace();
         }

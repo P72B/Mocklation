@@ -2,16 +2,16 @@ package de.p72b.mocklation.main.mode
 
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.TypedValue
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import de.p72b.mocklation.R
 import de.p72b.mocklation.service.room.LocationItem
 import de.p72b.mocklation.util.VisibilityAnimationListener

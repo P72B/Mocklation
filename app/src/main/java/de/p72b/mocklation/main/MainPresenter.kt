@@ -2,8 +2,8 @@ package de.p72b.mocklation.main
 
 import android.app.Activity
 import android.content.Intent
-import android.support.design.widget.Snackbar
-import android.support.v4.app.DialogFragment
+import androidx.fragment.app.DialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import de.p72b.mocklation.BuildConfig

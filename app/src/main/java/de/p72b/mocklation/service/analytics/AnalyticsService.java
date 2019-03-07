@@ -2,6 +2,8 @@ package de.p72b.mocklation.service.analytics;
 
 import android.content.Context;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 

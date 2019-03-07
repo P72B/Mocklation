@@ -2,7 +2,7 @@ package de.p72b.mocklation.map;
 
 
 import android.location.Location;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;

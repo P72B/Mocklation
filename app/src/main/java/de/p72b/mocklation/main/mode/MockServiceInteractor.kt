@@ -12,8 +12,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
 import android.provider.Settings
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import android.widget.Toast
 import de.p72b.mocklation.BuildConfig
 import de.p72b.mocklation.R
