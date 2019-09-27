@@ -54,7 +54,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
     public void onConnected(@Nullable Bundle bundle) {
         Logger.d(TAG, "onConnected");
 
-        if (mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (mPermissions.hasPermission(mFragmentActivity)) {
             checkIfLocationSniffingShouldStart();
         }
     }
@@ -99,10 +99,10 @@ public class LocationService implements ILocationService, LocationListener, Goog
     @Override
     @Nullable
     public Location getLastKnownLocation() {
-        final boolean hasPermission = mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION);
+        final boolean hasPermission = mPermissions.hasPermission(mFragmentActivity);
 
         if (!hasPermission) {
-            mPermissions.requestPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION, PERMISSION_REQUEST_CODE);
+            mPermissions.requestPermission(mFragmentActivity, PERMISSION_REQUEST_CODE);
         }
         return mLastKnownLocation;
     }
@@ -116,7 +116,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
     public void subscribeToLocationChanges(OnLocationChanged listener) {
         if (mGoogleApiClient != null
                 && mGoogleApiClient.isConnected()
-                && mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+                && mPermissions.hasPermission(mFragmentActivity)
                 && mSubscribers.size() == 0) {
             // We have at least one subscriber please start location updates.
             initLocationUpdateSniffing();
@@ -174,7 +174,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
 
         if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
-        } else if (mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION)
+        } else if (mPermissions.hasPermission(mFragmentActivity)
                 && mSubscribers.size() > 0) {
             // In case permissions where enabled again we restart the location updates:
             requestLocationUpdates();
@@ -243,7 +243,7 @@ public class LocationService implements ILocationService, LocationListener, Goog
                 Logger.d(TAG, " onComplete");
                 // Ok it can happen that during DELAY_FOR_RETRY_LAST_KNOWN_LOCATION
                 // the location permission is removed (very unlikely)
-                if (mPermissions.hasPermission(mFragmentActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if (mPermissions.hasPermission(mFragmentActivity)) {
                     getInitialLocationWithoutChange();
                 }
             }

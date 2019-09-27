@@ -97,6 +97,8 @@
     <string name="error_1018">Service is already killed.</string>
     <string name="error_1019">Change settings and set Mocklation as APP for MockLocations for you phone.</string>
     <string name="error_1020">Privacy policy declined</string>
+    <string name="error_1022">Trouble to request permission</string>
+    <string name="error_1023">Fake location service needs to run in background. Please allow location access all the time.</string>
 
     <string name="apache_2_license" tools:ignore="TypographyOther">Apache License
 \nVersion 2.0, January 2004

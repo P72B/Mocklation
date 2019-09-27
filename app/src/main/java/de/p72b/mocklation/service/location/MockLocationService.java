@@ -11,10 +11,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -70,7 +70,6 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     public static final String EVENT_PLAY = "EVENT_PLAY";
     public static final String EVENT_STOP = "EVENT_STOP";
     private static final String NOTIFICATION_CHANNEL_ID = "MOCK_LOCATION_NOTIFICATION";
-    private static final String MOCKLOCATION_PROVIDER_NAME = "gps";
 
     @Nullable
     private GoogleApiClient mGoogleApiClient;
@@ -231,8 +230,8 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     @SuppressWarnings("MissingPermission")
     private void checkPermissionAndStart() {
         final String code = mSetting.getMockLocationItemCode();
-        Logger.d(TAG, "code: " + code + " hasPermission: " + mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION));
-        if (mPermissions.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        Logger.d(TAG, "code: " + code + " hasPermission: " + mPermissions.hasPermission(this));
+        if (mPermissions.hasPermission(this)
                 && code != null) {
             requestLocationItem(code);
         }
@@ -379,14 +378,34 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         mAnalyticsService.trackEvent(AnalyticsService.Event.START_MOCK_LOCATION_SERVICE);
         LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, true);
 
-        mGpsLocationListener = new GpsLocationListener();
 
-        mLocationManager.requestLocationUpdates(MOCKLOCATION_PROVIDER_NAME, 0, 0, mGpsLocationListener);
-        mLocationManager.addTestProvider(MOCKLOCATION_PROVIDER_NAME, false, false,
+        mGpsLocationListener = new GpsLocationListener();
+        mLocationManager.requestLocationUpdates(getBestFittingProvider(), 0, 0, mGpsLocationListener);
+        if (mLocationManager.getProvider(getBestFittingProvider()) != null) {
+            try {
+               mLocationManager.removeTestProvider(getBestFittingProvider());
+            } catch (IllegalArgumentException e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+            }
+        }
+        mLocationManager.addTestProvider(getBestFittingProvider(), false, false,
                 false, false, true, true, true, 0, 5);
 
         mMockLocationUpdateInterval = getUpdateInterval();
         mDisposables.add(mMockLocationUpdateInterval);
+    }
+
+    @NonNull
+    private String getBestFittingProvider() {
+        final Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        final String provider = mLocationManager.getBestProvider( criteria, true );
+
+        if (provider == null || LocationManager.PASSIVE_PROVIDER.equals(provider)) {
+            return LocationManager.GPS_PROVIDER;
+        } else {
+            return provider;
+        }
     }
 
     @SuppressWarnings("MissingPermission")
@@ -395,7 +414,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         LocationServices.FusedLocationApi.setMockMode(mGoogleApiClient, false);
 
         mLocationManager.removeUpdates(mGpsLocationListener);
-        mLocationManager.removeTestProvider(MOCKLOCATION_PROVIDER_NAME);
+        mLocationManager.removeTestProvider(getBestFittingProvider());
 
         if (mMockLocationUpdateInterval != null && !mMockLocationUpdateInterval.isDisposed()) {
             mMockLocationUpdateInterval.dispose();
@@ -462,7 +481,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         public void onNext(Long value) {
             Logger.d(TAG, " onNext : value : " + value);
             LatLng nextLatLng = mLatLngList.get(0);
-            final Location location = new Location(MOCKLOCATION_PROVIDER_NAME);
+            final Location location = new Location(getBestFittingProvider());
             location.setLatitude(nextLatLng.latitude);
             location.setLongitude(nextLatLng.longitude);
             location.setAccuracy(6);
@@ -476,9 +495,8 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
                 updateNotification(location);
             }
 
-            mLocationManager.setTestProviderEnabled(MOCKLOCATION_PROVIDER_NAME, true);
-            mLocationManager.setTestProviderStatus(MOCKLOCATION_PROVIDER_NAME, LocationProvider.AVAILABLE, null, System.currentTimeMillis());
-            mLocationManager.setTestProviderLocation(MOCKLOCATION_PROVIDER_NAME, location);
+            mLocationManager.setTestProviderEnabled(getBestFittingProvider(), true);
+            mLocationManager.setTestProviderLocation(getBestFittingProvider(), location);
             LocationServices.FusedLocationApi.setMockLocation(mGoogleApiClient, location);
         }
 

@@ -491,7 +491,7 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
     }
 
     private boolean hasLocationPermission() {
-        return mPermissionService.hasPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        return mPermissionService.hasPermission(this);
     }
 
     private void toggleAnimationOverlayItems() {

@@ -29,9 +29,8 @@ public class PermissionService implements IPermissionService {
     }
 
     @Override
-    public void requestPermission(FragmentActivity activity, String permission, int requestCode) {
-        Logger.d(TAG, "requestPermission permission:" + permission);
-        requestPermissions(activity, new String[]{permission}, requestCode);
+    public void requestPermission(FragmentActivity activity, int requestCode) {
+        requestPermissions(activity, new String[]{ Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, requestCode);
     }
 
     @Override
@@ -90,13 +89,20 @@ public class PermissionService implements IPermissionService {
     }
 
     @Override
-    public boolean hasPermission(FragmentActivity activity, String permission) {
-        return ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
+    public boolean hasPermission(FragmentActivity activity) {
+        return hasAllNeededPermissions(activity.getApplicationContext());
     }
 
     @Override
-    public boolean hasPermission(Context context, String permission) {
-        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    public boolean hasPermission(Context context) {
+        return hasAllNeededPermissions(context);
+    }
+
+    private boolean hasAllNeededPermissions(Context context) {
+        final boolean hasBackgroundPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        final boolean hasFinePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        final boolean hasCoarsePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return hasBackgroundPermission && hasFinePermission && hasCoarsePermission;
     }
 
     @Override

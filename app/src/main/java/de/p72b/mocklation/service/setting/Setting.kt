@@ -51,7 +51,7 @@ class Setting(context: Context) : ISetting {
         }
     }
 
-    override fun setMockLocationItemCode(code: String) {
+    override fun setMockLocationItemCode(code: String?) {
         val edit = preferences.edit()
         edit.putString(ACTIVE_MOCK_LOCATION_CODE, code)
         edit.apply()

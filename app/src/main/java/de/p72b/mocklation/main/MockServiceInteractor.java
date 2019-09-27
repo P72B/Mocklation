@@ -91,10 +91,18 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
     @Override
     public void onMockPermissionsResult(int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults.length < 3) {
+            Toast.makeText(mContext, R.string.error_1022, Toast.LENGTH_LONG).show();
+            return;
+        }
+        final boolean hasFineLocationAccess = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+        final boolean hasBackgroundLocationAccess = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+        final boolean hasCoarseLocationAccess = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+
+        if (hasFineLocationAccess && hasBackgroundLocationAccess && hasCoarseLocationAccess) {
             checkDefaultMockLocationApp();
         } else {
-            // TODO: permission is needed.
+            Toast.makeText(mContext, R.string.error_1023, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -133,7 +141,9 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         mLocationItemCode = locationItemCode;
         Logger.d(TAG, "startMockLocation");
         String[] permissionsToBeRequired = new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
         };
         boolean shouldRequestPermission = false;
 
@@ -147,16 +157,6 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
         if (shouldRequestPermission) {
             Logger.d(TAG, "Some permissions aren't granted.");
-
-            /*// Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permissionsToBeRequired)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-
-            }
-            */
             ActivityCompat.requestPermissions(
                     mActivity,
                     permissionsToBeRequired,

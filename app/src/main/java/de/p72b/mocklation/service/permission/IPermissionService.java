@@ -10,7 +10,7 @@ import de.p72b.mocklation.service.setting.ISetting;
 
 public interface IPermissionService {
 
-    void requestPermission(FragmentActivity activity, String permission, int requestCode);
+    void requestPermission(FragmentActivity activity, int requestCode);
 
     void requestPermissions(FragmentActivity activity, String[] permission, int requestCode);
 
@@ -20,9 +20,9 @@ public interface IPermissionService {
 
     void onPermissionsChanged(int requestCode, String[] permissions, int[] grantResults);
 
-    boolean hasPermission(FragmentActivity activity, String permission);
+    boolean hasPermission(FragmentActivity activity);
 
-    boolean hasPermission(Context activity, String permission);
+    boolean hasPermission(Context activity);
 
     void subscribeToPermissionChanges(OnPermissionChanged listener);
 
