@@ -99,7 +99,12 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         final boolean hasBackgroundLocationAccess = grantResults[1] == PackageManager.PERMISSION_GRANTED;
         final boolean hasCoarseLocationAccess = grantResults[2] == PackageManager.PERMISSION_GRANTED;
 
-        if (hasFineLocationAccess && hasBackgroundLocationAccess && hasCoarseLocationAccess) {
+        boolean isGranted = hasFineLocationAccess && hasCoarseLocationAccess;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            isGranted = hasBackgroundLocationAccess && isGranted;
+        }
+
+        if (isGranted) {
             checkDefaultMockLocationApp();
         } else {
             Toast.makeText(mContext, R.string.error_1023, Toast.LENGTH_LONG).show();
@@ -140,12 +145,9 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     public void startMockLocation(@NonNull String locationItemCode) {
         mLocationItemCode = locationItemCode;
         Logger.d(TAG, "startMockLocation");
-        String[] permissionsToBeRequired = new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-        };
+
         boolean shouldRequestPermission = false;
+        final String[] permissionsToBeRequired = getRequiredPermissions();
 
         for (String permission : permissionsToBeRequired) {
             if (!hasPermission(permission)) {
@@ -170,6 +172,22 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     @Override
     public @ServiceStatus int getState() {
         return mState;
+    }
+
+    @NonNull
+    private String[] getRequiredPermissions() {
+        String[] permissionsToBeRequired = new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            permissionsToBeRequired = new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            };
+        }
+        return permissionsToBeRequired;
     }
 
     private void startMockLocationService(Class<?> service) {

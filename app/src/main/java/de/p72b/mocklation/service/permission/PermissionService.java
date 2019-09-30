@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -102,7 +103,12 @@ public class PermissionService implements IPermissionService {
         final boolean hasBackgroundPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
         final boolean hasFinePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         final boolean hasCoarsePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        return hasBackgroundPermission && hasFinePermission && hasCoarsePermission;
+
+        boolean isGranted = hasFinePermission && hasCoarsePermission;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            isGranted = hasBackgroundPermission && isGranted;
+        }
+        return isGranted;
     }
 
     @Override
