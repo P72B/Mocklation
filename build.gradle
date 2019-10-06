@@ -40,9 +40,7 @@ ext {
     playServicesVersion = "17.0.0"
     gsonVersion = "2.8.1"
     mapsUtilsVersion = "0.5"
-    daggerVersion = "2.8"
-    daggerCompiler = 'com.google.dagger:dagger-compiler:2.8'
-    roomVersion = '2.2.0-rc01'
+    roomVersion = '2.2.0'
     firebaseVersion = '17.2.0'
 
     rxjavaVersion = "2.1.2"

@@ -64,8 +64,6 @@
     <string name="maps_utils_api_link">https://developers.google.com/maps/documentation/android-api/utility</string>
     <string name="google_gson">Google GSON</string>
     <string name="google_gson_link">https://github.com/google/gson</string>
-    <string name="dagger_2">Dagger 2</string>
-    <string name="dagger_2_link">https://github.com/google/dagger</string>
     <string name="firebase_core">Firebase Core</string>
     <string name="firebase_core_link">https://firebase.google.com/docs/reference/android/com/google/firebase/package-summary</string>
     <string name="firebase_config">Firebase Remote Config</string>

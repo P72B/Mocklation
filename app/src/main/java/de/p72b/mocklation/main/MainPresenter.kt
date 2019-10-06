@@ -19,39 +19,8 @@ import de.p72b.mocklation.util.Constants
 class MainPresenter(private val activity: Activity, private val view: MainActivity,
                     private val setting: ISetting) {
 
-    private lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     private var fixedFragment: FixedFragment = FixedFragment()
     private var routeFragment: RouteFragment = RouteFragment()
-
-    init {
-        setupRemoteConfig()
-    }
-
-
-    private fun setupRemoteConfig() {
-        firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-        val configSettings = FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build()
-        firebaseRemoteConfig.setConfigSettings(configSettings)
-        firebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults)
-
-        fetchRemoteConfig()
-    }
-
-
-    private fun fetchRemoteConfig() {
-        var cacheExpiration: Long = 3600 // 1 hour in seconds.
-        if (firebaseRemoteConfig.info.configSettings.isDeveloperModeEnabled) {
-            cacheExpiration = 0
-        }
-        firebaseRemoteConfig.fetch(cacheExpiration)
-                .addOnCompleteListener(activity) { task ->
-                    if (task.isSuccessful) {
-                        firebaseRemoteConfig.activateFetched()
-                    }
-                }
-    }
 
     fun onStart() {
         view.show(fixedFragment)
@@ -90,7 +59,7 @@ class MainPresenter(private val activity: Activity, private val view: MainActivi
                         view.showSnackbar(R.string.error_1020, -1, null,
                                 Snackbar.LENGTH_LONG)
                     }
-                }, firebaseRemoteConfig.getString(Constants.REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY))
+                }, FirebaseRemoteConfig.getInstance().getString(Constants.REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY))
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme)
         dialog.show(fragmentManager, PrivacyUpdateDialog.TAG)
     }

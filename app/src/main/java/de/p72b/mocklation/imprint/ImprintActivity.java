@@ -27,16 +27,12 @@ import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.service.firebase.AppCredits;
+import de.p72b.mocklation.service.firebase.FirebaseHelper;
+import de.p72b.mocklation.service.firebase.Producer;
 import de.p72b.mocklation.util.AppUtil;
 
 public class ImprintActivity extends AppCompatActivity {
-
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_NAME = "imprint_producer_contact_name";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_CITY = "imprint_procuder_contact_city";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_COUNTRY = "imprint_producer_contact_country";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER = "imprint_producer";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_MAIL = "imprint_producer_contact_mail";
-    private static final String REMOTE_CONFIG_KEY_GITHUB_REPO = "imprint_github_project_repository";
 
     private TextView mProducer;
     private TextView mRepoLink;
@@ -87,13 +83,15 @@ public class ImprintActivity extends AppCompatActivity {
     }
 
     private void setTextViewsFromRemoteConfig() {
-        final FirebaseRemoteConfig config = FirebaseRemoteConfig.getInstance();
-        mProducer.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER));
-        mRepoLink.setText(config.getString(REMOTE_CONFIG_KEY_GITHUB_REPO));
-        mProducerName.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER_NAME));
-        mProducerMail.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER_MAIL));
-        String address = config.getString(REMOTE_CONFIG_KEY_PRODUCER_CITY) + " " +
-                config.getString(REMOTE_CONFIG_KEY_PRODUCER_COUNTRY);
+        final AppCredits credits = FirebaseHelper.INSTANCE.getAppCredits();
+        final Producer producer = credits.getProducer();
+        final String contributors = "";
+        mProducer.setText(contributors);
+        mRepoLink.setText(credits.getGithubProjectRepositoryUrl());
+        mProducerName.setText(producer.getName());
+        mProducerMail.setText(producer.getEmail());
+        String address = producer.getCity() + " " +
+                producer.getCountry();
         mProducerAddress.setText(address);
     }
 
@@ -153,14 +151,6 @@ public class ImprintActivity extends AppCompatActivity {
                 R.string.google_gson_link,
                 String.format(getString(R.string.imprint_dependencies_version),
                         BuildConfig.GSON_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
-        items.add(new DependencyItem(
-                R.string.dagger_2,
-                R.string.dagger_2_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.DAGGER_VERSION),
                 String.format(getString(R.string.imprint_dependencies_license),
                         getString(R.string.apache_license)))
         );
