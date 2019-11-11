@@ -1,0 +1,20 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Theme.MaterialComponents.DayNight" parent="Theme.MaterialComponents">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:action">@color/colorBackground</item>
+
+        <item name="actionBarStyle">@style/ActionBarDayNight</item>
+    </style>
+
+    <style name="ActionBarDayNight" parent="Widget.MaterialComponents.Light.ActionBar.Solid">
+        <item name="background">@color/colorSurface</item>
+    </style>
+</resources>

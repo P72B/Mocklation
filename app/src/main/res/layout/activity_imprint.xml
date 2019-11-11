@@ -11,8 +11,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="wrap_content">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/vToolbar"
@@ -26,7 +25,7 @@
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="de.p72b.mocklation.main.OldMainActivity"
-        tools:showIn="@layout/activity_main">
+        tools:showIn="@layout/activity_old_main">
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/colorPrimary200</color>
+    <color name="colorPrimaryDark">@color/colorPrimary400</color>
+    <color name="colorPrimaryLight">@color/colorPrimary50</color>
+    <color name="colorAccent">@color/colorAccent200</color>
+    <color name="colorAccentDark">@color/colorAccent400</color>
+    <color name="colorAccentLight">@color/colorAccent50</color>
+
+    <color name="colorBackground">#121212</color>
+    <color name="colorSurface">#1e1e1e</color>
+    <color name="colorOnBackground">#FFFFFF</color>
+    <color name="colorOnSurface">#FFFFFF</color>
+</resources>

@@ -1,4 +1,4 @@
-        classpath 'io.fabric.tools:gradle:1.26.1'
+        classpath 'io.fabric.tools:gradle:1.31.1'
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.firebase.crashlytics'
@@ -50,15 +50,15 @@ android {
         applicationId "de.p72b.mocklation"
         minSdkVersion appMinSdk
         targetSdkVersion 29
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
         buildConfigField "String", "ANDROID_X_VERSION", '"1.1.0"'
-        buildConfigField "String", "ROOM_VERSION", '"' + rootProject.roomVersion + '"'
-        buildConfigField "String", "PLAY_SERVICES_VERSION", '"' + playServicesVersion + '"'
-        buildConfigField "String", "MAP_UTILITIES_VERSION", '"' + mapsUtilsVersion + '"'
-        buildConfigField "String", "GSON_VERSION", '"' + gsonVersion + '"'
-        buildConfigField "String", "FIREBASE_VERSION", '"' + firebaseVersion + '"'
-        buildConfigField "String", "RX_JAVA_VERSION", '"' + rxjavaVersion + '"'
-        buildConfigField "String", "RX_ANDROID_VERSION", '"' + rxandroidVersion + '"'
+        buildConfigField "String", "ROOM_VERSION", '"XXX"'
+        buildConfigField "String", "PLAY_SERVICES_VERSION", '"XXX"'
+        buildConfigField "String", "MAP_UTILITIES_VERSION", '"XXX"'
+        buildConfigField "String", "GSON_VERSION", '"XXX"'
+        buildConfigField "String", "FIREBASE_VERSION", '"XXX"'
+        buildConfigField "String", "RX_JAVA_VERSION", '"XXX"'
+        buildConfigField "String", "RX_ANDROID_VERSION", '"XXX"'
     }
 
     buildTypes {
@@ -95,21 +95,23 @@ android {
 }
 
 dependencies {
-    api fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     api "androidx.appcompat:appcompat:1.3.0-alpha02"
-    api "androidx.cardview:cardview:1.0.0"
+    implementation 'androidx.cardview:cardview:1.0.0'
     api "com.google.android.material:material:1.3.0-beta01"
     api "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
     api "androidx.browser:browser:1.3.0"
     api "androidx.room:room-runtime:2.3.0-alpha04"
     annotationProcessor "androidx.room:room-compiler:2.3.0-alpha04"
     api "androidx.room:room-rxjava2:2.3.0-alpha04"
-    api "com.google.android.gms:play-services-maps:${playServicesVersion}"
-    api "com.google.android.gms:play-services-places:${playServicesVersion}"
-    api "com.google.android.gms:play-services-location:${playServicesVersion}"
-    api "com.github.p72b:android-maps-utils:0.6.3"
-    api "com.github.p72b:locator-library:1.4.0"
-    api "com.google.code.gson:gson:${gsonVersion}"
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-places:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.github.p72b:android-maps-utils:0.6.3'
+    implementation 'com.github.p72b:locator-library:1.4.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     implementation platform('com.google.firebase:firebase-bom:26.2.0')
     implementation 'com.google.firebase:firebase-core'
@@ -117,9 +119,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-    api "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
-    api "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    api 'ru.bullyboo.ecryption:encoder:1.0.3'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'ru.bullyboo.ecryption:encoder:1.0.3'
 }
 apply plugin: 'com.google.gms.google-services'

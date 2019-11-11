@@ -40,7 +40,7 @@ class OldMainActivity : LocationAwareAppCompatActivity(), NavigationView.OnNavig
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_old_main)
         val setting = AppServices.getService(AppServices.SETTINGS) as ISetting
         presenter = MainPresenter(this, this, setting)
         val toolbar = findViewById<Toolbar>(R.id.vToolbar)

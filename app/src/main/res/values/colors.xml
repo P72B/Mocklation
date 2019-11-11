@@ -1,8 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#CF4141</color>
-    <color name="colorPrimaryDark">#541D1B</color>
-    <color name="colorAccent">#FF9800</color>
+    <color name="colorPrimary">@color/colorPrimary700</color>
+    <color name="colorPrimaryDark">@color/colorPrimary900</color>
+    <color name="colorPrimaryLight">@color/colorPrimary300</color>
+    <color name="colorAccent">@color/colorAccent300</color>
+    <color name="colorAccentDark">@color/colorAccent600</color>
+    <color name="colorAccentLight">@color/colorAccent100</color>
+
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnBackground">#121212</color>
+    <color name="colorOnSurface">#121212</color>
+
+    <color name="colorPrimary900">#b23330</color>
+    <color name="colorPrimary800">#c23b3a</color>
+    <color name="colorPrimary700">#cf4141</color>
+    <color name="colorPrimary600">#e14a48</color>
+    <color name="colorPrimary500">#f05249</color>
+    <color name="colorPrimary400">#eb6060</color>
+    <color name="colorPrimary300">#e07c7f</color>
+    <color name="colorPrimary200">#eba0a2</color>
+    <color name="colorPrimary100">#fcd0d6</color>
+    <color name="colorPrimary50">#fdecf0</color>
+
+    <color name="colorAccent900">#004897</color>
+    <color name="colorAccent800">#0066b4</color>
+    <color name="colorAccent700">#0076c5</color>
+    <color name="colorAccent600">#0088d7</color>
+    <color name="colorAccent500">#0e95e4</color>
+    <color name="colorAccent400">#42a4e6</color>
+    <color name="colorAccent300">#64b3e9</color>
+    <color name="colorAccent200">#8fc9f0</color>
+    <color name="colorAccent100">#badef5</color>
+    <color name="colorAccent50">#e3f2fb</color>
 
     <color name="face">#FEFEFD</color>
     <color name="eye">#584E45</color>

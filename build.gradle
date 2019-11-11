@@ -36,13 +36,4 @@ ext {
     appMinSdk = 21
     appCompileSdk = 29
     appBuildTools = "28.0.3"
-
-    playServicesVersion = "17.0.0"
-    gsonVersion = "2.8.1"
-    mapsUtilsVersion = "0.5"
-    roomVersion = '2.2.0'
-    firebaseVersion = '17.2.0'
-
-    rxjavaVersion = "2.1.2"
-    rxandroidVersion = "2.1.1"
 }

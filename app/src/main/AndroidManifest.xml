@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:resizeableActivity="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.MaterialComponents.DayNight"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
         <uses-library android:name="org.apache.http.legacy" android:required="false"/>
@@ -27,34 +27,13 @@
             android:value="@string/google_maps_api_key" />
 
         <activity
-            android:name=".main.OldMainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".revamp.main.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".map.MapsActivity"
-            android:parentActivityName=".main.OldMainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.OldMainActivity" />
-        </activity>
-
-        <activity
-            android:name=".imprint.ImprintActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".main.OldMainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.OldMainActivity" />
         </activity>
 
         <receiver android:name=".notification.NotificationBroadcastReceiver">
