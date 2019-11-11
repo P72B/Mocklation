@@ -5,8 +5,6 @@ import android.content.Intent
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import de.p72b.mocklation.BuildConfig
 import de.p72b.mocklation.R
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog
 import de.p72b.mocklation.imprint.ImprintActivity
@@ -16,7 +14,7 @@ import de.p72b.mocklation.map.MapsActivity
 import de.p72b.mocklation.service.setting.ISetting
 import de.p72b.mocklation.util.Constants
 
-class MainPresenter(private val activity: Activity, private val view: MainActivity,
+class MainPresenter(private val activity: Activity, private val view: OldMainActivity,
                     private val setting: ISetting) {
 
     private var fixedFragment: FixedFragment = FixedFragment()

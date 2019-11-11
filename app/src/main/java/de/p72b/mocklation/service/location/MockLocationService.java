@@ -42,7 +42,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.room.Room;
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.main.MainActivity;
+import de.p72b.mocklation.main.OldMainActivity;
 import de.p72b.mocklation.notification.NotificationBroadcastReceiver;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.AnalyticsService;
@@ -233,9 +233,9 @@ public class MockLocationService extends Service {
                 .setSmallIcon(R.drawable.ic_location_on_black_24dp)
                 .setContentTitle(mLocationItem.getDisplayedName());
 
-        Intent resultIntent = new Intent(this, MainActivity.class);
+        Intent resultIntent = new Intent(this, OldMainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addParentStack(OldMainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(

@@ -270,7 +270,7 @@ public class MapsPresenter implements IMapsPresenter {
         }
 
         /**
-         * Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         * Receives data sent from FetchAddressIntentService and updates the UI in OldMainActivity.
          */
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {

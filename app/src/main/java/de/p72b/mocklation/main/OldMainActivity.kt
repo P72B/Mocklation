@@ -25,7 +25,7 @@ import de.p72b.mocklation.service.AppServices
 import de.p72b.mocklation.service.setting.ISetting
 
 
-class MainActivity : LocationAwareAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+class OldMainActivity : LocationAwareAppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
         View.OnClickListener {
 
     private lateinit var drawer: DrawerLayout

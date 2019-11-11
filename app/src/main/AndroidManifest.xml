@@ -27,7 +27,7 @@
             android:value="@string/google_maps_api_key" />
 
         <activity
-            android:name=".main.MainActivity"
+            android:name=".main.OldMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -39,22 +39,22 @@
 
         <activity
             android:name=".map.MapsActivity"
-            android:parentActivityName=".main.MainActivity"
+            android:parentActivityName=".main.OldMainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.MainActivity" />
+                android:value=".main.OldMainActivity" />
         </activity>
 
         <activity
             android:name=".imprint.ImprintActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".main.MainActivity">
+            android:parentActivityName=".main.OldMainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.MainActivity" />
+                android:value=".main.OldMainActivity" />
         </activity>
 
         <receiver android:name=".notification.NotificationBroadcastReceiver">
