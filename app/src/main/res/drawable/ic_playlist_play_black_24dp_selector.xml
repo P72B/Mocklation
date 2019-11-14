@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:enterFadeDuration="@android:integer/config_longAnimTime"
+    android:exitFadeDuration="@android:integer/config_longAnimTime">
+        <item android:state_checked="true"
+            android:drawable="@drawable/ic_playlist_play_black_24dp_selected" />
+        <item android:state_pressed="true"
+            android:state_enabled="true"
+            android:drawable="@drawable/ic_playlist_play_black_24dp_selected" />
+        <item android:drawable="@drawable/ic_playlist_play_black_24dp" />
+</selector>

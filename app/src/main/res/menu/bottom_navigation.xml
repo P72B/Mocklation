@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/navigation_player"
-          android:icon="@drawable/ic_location_on_black_24dp"
-          android:title="@string/bottom_navigation_player"/>
+    <item
+        android:id="@+id/navigation_player"
+        android:icon="@drawable/ic_voicemail_black_24dp_selector"
+        android:title="@string/bottom_navigation_player" />
 
-    <item android:id="@+id/navigation_tracks"
-          android:icon="@drawable/ic_location_on_black_24dp"
-          android:title="@string/bottom_navigation_tracks"/>
+    <item
+        android:id="@+id/navigation_tracks"
+        android:icon="@drawable/ic_playlist_play_black_24dp_selector"
+        android:title="@string/bottom_navigation_tracks" />
 
-    <item android:id="@+id/navigation_recorder"
-          android:icon="@drawable/ic_location_on_black_24dp"
-          android:title="@string/bottom_navigation_recorder"/>
+    <item
+        android:id="@+id/navigation_recorder"
+        android:icon="@drawable/ic_fiber_manual_record_black_24dp_selector"
+        android:title="@string/bottom_navigation_recorder" />
 </menu>
