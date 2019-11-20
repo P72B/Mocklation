@@ -1,6 +1,5 @@
 package de.p72b.mocklation.map;
 
-import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -23,21 +22,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.TextPaint;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.AutocompleteFilter;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
@@ -562,34 +554,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
                     }
                 }
         );
-
-        PlaceAutocompleteFragment mAutocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-        mAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                Logger.i(TAG, "Place: " + place.getName());
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        place.getLatLng(), DEFAULT_ZOOM_LEVEL));
-                mPresenter.onMapLongClicked(place.getLatLng());
-            }
-
-            @Override
-            public void onError(Status status) {
-                Logger.i(TAG, "An error occurred: " + status);
-            }
-        });
-        View view = mAutocompleteFragment.getView();
-        if (view != null) {
-            EditText editText = view.findViewById(R.id.place_autocomplete_search_input);
-            editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(
-                    R.dimen.text_size_middle));
-        }
-        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
-                .build();
-        mAutocompleteFragment.setFilter(typeFilter);
     }
 
     private void calculateViewElementDimension() {
