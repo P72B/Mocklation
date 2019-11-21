@@ -40,11 +40,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.room.Room;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
+import de.p72b.mocklation.revamp.room.AppDatabase;
+import de.p72b.mocklation.revamp.room.LocationItem;
 import de.p72b.mocklation.service.geocoder.Constants;
 import de.p72b.mocklation.service.geocoder.GeocoderIntentService;
-import de.p72b.mocklation.service.room.AppDatabase;
-import de.p72b.mocklation.service.room.LocationItem;
-import de.p72b.mocklation.service.room.Mode;
 import de.p72b.mocklation.util.AppUtil;
 import de.p72b.mocklation.util.Logger;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -95,7 +94,7 @@ public class MapsPresenter implements IMapsPresenter {
         if (geometry == null) {
             return;
         }
-        final LocationItem item = new LocationItem(code, "", geometry, 6, 0, Mode.FIXED.name());
+        final LocationItem item = new LocationItem(code, "", geometry, 6, 0, false, 0);
         mOnTheMapItemPair = new Pair<>(code, item);
 
         resolveAddressFromLocation(latLng);

@@ -1,4 +1,4 @@
-package de.p72b.mocklation.revamp.main
+package de.p72b.mocklation.revamp.view
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -6,15 +6,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.p72b.mocklation.R
-import de.p72b.mocklation.revamp.main.player.PlayerFragment
-import de.p72b.mocklation.revamp.main.recorder.RecorderFragment
-import de.p72b.mocklation.revamp.main.tracks.TracksFragment
+import de.p72b.mocklation.revamp.view.player.PlayerFragment
+import de.p72b.mocklation.revamp.view.recorder.RecorderFragment
+import de.p72b.mocklation.revamp.view.tracks.TracksFragment
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
-    var playerFragment = PlayerFragment()
-    var tracksFragment = TracksFragment()
-    var recorderFragment = RecorderFragment()
+    private var playerFragment = PlayerFragment()
+    private var tracksFragment = TracksFragment()
+    private var recorderFragment = RecorderFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

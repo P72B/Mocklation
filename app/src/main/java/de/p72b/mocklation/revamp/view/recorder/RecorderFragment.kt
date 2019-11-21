@@ -1,4 +1,4 @@
-package de.p72b.mocklation.revamp.main.recorder
+package de.p72b.mocklation.revamp.view.recorder
 
 import android.os.Bundle
 import android.view.LayoutInflater

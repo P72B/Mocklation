@@ -11,8 +11,8 @@ import com.google.maps.android.data.geojson.GeoJsonPoint
 import de.p72b.mocklation.R
 import de.p72b.mocklation.main.mode.BaseModeFragment
 import de.p72b.mocklation.main.mode.BaseModePresenter
+import de.p72b.mocklation.revamp.room.LocationItem
 import de.p72b.mocklation.service.AppServices
-import de.p72b.mocklation.service.room.LocationItem
 import de.p72b.mocklation.service.setting.ISetting
 
 class FixedFragment : BaseModeFragment() {
@@ -52,8 +52,8 @@ class FixedFragment : BaseModeFragment() {
 
     override fun selectLocation(item: LocationItem) {
         super.selectLocation(item)
-        selectedLocationName.text = LocationItem.getNameToBeDisplayed(item)
-        item.geometry.let {
+        selectedLocationName.text = item.displayedName
+        item.getGeometry().let {
             when (it) {
                 is GeoJsonPoint -> {
                     val latLng = it.coordinates

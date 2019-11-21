@@ -9,9 +9,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import de.p72b.mocklation.R
 import de.p72b.mocklation.dialog.EditLocationItemDialog
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog
-import de.p72b.mocklation.service.room.AppDatabase
-import de.p72b.mocklation.service.room.LocationItem
-import de.p72b.mocklation.service.room.Mode
+import de.p72b.mocklation.revamp.room.AppDatabase
+import de.p72b.mocklation.revamp.room.LocationItem
 import de.p72b.mocklation.service.setting.ISetting
 import de.p72b.mocklation.util.Constants
 import io.reactivex.Completable
@@ -26,15 +25,13 @@ abstract class BaseModePresenter(private val supportFragmentManager: FragmentMan
                                  private val view: BaseModeFragment,
                                  private val setting: ISetting) {
 
-    private var db: AppDatabase = AppDatabase.getLocationsDb().build()
+    private var db: AppDatabase = AppDatabase.locationsDb.build()
     private var disposableGetAll: Disposable? = null
     private val disposables = CompositeDisposable()
     private lateinit var locationItemList: MutableList<LocationItem>
     private lateinit var mockServiceInteractor: MockServiceInteractor
     private val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
     private var selectedItem: LocationItem? = null
-
-    abstract fun getMode(): Mode
 
     fun onResume() {
         fetchAll()
@@ -105,14 +102,9 @@ abstract class BaseModePresenter(private val supportFragmentManager: FragmentMan
 
     private fun fetchAll() {
         val dao = db.locationItemDao()
-        val maybe = when (getMode()) {
-            Mode.FIXED -> dao.allFixed
-            Mode.ROUTE -> dao.allRoute
-            else -> return
-        }
-        val disposable = maybe.subscribeOn(Schedulers.io())
+        val disposable = dao.all.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(FetchAllLocationItemObserver())
+                .subscribe { FetchAllLocationItemObserver() }
         disposableGetAll = disposable
         disposables.add(disposable)
     }
@@ -198,7 +190,7 @@ abstract class BaseModePresenter(private val supportFragmentManager: FragmentMan
             return
         }
         val item = selectedItem
-        item!!.isIsFavorite = !item.isIsFavorite
+        item!!.favorite = !item.favorite
         updateItem(item)
     }
 

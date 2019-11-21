@@ -13,7 +13,7 @@ import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.service.room.LocationItem;
+import de.p72b.mocklation.revamp.room.LocationItem;
 import de.p72b.mocklation.util.Logger;
 
 public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
@@ -56,7 +56,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LocationItem locationItem = mDataset.get(position);
         ViewHolder viewHolder = (ViewHolder) holder;
 
-        viewHolder.mTextView.setText(LocationItem.getNameToBeDisplayed(locationItem));
+        viewHolder.mTextView.setText(locationItem.getDisplayedName());
         if (mSelectedItem != null && locationItem.getCode().equals(mSelectedItem.getCode())) {
             viewHolder.flagVisibility(View.VISIBLE);
         } else {
@@ -93,9 +93,9 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         Collections.sort(mDataset, new Comparator<LocationItem>() {
             @Override
             public int compare(LocationItem o1, LocationItem o2) {
-                boolean equal = o1.isIsFavorite() && o2.isIsFavorite() || !o1.isIsFavorite() && !o2.isIsFavorite();
-                boolean greater = o1.isIsFavorite() && !o2.isIsFavorite();
-                boolean less = !o1.isIsFavorite() && o2.isIsFavorite();
+                boolean equal = o1.getFavorite() && o2.getFavorite() || !o1.getFavorite() && !o2.getFavorite();
+                boolean greater = o1.getFavorite() && !o2.getFavorite();
+                boolean less = !o1.getFavorite() && o2.getFavorite();
                 int stringCompare = o1.getDisplayedName().compareToIgnoreCase(o2.getDisplayedName());
 
                 if (equal) {

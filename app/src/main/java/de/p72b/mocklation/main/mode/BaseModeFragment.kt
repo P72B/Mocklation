@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.p72b.mocklation.R
-import de.p72b.mocklation.service.room.LocationItem
+import de.p72b.mocklation.revamp.room.LocationItem
 import de.p72b.mocklation.util.VisibilityAnimationListener
 
 
@@ -41,7 +41,7 @@ abstract class BaseModeFragment : Fragment(), View.OnClickListener {
     abstract fun showSnackbar(message: Int, action: Int, listener: View.OnClickListener?, duration: Int)
 
     open fun selectLocation(item: LocationItem) {
-        favorite.background = activity!!.getDrawable(if (item.isIsFavorite)
+        favorite.background = activity!!.getDrawable(if (item.favorite)
             R.drawable.ic_favorite_black_24dp else R.drawable.ic_favorite_border_black_24dp)
 
         adapter.flagItem(item)

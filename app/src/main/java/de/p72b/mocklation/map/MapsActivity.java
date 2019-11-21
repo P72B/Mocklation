@@ -61,7 +61,7 @@ import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 import de.p72b.mocklation.R;
-import de.p72b.mocklation.service.room.LocationItem;
+import de.p72b.mocklation.revamp.room.LocationItem;
 import de.p72b.mocklation.util.AppUtil;
 import de.p72b.mocklation.util.Logger;
 

@@ -10,7 +10,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.List;
 
-import de.p72b.mocklation.service.room.LocationItem;
+import de.p72b.mocklation.revamp.room.LocationItem;
 
 public interface IMapsView {
 
