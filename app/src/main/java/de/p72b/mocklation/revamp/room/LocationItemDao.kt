@@ -16,8 +16,8 @@ interface LocationItemDao {
     @Query("SELECT * FROM locations where code = :code")
     fun findByCode(code: String): Single<LocationItem>
 
-    @Query("SELECT * FROM locations where displayed_name = :displayedName")
-    fun findByDisplayedName(displayedName: String): Maybe<List<LocationItem>>
+    @Query("SELECT * FROM locations where title = :name")
+    fun findByTitle(name: String): Maybe<List<LocationItem>>
 
     @Insert
     fun insertAll(vararg locationItems: LocationItem)

@@ -4,6 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".revamp.main.view.tracks.MainActivity">
+    android:background="@color/colorBackground"
+    tools:context=".revamp.view.MainActivity">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/vRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

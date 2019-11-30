@@ -231,7 +231,7 @@ public class MockLocationService extends Service {
         mNumMessages = 0;
         mNotifyBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_location_on_black_24dp)
-                .setContentTitle(mLocationItem.getDisplayedName());
+                .setContentTitle(mLocationItem.getTitle());
 
         Intent resultIntent = new Intent(this, OldMainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);

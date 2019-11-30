@@ -19,28 +19,55 @@ abstract class AppDatabase : RoomDatabase() {
         private const val DB_NAME_LOCATIONS = "locations"
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("""
+                CREATE TABLE new_locations (
+                    code TEXT PRIMARY KEY NOT NULL,
+                    geom TEXT NOT NULL,
+                    color INTEGER NOT NULL,
+                    title TEXT NOT NULL,
+                    accuracy INTEGER NOT NULL,
+                    favorite INTEGER NOT NULL,
+                    speed INTEGER NOT NULL
+                )
+                """.trimIndent())
+
                 val cursor = database.query("SELECT * FROM locations")
                 while (cursor.moveToNext()) {
                     val itemCode = cursor.getString(cursor.getColumnIndex("code"))
                     val itemGeoJson = cursor.getString(cursor.getColumnIndex("geo_json"))
                     val geometry = migrateFeatureToGeometry(itemGeoJson)
-                    if (geometry != null) {
-                        database.execSQL("UPDATE locations SET geo_json=\""
-                                + geometry + "\" WHERE code=\"" + itemCode + "\"")
+                    val color = cursor.getInt(cursor.getColumnIndex("color"))
+                    val title = cursor.getString(cursor.getColumnIndex("displayed_name")) ?: "not set"
+                    val accuracy = cursor.getInt(cursor.getColumnIndex("accuracy"))
+                    val favorite = cursor.getInt(cursor.getColumnIndex("favorite"))
+                    val speed = cursor.getInt(cursor.getColumnIndex("speed"))
+
+                    geometry?.let {
+                        database.execSQL("INSERT INTO new_locations (code, geom, color, title, accuracy, favorite, speed) VALUES (\""
+                                + itemCode + "\", \""
+                                + it + "\", \""
+                                + color + "\", \""
+                                + title + "\", \""
+                                + accuracy + "\", \""
+                                + favorite + "\", \""
+                                + speed + "\")"
+                        )
                     }
                 }
+
+                database.execSQL("DROP TABLE locations")
+                database.execSQL("ALTER TABLE new_locations RENAME TO locations")
             }
         }
 
         private fun migrateFeatureToGeometry(itemGeoJson: String): String? {
-            var result: String? = null
             try {
-                val geometry = GeoJsonParser.parseGeometry(JSONObject(itemGeoJson))
-                result = AppUtil.geometryToString(geometry)
+                val geoJsonFeature = GeoJsonParser.parseFeature(JSONObject(itemGeoJson))
+                return AppUtil.geometryToString(geoJsonFeature.geometry)
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-            return result
+            return null
         }
 
         @JvmStatic

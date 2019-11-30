@@ -14,15 +14,15 @@ import org.json.JSONObject
 @Parcelize
 data class LocationItem(@PrimaryKey
                         @ColumnInfo(name = "code") val code: String = "",
-                        @ColumnInfo(name = "displayed_name") var displayedName: String = "",
-                        @ColumnInfo(name = "geo_json") var geoJson: String = "{}",
+                        @ColumnInfo(name = "title") var title: String = "",
+                        @ColumnInfo(name = "geom") var geom: String = "{}",
                         @ColumnInfo(name = "accuracy") var accuracy: Int = 0,
                         @ColumnInfo(name = "speed") var speed: Int = 0,
                         @ColumnInfo(name = "favorite") var favorite: Boolean = false,
                         @ColumnInfo(name = "color") var color: Int = 0) : Parcelable {
     fun getGeometry(): Geometry<Any>? {
         return try {
-            GeoJsonParser.parseGeometry(JSONObject(geoJson))
+            GeoJsonParser.parseGeometry(JSONObject(geom))
         } catch (e: JSONException) {
             e.printStackTrace()
             null

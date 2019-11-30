@@ -106,7 +106,7 @@ public class MapsPresenter implements IMapsPresenter {
         Logger.d(TAG, "onMarkerClicked marker id: " + marker.getId());
 
         LocationItem item = (LocationItem) marker.getTag();
-        if (item != null && item.getDisplayedName().length() == 0) {
+        if (item != null && item.getTitle().length() == 0) {
             resolveAddressFromLocation(marker.getPosition());
         }
         mView.showBottomSheet(item);
@@ -170,7 +170,7 @@ public class MapsPresenter implements IMapsPresenter {
         FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
         LocationItem item = mOnTheMapItemPair.second;
         if (mAddressOutput != null && item != null) {
-            item.setDisplayedName(mAddressOutput.getLocality());
+            item.setTitle(mAddressOutput.getLocality());
         }
 
         EditLocationItemDialog dialog = EditLocationItemDialog.newInstance(

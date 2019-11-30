@@ -8,6 +8,10 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import de.p72b.mocklation.util.Logger
 import io.fabric.sdk.android.Fabric
 import com.google.android.gms.tasks.OnCompleteListener
+import de.p72b.mocklation.revamp.di.appModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -24,11 +28,20 @@ class App : Application() {
         super.onCreate()
         sInstance = this
 
+        initKoin()
         Fabric.with(this, Crashlytics())
         initLogging()
         initFirebase()
 
         //(AppServices.getService(AppServices.ANALYTICS) as IAnalyticsService).trackEvent(FirebaseAnalytics.Event.APP_OPEN)
+    }
+
+    private fun initKoin() {
+        startKoin {
+            androidContext(this@App)
+            androidLogger()
+            modules(appModule)
+        }
     }
 
     private fun initFirebase() {

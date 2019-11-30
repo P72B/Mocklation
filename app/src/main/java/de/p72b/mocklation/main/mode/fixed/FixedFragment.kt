@@ -52,7 +52,7 @@ class FixedFragment : BaseModeFragment() {
 
     override fun selectLocation(item: LocationItem) {
         super.selectLocation(item)
-        selectedLocationName.text = item.displayedName
+        selectedLocationName.text = item.title
         item.getGeometry().let {
             when (it) {
                 is GeoJsonPoint -> {

@@ -56,7 +56,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         LocationItem locationItem = mDataset.get(position);
         ViewHolder viewHolder = (ViewHolder) holder;
 
-        viewHolder.mTextView.setText(locationItem.getDisplayedName());
+        viewHolder.mTextView.setText(locationItem.getTitle());
         if (mSelectedItem != null && locationItem.getCode().equals(mSelectedItem.getCode())) {
             viewHolder.flagVisibility(View.VISIBLE);
         } else {
@@ -96,7 +96,7 @@ public class LocationListAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 boolean equal = o1.getFavorite() && o2.getFavorite() || !o1.getFavorite() && !o2.getFavorite();
                 boolean greater = o1.getFavorite() && !o2.getFavorite();
                 boolean less = !o1.getFavorite() && o2.getFavorite();
-                int stringCompare = o1.getDisplayedName().compareToIgnoreCase(o2.getDisplayedName());
+                int stringCompare = o1.getTitle().compareToIgnoreCase(o2.getTitle());
 
                 if (equal) {
                     return stringCompare;
