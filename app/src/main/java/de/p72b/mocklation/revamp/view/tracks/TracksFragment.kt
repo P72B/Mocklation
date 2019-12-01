@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.fragment_tracks.*
 class TracksFragment : Fragment() {
 
     private lateinit var locationViewModel: LocationViewModel
-    private lateinit var adapter: ListAdapter
+    private var adapter = ListAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tracks, null)
@@ -28,13 +28,14 @@ class TracksFragment : Fragment() {
 
         initAdapter()
 
-        locationViewModel.items.observe(viewLifecycleOwner, Observer { if (it != null) {
-            adapter.setData(it)
-        } })
+        locationViewModel.items.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                adapter.setData(it)
+            }
+        })
     }
 
     private fun initAdapter() {
-        adapter =ListAdapter(App.sInstance)
         vRecyclerView.adapter = adapter
         vRecyclerView.layoutManager = LinearLayoutManager(App.sInstance)
     }
