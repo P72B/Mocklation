@@ -34,6 +34,8 @@
     <color name="colorAccent100">#badef5</color>
     <color name="colorAccent50">#e3f2fb</color>
 
+    <color name="selected_card_view_transparent_5">#0D388e3c</color>
+
     <color name="face">#FEFEFD</color>
     <color name="eye">#584E45</color>
     <color name="collar">#FEFEF3</color>

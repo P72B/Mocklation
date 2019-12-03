@@ -17,4 +17,11 @@
     <style name="ActionBarDayNight" parent="Widget.MaterialComponents.Light.ActionBar.Solid">
         <item name="background">@color/colorSurface</item>
     </style>
+
+    <style name="MaterialCardViewDayNight" parent="Widget.MaterialComponents.CardView">
+        <item name="strokeColor">@color/colorSurface</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="checkedIconTint">@color/colorSurface</item>
+        <item name="cardForegroundColor">@color/selector_card_view_color</item>
+    </style>
 </resources>

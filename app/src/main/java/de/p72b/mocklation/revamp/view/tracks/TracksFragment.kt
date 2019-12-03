@@ -29,9 +29,7 @@ class TracksFragment : Fragment() {
         initAdapter()
 
         locationViewModel.items.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                adapter.setData(it)
-            }
+            adapter.setData(it)
         })
     }
 

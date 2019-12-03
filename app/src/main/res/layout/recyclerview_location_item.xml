@@ -8,25 +8,53 @@
         <variable
             name="item"
             type="de.p72b.mocklation.revamp.room.LocationItem" />
+
+        <variable
+            name="handler"
+            type="de.p72b.mocklation.revamp.view.tracks.Handler" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/vItemRoot"
+    <com.google.android.material.card.MaterialCardView
+        style="@style/MaterialCardViewDayNight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBackground"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_marginLeft="@dimen/mtrl_card_spacing"
+        android:layout_marginTop="@dimen/mtrl_card_spacing"
+        android:layout_marginRight="@dimen/mtrl_card_spacing"
+        android:checkable="true"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="@{(view) -> handler.onCardClick(view, item)}"
+        app:checkedIcon="@drawable/selector_location_item_list">
 
-        <TextView
-            android:id="@+id/vName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{item.title}"
-            android:textColor="@color/colorOnBackground"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Berlin" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/vItemRoot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorSurface"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/vImage"
+                android:layout_width="0dp"
+                android:layout_height="194dp"
+                android:background="@{item.color}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:background="@color/r1" />
+
+            <TextView
+                android:id="@+id/vName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@{item.title}"
+                android:textColor="@color/colorOnBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/vImage"
+                tools:text="Berlin" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 </layout>

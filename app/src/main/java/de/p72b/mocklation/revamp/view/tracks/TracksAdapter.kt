@@ -26,6 +26,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.RepositoryViewHolder>() {
     override fun onBindViewHolder(holder: RepositoryViewHolder, position: Int) {
         val item = list[position]
         holder.binding.item = item
+        holder.binding.handler = Handler()
     }
 
     fun setData(items: List<LocationItem>) {

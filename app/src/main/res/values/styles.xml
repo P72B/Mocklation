@@ -45,4 +45,11 @@
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
+    <style name="MaterialCardViewDayNight" parent="Widget.MaterialComponents.CardView">
+        <item name="strokeColor">@color/colorBackground</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="checkedIconTint">@color/colorBackground</item>
+        <item name="cardForegroundColor">@color/selector_card_view_color</item>
+    </style>
+
 </resources>

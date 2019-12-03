@@ -11,4 +11,6 @@
     <color name="colorSurface">#1e1e1e</color>
     <color name="colorOnBackground">#FFFFFF</color>
     <color name="colorOnSurface">#FFFFFF</color>
+
+    <color name="selected_card_view_transparent_5">#0D42a4e6</color>
 </resources>
