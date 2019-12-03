@@ -81,7 +81,7 @@ public class EditLocationItemDialog extends DialogFragment {
                                                      final LocationItem locationItem) {
         EditLocationItemDialog dialogFragment = new EditLocationItemDialog();
         Bundle args = new Bundle();
-        args.putParcelable(EXTRA_LOCATION_ITEM, locationItem);
+        //args.putParcelable(EXTRA_LOCATION_ITEM, locationItem);
         dialogFragment.setArguments(args);
         dialogFragment.setListener(listener);
         return dialogFragment;
@@ -254,11 +254,7 @@ public class EditLocationItemDialog extends DialogFragment {
                 new LatLng(Double.parseDouble(mLatitude.getText().toString()),
                         Double.parseDouble(mLongitude.getText().toString()))
         );
-        final String geometry = AppUtil.geometryToString(geoJsonPoint);
-        if (geometry == null) {
-            return;
-        }
-        mLocationItem.setGeom(geometry);
+        mLocationItem.setGeometry(geoJsonPoint);
     }
 
     private void writeItem() {

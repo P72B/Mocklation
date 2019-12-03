@@ -3,6 +3,7 @@ package de.p72b.mocklation.revamp.room
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.maps.android.data.geojson.GeoJsonParser
@@ -12,6 +13,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 @Database(entities = [LocationItem::class], version = 2, exportSchema = false)
+@TypeConverters(GeometryTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun locationItemDao(): LocationItemDao
 
@@ -22,7 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
                 database.execSQL("""
                 CREATE TABLE new_locations (
                     code TEXT PRIMARY KEY NOT NULL,
-                    geom TEXT NOT NULL,
+                    geom TEXT,
                     color INTEGER NOT NULL,
                     title TEXT NOT NULL,
                     accuracy INTEGER NOT NULL,

@@ -90,10 +90,7 @@ public class MapsPresenter implements IMapsPresenter {
     public void onMapLongClicked(LatLng latLng) {
         final LatLng roundedLatLng = AppUtil.roundLatLng(latLng);
         final String code = AppUtil.createLocationItemCode(roundedLatLng);
-        final String geometry = AppUtil.geometryToString(new GeoJsonPoint(roundedLatLng));
-        if (geometry == null) {
-            return;
-        }
+        final Geometry geometry = new GeoJsonPoint(roundedLatLng);
         final LocationItem item = new LocationItem(code, "", geometry, 6, 0, false, 0);
         mOnTheMapItemPair = new Pair<>(code, item);
 
