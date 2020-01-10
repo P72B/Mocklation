@@ -27,4 +27,7 @@ interface LocationItemDao {
 
     @Update
     fun updateLocationItems(vararg locationItems: LocationItem)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(items: List<LocationItem>)
 }

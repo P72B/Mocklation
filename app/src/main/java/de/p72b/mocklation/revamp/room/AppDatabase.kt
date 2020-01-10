@@ -29,7 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
                     title TEXT NOT NULL,
                     accuracy INTEGER NOT NULL,
                     favorite INTEGER NOT NULL,
-                    speed INTEGER NOT NULL
+                    speed INTEGER NOT NULL,
+                    selected INTEGER NOT NULL
                 )
                 """.trimIndent())
 
@@ -43,16 +44,18 @@ abstract class AppDatabase : RoomDatabase() {
                     val accuracy = cursor.getInt(cursor.getColumnIndex("accuracy"))
                     val favorite = cursor.getInt(cursor.getColumnIndex("favorite"))
                     val speed = cursor.getInt(cursor.getColumnIndex("speed"))
+                    val selected = 0
 
                     geometry?.let {
-                        database.execSQL("INSERT INTO new_locations (code, geom, color, title, accuracy, favorite, speed) VALUES (\""
+                        database.execSQL("INSERT INTO new_locations (code, geom, color, title, accuracy, favorite, speed, selected) VALUES (\""
                                 + itemCode + "\", \""
                                 + it + "\", \""
                                 + color + "\", \""
                                 + title + "\", \""
                                 + accuracy + "\", \""
                                 + favorite + "\", \""
-                                + speed + "\")"
+                                + speed + "\", \""
+                                + selected + "\")"
                         )
                     }
                 }

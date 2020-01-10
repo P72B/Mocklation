@@ -4,11 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
 import de.p72b.mocklation.R
 import de.p72b.mocklation.databinding.RecyclerviewLocationItemBinding
+import de.p72b.mocklation.revamp.arch.LocationViewModel
 import de.p72b.mocklation.revamp.room.LocationItem
 
-class ListAdapter: RecyclerView.Adapter<ListAdapter.RepositoryViewHolder>() {
+class TracksAdapter(private val viewModel: LocationViewModel): RecyclerView.Adapter<TracksAdapter.RepositoryViewHolder>() {
 
     private var list: ArrayList<LocationItem> = ArrayList()
 
@@ -26,7 +28,8 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.RepositoryViewHolder>() {
     override fun onBindViewHolder(holder: RepositoryViewHolder, position: Int) {
         val item = list[position]
         holder.binding.item = item
-        holder.binding.handler = Handler()
+        holder.binding.handler = Handler(viewModel)
+        (holder.binding.vItemRoot as MaterialCardView).isChecked = item.selected
     }
 
     fun setData(items: List<LocationItem>) {

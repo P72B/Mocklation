@@ -13,4 +13,5 @@ data class LocationItem(@PrimaryKey
                         @ColumnInfo(name = "accuracy") var accuracy: Int = 0,
                         @ColumnInfo(name = "speed") var speed: Int = 0,
                         @ColumnInfo(name = "favorite") var favorite: Boolean = false,
-                        @ColumnInfo(name = "color") var color: Int = 0)
+                        @ColumnInfo(name = "color") var color: Int = 0,
+                        @ColumnInfo(name = "selected") var selected: Boolean = false)

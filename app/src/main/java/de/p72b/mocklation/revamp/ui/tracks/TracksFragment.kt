@@ -18,10 +18,11 @@ class TracksFragment : Fragment() {
 
     private lateinit var binding: FragmentTracksBinding
     private lateinit var viewModel: LocationViewModel
-    private val adapter = ListAdapter()
+    private lateinit var adapter: TracksAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewModel = ViewModelProviders.of(this).get(LocationViewModel::class.java)
+        adapter = TracksAdapter(viewModel)
 
         binding = DataBindingUtil.inflate(
                 inflater,

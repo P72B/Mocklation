@@ -22,4 +22,17 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
         }
         return all.value!!.isEmpty()
     }
+
+    fun changeSelection(item: LocationItem, state: Boolean) {
+        all.value?.let {
+            it.forEach { singleItem ->
+                if (singleItem.code == item.code) {
+                    singleItem.selected = state
+                } else {
+                    singleItem.selected = false
+                }
+            }
+            repository.save(it)
+        }
+    }
 }

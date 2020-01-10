@@ -91,7 +91,7 @@ public class MapsPresenter implements IMapsPresenter {
         final LatLng roundedLatLng = AppUtil.roundLatLng(latLng);
         final String code = AppUtil.createLocationItemCode(roundedLatLng);
         final Geometry geometry = new GeoJsonPoint(roundedLatLng);
-        final LocationItem item = new LocationItem(code, "", geometry, 6, 0, false, 0);
+        final LocationItem item = new LocationItem(code, "", geometry, 6, 0, false, 0, false);
         mOnTheMapItemPair = new Pair<>(code, item);
 
         resolveAddressFromLocation(latLng);
