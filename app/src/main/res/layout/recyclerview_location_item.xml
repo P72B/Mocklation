@@ -11,7 +11,7 @@
 
         <variable
             name="handler"
-            type="de.p72b.mocklation.revamp.view.tracks.Handler" />
+            type="de.p72b.mocklation.revamp.ui.tracks.Handler" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -54,6 +54,19 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/vImage"
+                tools:text="Berlin" />
+
+            <TextView
+                android:id="@+id/vTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/selected_card_view_transparent_5"
+                android:maxLines="1"
+                android:padding="16dp"
+                android:text="@{item.title}"
+                app:layout_constraintBottom_toBottomOf="@+id/vImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 tools:text="Berlin" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

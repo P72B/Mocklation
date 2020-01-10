@@ -1,4 +1,4 @@
-package de.p72b.mocklation.revamp.view
+package de.p72b.mocklation.revamp.ui
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import de.p72b.mocklation.R
-import de.p72b.mocklation.revamp.view.player.PlayerFragment
-import de.p72b.mocklation.revamp.view.recorder.RecorderFragment
-import de.p72b.mocklation.revamp.view.tracks.TracksFragment
+import de.p72b.mocklation.revamp.ui.player.PlayerFragment
+import de.p72b.mocklation.revamp.ui.recorder.RecorderFragment
+import de.p72b.mocklation.revamp.ui.tracks.TracksFragment
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 

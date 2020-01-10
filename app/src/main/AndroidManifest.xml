@@ -27,7 +27,7 @@
             android:value="@string/google_maps_api_key" />
 
         <activity
-            android:name=".revamp.view.MainActivity"
+            android:name=".revamp.ui.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

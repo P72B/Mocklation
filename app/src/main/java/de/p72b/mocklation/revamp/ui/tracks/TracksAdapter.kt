@@ -1,4 +1,4 @@
-package de.p72b.mocklation.revamp.view.tracks
+package de.p72b.mocklation.revamp.ui.tracks
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,7 +10,7 @@ import de.p72b.mocklation.revamp.room.LocationItem
 
 class ListAdapter: RecyclerView.Adapter<ListAdapter.RepositoryViewHolder>() {
 
-    private var list: List<LocationItem> = ArrayList()
+    private var list: ArrayList<LocationItem> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -30,7 +30,8 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.RepositoryViewHolder>() {
     }
 
     fun setData(items: List<LocationItem>) {
-        list = items
+        list.clear()
+        list.addAll(items)
         notifyDataSetChanged()
     }
 

@@ -51,6 +51,7 @@ android {
         applicationId "de.p72b.mocklation"
         minSdkVersion appMinSdk
         targetSdkVersion 29
+        setProperty("archivesBaseName", "${applicationId}-v${versionName}(${versionCode})")
 
         buildConfigField "String", "ANDROID_X_VERSION", '"1.1.0"'
         buildConfigField "String", "ROOM_VERSION", '"XXX"'

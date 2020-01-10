@@ -35,6 +35,7 @@
     <color name="colorAccent50">#e3f2fb</color>
 
     <color name="selected_card_view_transparent_5">#0D388e3c</color>
+    <color name="card_title_transparent_50">#80121212</color>
 
     <color name="face">#FEFEFD</color>
     <color name="eye">#584E45</color>

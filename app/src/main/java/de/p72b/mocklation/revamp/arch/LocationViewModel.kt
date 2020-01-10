@@ -10,7 +10,16 @@ import org.koin.core.inject
 
 class LocationViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
     private val repository: LocationRepository by inject()
+    val all: LiveData<List<LocationItem>>
 
-    val items: LiveData<List<LocationItem>>
-        get() = repository.getAll()
+    init {
+        all = repository.getAll()
+    }
+
+    fun isEmpty(): Boolean {
+        if (all.value == null) {
+            return true
+        }
+        return all.value!!.isEmpty()
+    }
 }

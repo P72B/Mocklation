@@ -1,4 +1,4 @@
-package de.p72b.mocklation.revamp.view.tracks
+package de.p72b.mocklation.revamp.ui.tracks
 
 import android.view.View
 import com.google.android.material.card.MaterialCardView
