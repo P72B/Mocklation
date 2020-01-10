@@ -35,4 +35,8 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
             repository.save(it)
         }
     }
+
+    fun delete(item: LocationItem) {
+        repository.delete(item)
+    }
 }

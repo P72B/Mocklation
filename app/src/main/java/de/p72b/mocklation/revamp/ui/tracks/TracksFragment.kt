@@ -8,11 +8,13 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import de.p72b.mocklation.App
 import de.p72b.mocklation.R
 import de.p72b.mocklation.databinding.FragmentTracksBinding
 import de.p72b.mocklation.revamp.arch.LocationViewModel
+import de.p72b.mocklation.revamp.util.SwipeAndTouchHelper
 
 class TracksFragment : Fragment() {
 
@@ -41,6 +43,9 @@ class TracksFragment : Fragment() {
             }
             binding.invalidateAll()
         })
+
+        val touchHelper = ItemTouchHelper(SwipeAndTouchHelper(adapter))
+        touchHelper.attachToRecyclerView(binding.vRecyclerView)
 
         return binding.root
     }

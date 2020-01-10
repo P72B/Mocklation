@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.p72b.mocklation.R
 import de.p72b.mocklation.revamp.room.LocationItem
+import de.p72b.mocklation.revamp.util.SwipeAndTouchHelper
 import de.p72b.mocklation.util.VisibilityAnimationListener
 
 
