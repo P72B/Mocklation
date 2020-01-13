@@ -43,7 +43,7 @@ class TracksAdapter(private val viewModel: LocationViewModel): RecyclerView.Adap
 
     fun setData(items: List<LocationItem>) {
         list.clear()
-        list.addAll(items)
+        list.addAll(items.sortedBy { it.title })
         notifyDataSetChanged()
     }
 
