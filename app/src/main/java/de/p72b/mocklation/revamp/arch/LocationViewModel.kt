@@ -3,6 +3,7 @@ package de.p72b.mocklation.revamp.arch
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import de.p72b.mocklation.revamp.room.LocationItem
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -10,6 +11,7 @@ import org.koin.core.inject
 
 class LocationViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
     private val repository: LocationRepository by inject()
+    val lastDeletedItem = MutableLiveData<LocationItem>()
     val all: LiveData<List<LocationItem>>
 
     init {
@@ -38,5 +40,13 @@ class LocationViewModel(application: Application) : AndroidViewModel(application
 
     fun delete(item: LocationItem) {
         repository.delete(item)
+        item.selected = false
+        lastDeletedItem.value = item
+    }
+
+    fun undo() {
+        lastDeletedItem.value?.let {
+            repository.save(it)
+        }
     }
 }

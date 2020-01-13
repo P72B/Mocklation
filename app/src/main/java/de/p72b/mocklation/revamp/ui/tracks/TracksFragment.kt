@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import de.p72b.mocklation.App
 import de.p72b.mocklation.R
 import de.p72b.mocklation.databinding.FragmentTracksBinding
@@ -44,9 +45,25 @@ class TracksFragment : Fragment() {
             binding.invalidateAll()
         })
 
+        viewModel.lastDeletedItem.observe(this, Observer {
+            showSnackbar(R.string.message_location_item_removed, R.string.snackbar_action_undo,
+                    View.OnClickListener { viewModel.undo() })
+        })
+
         val touchHelper = ItemTouchHelper(SwipeAndTouchHelper(adapter))
         touchHelper.attachToRecyclerView(binding.vRecyclerView)
 
         return binding.root
+    }
+
+    private fun showSnackbar(message: Int,
+                             action: Int = -1,
+                             listener: View.OnClickListener? = null,
+                             duration: Int = Snackbar.LENGTH_LONG) {
+        val snackbar = Snackbar.make(binding.root, message, duration)
+        if (action != -1) {
+            snackbar.setAction(action, listener)
+        }
+        snackbar.show()
     }
 }

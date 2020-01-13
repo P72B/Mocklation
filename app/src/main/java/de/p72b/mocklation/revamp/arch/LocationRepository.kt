@@ -32,6 +32,15 @@ class LocationRepository {
                 }
     }
 
+    fun save(item: LocationItem) {
+        val resultToBeIgnored = Completable.fromAction { locationItemDao.insertAll(item) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe {
+                    Logger.d("p72b", "updated the database")
+                }
+    }
+
     fun delete(item: LocationItem) {
         val resultToBeIgnored = Completable.fromAction { locationItemDao.delete(item) }
                 .observeOn(AndroidSchedulers.mainThread())
