@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import de.p72b.mocklation.R
 import de.p72b.mocklation.databinding.RecyclerviewLocationItemBinding
-import de.p72b.mocklation.revamp.arch.LocationViewModel
+import de.p72b.mocklation.revamp.arch.TracksViewModel
 import de.p72b.mocklation.revamp.room.LocationItem
 import de.p72b.mocklation.revamp.util.SwipeAndTouchHelper.ActionCompletionContract
 
-class TracksAdapter(private val viewModel: LocationViewModel): RecyclerView.Adapter<TracksAdapter.RepositoryViewHolder>(), ActionCompletionContract {
+class TracksAdapter(private val viewModel: TracksViewModel): RecyclerView.Adapter<TracksAdapter.RepositoryViewHolder>(), ActionCompletionContract {
 
     private var list: ArrayList<LocationItem> = ArrayList()
 

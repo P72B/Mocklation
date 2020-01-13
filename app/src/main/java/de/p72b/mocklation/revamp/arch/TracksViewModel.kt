@@ -9,7 +9,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 
-class LocationViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
+class TracksViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
     private val repository: LocationRepository by inject()
     val lastDeletedItem = MutableLiveData<LocationItem>()
     val all: LiveData<List<LocationItem>>

@@ -14,17 +14,17 @@ import com.google.android.material.snackbar.Snackbar
 import de.p72b.mocklation.App
 import de.p72b.mocklation.R
 import de.p72b.mocklation.databinding.FragmentTracksBinding
-import de.p72b.mocklation.revamp.arch.LocationViewModel
+import de.p72b.mocklation.revamp.arch.TracksViewModel
 import de.p72b.mocklation.revamp.util.SwipeAndTouchHelper
 
 class TracksFragment : Fragment() {
 
     private lateinit var binding: FragmentTracksBinding
-    private lateinit var viewModel: LocationViewModel
+    private lateinit var viewModel: TracksViewModel
     private lateinit var adapter: TracksAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel = ViewModelProviders.of(this).get(LocationViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(TracksViewModel::class.java)
         adapter = TracksAdapter(viewModel)
 
         binding = DataBindingUtil.inflate(

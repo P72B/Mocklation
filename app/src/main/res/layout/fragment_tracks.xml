@@ -13,7 +13,7 @@
 
         <variable
             name="viewModel"
-            type="de.p72b.mocklation.revamp.arch.LocationViewModel" />
+            type="de.p72b.mocklation.revamp.arch.TracksViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
