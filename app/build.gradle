@@ -1,4 +1,4 @@
-        classpath 'io.fabric.tools:gradle:1.31.1'
+        classpath 'io.fabric.tools:gradle:1.31.2'
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -45,7 +45,7 @@ android {
 
 
     compileSdkVersion appCompileSdk
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.2'
     defaultConfig {
         multiDexEnabled true
         applicationId "de.p72b.mocklation"
@@ -116,14 +116,17 @@ dependencies {
     implementation 'android.arch.lifecycle:viewmodel:1.1.1'
 
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03'
+    implementation 'androidx.browser:browser:1.3.0-alpha04'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta7'
+    implementation 'androidx.room:room-runtime:2.2.5'
+    kapt 'androidx.room:room-compiler:2.2.5'
     api "com.google.android.material:material:1.3.0-beta01"
-    api "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
+    
     api "androidx.browser:browser:1.3.0"
-    api "androidx.room:room-runtime:2.3.0-alpha04"
-    annotationProcessor "androidx.room:room-compiler:2.3.0-alpha04"
     api "androidx.room:room-rxjava2:2.3.0-alpha04"
 
-    implementation 'com.google.android.material:material:1.2.0-alpha02'
+    implementation 'com.google.android.material:material:1.3.0-alpha01'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
