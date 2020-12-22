@@ -389,7 +389,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
             }
         }
         mLocationManager.addTestProvider(getBestFittingProvider(), false, false,
-                false, false, true, true, true, 0, 5);
+                false, false, true, true, true, 1, 2);
 
         mMockLocationUpdateInterval = getUpdateInterval();
         mDisposables.add(mMockLocationUpdateInterval);
@@ -401,7 +401,9 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         final String provider = mLocationManager.getBestProvider( criteria, true );
 
-        if (provider == null || LocationManager.PASSIVE_PROVIDER.equals(provider)) {
+        if (provider == null || LocationManager.PASSIVE_PROVIDER.equals(provider)
+                || !mLocationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)
+                || !mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             return LocationManager.GPS_PROVIDER;
         } else {
             return provider;
