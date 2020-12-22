@@ -1,8 +1,6 @@
 package de.p72b.mocklation.main;
 
 
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.util.Logger;

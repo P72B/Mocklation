@@ -11,18 +11,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
-import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -38,6 +31,11 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.room.LocationItem;
 
@@ -189,7 +187,7 @@ public class AppUtil {
     /**
      * Registers a given {@link BroadcastReceiver} to a list of actions.
      *
-     * @param context           The {@link Context} of the {@link LocalBroadcastManager}.
+     * @param context           The {@link Context} of the {@link androidx.localbroadcastmanager.content.LocalBroadcastManager}.
      * @param broadcastReceiver The  {@link BroadcastReceiver} to register.
      * @param actions           The actions to register for.
      */
@@ -239,7 +237,8 @@ public class AppUtil {
         return textView;
     }
 
-    public static @Nullable LatLngBounds getBounds(@Nullable List<LocationItem> locationItems) {
+    public static @Nullable
+    LatLngBounds getBounds(@Nullable List<LocationItem> locationItems) {
         if (locationItems == null || locationItems.size() <= 1) {
             return null;
         }

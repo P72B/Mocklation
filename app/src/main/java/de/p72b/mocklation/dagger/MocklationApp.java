@@ -4,14 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.util.Logger;
-import io.fabric.sdk.android.Fabric;
 
 public final class MocklationApp
         extends Application {
@@ -22,7 +20,6 @@ public final class MocklationApp
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
         sInstance = this;
 
         Logger.enableLogging(BuildConfig.BUILD_TYPE != "release");

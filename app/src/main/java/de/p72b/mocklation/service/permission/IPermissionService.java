@@ -2,11 +2,9 @@ package de.p72b.mocklation.service.permission;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 
-
-import de.p72b.mocklation.service.setting.ISetting;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 public interface IPermissionService {
 

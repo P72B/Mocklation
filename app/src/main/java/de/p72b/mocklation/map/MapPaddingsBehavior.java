@@ -1,7 +1,6 @@
 package de.p72b.mocklation.map;
 
 import android.content.Context;
-import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -9,6 +8,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import de.p72b.mocklation.R;
 
 @SuppressWarnings("unused") // It's used in R.layout.activity_maps

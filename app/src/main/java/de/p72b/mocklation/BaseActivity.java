@@ -2,10 +2,10 @@ package de.p72b.mocklation;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
@@ -48,6 +48,7 @@ public class BaseActivity extends AppCompatActivity {
                 mPermissionService.permissionDenied(permissions[i], this, requestCode);
             }
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
 

@@ -5,7 +5,7 @@
     android:background="@color/face"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/dialog_edit_item_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"

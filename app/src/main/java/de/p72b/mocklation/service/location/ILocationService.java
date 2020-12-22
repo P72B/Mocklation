@@ -1,12 +1,10 @@
 package de.p72b.mocklation.service.location;
 
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 import de.p72b.mocklation.service.permission.IPermissionService;
-import de.p72b.mocklation.service.permission.PermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
 
 public interface ILocationService {

@@ -1,8 +1,9 @@
 package de.p72b.mocklation.service.analytics;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public interface IAnalyticsService {
     void trackEvent(@NonNull String name);

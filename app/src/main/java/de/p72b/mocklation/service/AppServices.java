@@ -1,12 +1,11 @@
 package de.p72b.mocklation.service;
 
-import android.support.annotation.StringDef;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.StringDef;
 import de.p72b.mocklation.dagger.MocklationApp;
 import de.p72b.mocklation.service.analytics.AnalyticsService;
 import de.p72b.mocklation.service.location.LocationService;

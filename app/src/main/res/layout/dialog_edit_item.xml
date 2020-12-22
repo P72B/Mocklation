@@ -6,7 +6,7 @@
     android:background="@color/face"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/dialog_edit_item_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -46,7 +46,7 @@
                 android:textColor="@color/eye"
                 android:textSize="@dimen/text_size_middle" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_pin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,9 +64,9 @@
                     android:hint="@string/dialog_edit_item_displayed_name"
                     android:inputType="text"
                     android:textColor="@color/eye" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_latitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,9 +83,9 @@
                     android:hint="@string/dialog_edit_item_latitude"
                     android:inputType="numberDecimal|numberSigned"
                     android:textColor="@color/eye" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_layout_longitude"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
                     android:hint="@string/dialog_edit_item_longitude"
                     android:inputType="numberDecimal|numberSigned"
                     android:textColor="@color/eye" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

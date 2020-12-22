@@ -3,9 +3,6 @@ package de.p72b.mocklation.service.location;
 import android.Manifest;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -16,6 +13,9 @@ import com.google.android.gms.location.LocationServices;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.Logger;

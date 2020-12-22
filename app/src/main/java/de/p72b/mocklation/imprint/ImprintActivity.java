@@ -3,26 +3,22 @@ package de.p72b.mocklation.imprint;
 import android.annotation.SuppressLint;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
+import androidx.core.content.ContextCompat;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.util.AppUtil;
@@ -98,46 +94,6 @@ public class ImprintActivity extends AppCompatActivity {
     @SuppressLint("StringFormatInvalid")
     private void setupDependencies() {
         List<DependencyItem> items = new ArrayList<>();
-        items.add(new DependencyItem(
-                R.string.v7_appcompat_library,
-                R.string.v7_appcompat_library_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.SUPPORT_LIB_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
-        items.add(new DependencyItem(
-                R.string.v7_cardview_library,
-                R.string.v7_cardview_library_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.SUPPORT_LIB_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
-        items.add(new DependencyItem(
-                R.string.android_design_library,
-                R.string.android_design_library_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.SUPPORT_LIB_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
-        items.add(new DependencyItem(
-                R.string.v7_support_dynamic_animation_library,
-                R.string.v7_support_dynamic_animation_library_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.SUPPORT_LIB_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
-        items.add(new DependencyItem(
-                R.string.v7_support_custom_tabs_library,
-                R.string.v7_support_custom_tabs_library_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.SUPPORT_LIB_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
         items.add(new DependencyItem(
                 R.string.room_library,
                 R.string.room_library_link,
