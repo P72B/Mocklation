@@ -108,15 +108,17 @@ dependencies {
     api "com.google.maps.android:android-maps-utils:0.4.4"
     api "com.google.code.gson:gson:${gsonVersion}"
     api "com.google.dagger:dagger:${daggerVersion}"
-    api "com.google.firebase:firebase-core:18.0.0"
-    api 'com.google.firebase:firebase-config:20.0.2'
+
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation 'com.google.firebase:firebase-core'
+    implementation 'com.google.firebase:firebase-config'
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+
     annotationProcessor rootProject.ext.daggerCompiler
     api "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
     api "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api 'ru.bullyboo.ecryption:encoder:1.0.3'
-
-    implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
-    implementation 'com.google.firebase:firebase-analytics:18.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

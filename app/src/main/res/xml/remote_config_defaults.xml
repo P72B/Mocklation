@@ -3,27 +3,27 @@
 <defaultsMap>
     <entry>
         <key>imprint_producer_contact_name</key>
-        <value>...</value>
+        <value>Willy Marten</value>
     </entry>
     <entry>
         <key>imprint_procuder_contact_city</key>
-        <value>...</value>
+        <value>Berlin</value>
     </entry>
     <entry>
         <key>imprint_producer_contact_country</key>
-        <value>..</value>
+        <value>Germany</value>
     </entry>
     <entry>
         <key>imprint_producer</key>
-        <value>...</value>
+        <value>Willy Marten</value>
     </entry>
     <entry>
         <key>imprint_producer_contact_mail</key>
-        <value>...</value>
+        <value>willy.riechert@googlemail.com</value>
     </entry>
     <entry>
         <key>imprint_github_project_repository</key>
-        <value>...</value>
+        <value>https://github.com/P72B/Mocklation</value>
     </entry>
     <entry>
         <key>url_privacy_policy</key>

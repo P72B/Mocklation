@@ -3,8 +3,10 @@ package de.p72b.mocklation.main;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -12,6 +14,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -298,26 +301,12 @@ public class MainPresenter implements IMainPresenter {
 
     private void setupRemoteConfig() {
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(3600)
                 .build();
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
         mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_defaults);
-
-        fetchRemoteConfig();
-    }
-
-    private void fetchRemoteConfig() {
-        long cacheExpiration = 3600; // 1 hour in seconds.
-        mFirebaseRemoteConfig.fetch(cacheExpiration)
-                .addOnCompleteListener(mActivity, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            // TODO
-                        }
-                    }
-                });
+        mFirebaseRemoteConfig.fetchAndActivate();
     }
 
     private class FetchAllLocationItemObserver implements Consumer<List<LocationItem>> {
