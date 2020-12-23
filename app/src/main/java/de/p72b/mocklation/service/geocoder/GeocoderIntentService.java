@@ -7,7 +7,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.List;

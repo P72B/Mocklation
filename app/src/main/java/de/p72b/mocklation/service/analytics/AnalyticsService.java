@@ -8,9 +8,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import de.p72b.mocklation.App;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 public class AnalyticsService implements IAnalyticsService {
 
     public static class Event {

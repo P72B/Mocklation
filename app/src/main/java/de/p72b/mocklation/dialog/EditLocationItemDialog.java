@@ -6,8 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,8 +23,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.maps.android.data.Geometry;
 import com.google.maps.android.data.geojson.GeoJsonPoint;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.List;
 
@@ -37,9 +33,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.room.EmptyResultSetException;
-import androidx.fragment.app.FragmentManager;
-import androidx.room.EmptyResultSetException;
-import androidx.room.Room;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.revamp.room.AppDatabase;
 import de.p72b.mocklation.revamp.room.LocationItem;

@@ -15,16 +15,8 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NavUtils;
-import androidx.core.content.ContextCompat;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.firebase.AppCredits;

@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Map;
 
-import androidx.annotation.StringDef;
 import de.p72b.mocklation.service.analytics.AnalyticsService;
 import de.p72b.mocklation.service.setting.Setting;
 

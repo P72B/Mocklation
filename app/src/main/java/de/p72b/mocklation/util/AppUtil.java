@@ -38,11 +38,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.revamp.room.LocationItem;
 

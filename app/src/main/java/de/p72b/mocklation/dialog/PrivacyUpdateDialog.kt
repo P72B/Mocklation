@@ -3,8 +3,6 @@ package de.p72b.mocklation.dialog
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.core.content.ContextCompat
-import android.support.v4.app.DialogFragment
 import android.view.*
 import android.widget.CheckBox
 import android.widget.TextView
@@ -12,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import de.p72b.mocklation.R
 import de.p72b.mocklation.util.AppUtil
 
@@ -110,7 +107,7 @@ class PrivacyUpdateDialog : DialogFragment() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-*/
+
     private fun setCheckBoxHintVisibility(checkBoxHintVisibility: Boolean) {
         checkBox.setTextColor(ContextCompat.getColor(requireContext(), if (checkBoxHintVisibility)
             R.color.colorAccent

@@ -2,18 +2,14 @@ package de.p72b.mocklation
 
 import android.annotation.SuppressLint
 import android.app.Application
-import com.crashlytics.android.Crashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import de.p72b.mocklation.util.Logger
-import io.fabric.sdk.android.Fabric
 import com.google.android.gms.tasks.OnCompleteListener
-import de.p72b.mocklation.revamp.arch.LocationRepository
 import de.p72b.mocklation.revamp.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import org.koin.core.inject
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -31,7 +27,6 @@ class App : Application() {
         sInstance = this
 
         initKoin()
-        Fabric.with(this, Crashlytics())
         initLogging()
         initFirebase()
 

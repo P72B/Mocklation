@@ -1,8 +1,8 @@
-        classpath 'io.fabric.tools:gradle:1.31.2'
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
     mavenCentral()
@@ -15,7 +15,6 @@ android {
     Properties props = new Properties()
     def propFile = file('./signing.properties')
     if (propFile.canRead() && props != null){
-        def KEY_FABRIC_API_KEY = "FABRIC_API_KEY"
         def KEY_GOOGLE_MAPS_API_KEY_DEVELOP = "GOOGLE_MAPS_API_KEY_DEVELOP"
         def KEY_GOOGLE_MAPS_API_KEY_STORE = "GOOGLE_MAPS_API_KEY_STORE"
         def KEY_PASSWORD_DEBUG = "KEY_PASSWORD_DEBUG"

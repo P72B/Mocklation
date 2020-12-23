@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/colorBackground"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".revamp.main.view.tracks.MainActivity">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/vTextViewTitle"
