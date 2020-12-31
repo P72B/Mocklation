@@ -1,108 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@color/face"
-    android:orientation="vertical">
+    android:fillViewport="true"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/dialog_edit_item_toolbar"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp" />
+        android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/dialog_edit_item_toolbar"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:layout_height="?attr/actionBarSize"
             android:layout_width="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/title"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_width="match_parent"
+            android:paddingBottom="@dimen/guideline_dialog_title_body_padding"
+            android:paddingTop="@dimen/guideline_dialog_content_padding"
+            android:text="@string/dialog_edit_item_title"
+            android:textColor="@color/head"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_edit_item_toolbar" />
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/message"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_width="match_parent"
+            android:text="@string/dialog_edit_item_message"
+            android:textColor="@color/eye"
+            android:textSize="@dimen/text_size_middle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_pin"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_width="match_parent"
+            android:nextFocusLeft="@id/input_layout_pin"
+            android:nextFocusUp="@id/input_layout_pin"
+            android:theme="@style/TextInputLayoutDialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/message">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_displayed_name"
+                android:background="@android:color/transparent"
+                android:hint="@string/dialog_edit_item_displayed_name"
+                android:inputType="text"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
-                android:layout_marginRight="@dimen/guideline_dialog_content_padding"
-                android:paddingBottom="@dimen/guideline_dialog_title_body_padding"
-                android:paddingTop="@dimen/guideline_dialog_content_padding"
-                android:text="@string/dialog_edit_item_title"
-                android:textColor="@color/head"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/message"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
-                android:layout_marginRight="@dimen/guideline_dialog_content_padding"
-                android:text="@string/dialog_edit_item_message"
-                android:textColor="@color/eye"
-                android:textSize="@dimen/text_size_middle" />
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:textColor="@color/eye" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_layout_pin"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_latitude"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_width="match_parent"
+            android:theme="@style/TextInputLayoutDialog"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_pin"
+            tools:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_latitude"
+                android:background="@android:color/transparent"
+                android:hint="@string/dialog_edit_item_latitude"
+                android:inputType="numberDecimal|numberSigned"
+                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:textColor="@color/eye" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_longitude"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_width="match_parent"
+            android:theme="@style/TextInputLayoutDialog"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_latitude"
+            tools:visibility="visible">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_longitude"
+                android:background="@android:color/transparent"
+                android:hint="@string/dialog_edit_item_longitude"
+                android:inputType="numberDecimal|numberSigned"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
-                android:layout_marginRight="@dimen/guideline_dialog_content_padding"
-                android:paddingTop="@dimen/guideline_screen_edge_top_bottom_distance_half"
-                android:theme="@style/TextInputLayoutDialog"
-                android:nextFocusUp="@id/input_layout_pin"
-                android:nextFocusLeft="@id/input_layout_pin">
-
-                <EditText
-                    android:id="@+id/input_displayed_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/dialog_edit_item_displayed_name"
-                    android:inputType="text"
-                    android:textColor="@color/eye" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_layout_latitude"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
-                android:layout_marginRight="@dimen/guideline_dialog_content_padding"
-                android:theme="@style/TextInputLayoutDialog"
-                android:visibility="gone"
-                tools:visibility="visible">
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:textColor="@color/eye" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <EditText
-                    android:id="@+id/input_latitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/dialog_edit_item_latitude"
-                    android:inputType="numberDecimal|numberSigned"
-                    android:textColor="@color/eye" />
-            </com.google.android.material.textfield.TextInputLayout>
+        <Button
+            android:id="@+id/ctaSave"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_width="wrap_content"
+            android:text="@string/action_save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_longitude"
+            app:layout_constraintVertical_bias="1.0" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/input_layout_longitude"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/guideline_dialog_content_padding"
-                android:layout_marginRight="@dimen/guideline_dialog_content_padding"
-                android:theme="@style/TextInputLayoutDialog"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <EditText
-                    android:id="@+id/input_longitude"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/dialog_edit_item_longitude"
-                    android:inputType="numberDecimal|numberSigned"
-                    android:textColor="@color/eye" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

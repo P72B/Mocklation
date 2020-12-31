@@ -130,6 +130,7 @@
             android:layout_marginRight="@dimen/fab_margin_right"
             android:layout_marginTop="@dimen/fab_margin"
             android:clickable="true"
+            app:backgroundTint="@color/colorAccent"
             app:srcCompat="@drawable/ic_save_black_24dp" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,28 +1,29 @@
 package de.p72b.mocklation.main;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.room.Room;
-import de.p72b.mocklation.BuildConfig;
+import de.p72b.locator.location.ILastLocationListener;
+import de.p72b.locator.location.ISettingsClientResultListener;
+import de.p72b.locator.location.LocationManager;
 import de.p72b.mocklation.R;
+import de.p72b.mocklation.dialog.BackgroundLocationDialog;
+import de.p72b.mocklation.dialog.DialogListener;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
 import de.p72b.mocklation.dialog.PrivacyUpdateDialog;
 import de.p72b.mocklation.map.MapsActivity;
@@ -37,18 +38,17 @@ import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainPresenter implements IMainPresenter {
 
     private static final String TAG = MainPresenter.class.getSimpleName();
-    private static final String REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY = "url_privacy_policy";
 
     private IMainView mView;
     private AppDatabase mDb;
     private FragmentActivity mActivity;
+    private LocationManager mLocationManager;
     private ISetting mSetting;
     private CompositeDisposable mDisposables = new CompositeDisposable();
     private IMockServiceInteractor mMockServiceInteractor;
@@ -59,20 +59,19 @@ public class MainPresenter implements IMainPresenter {
     private Disposable mDisposableUpdateItem;
     private IAnalyticsService mAnalyticsService;
     private List<LocationItem> mLocationItems;
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
 
-    MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics) {
+    MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics, LocationManager locationManager) {
         Logger.d(TAG, "new MainPresenter");
+        mLocationManager = locationManager;
         mActivity = activity;
         mView = (IMainView) activity;
         mSetting = setting;
         mAnalyticsService = analytics;
         mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
         mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting,
-                new MockServiceListener());
+                new MockServiceListener(), locationManager);
 
         mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
-        setupRemoteConfig();
     }
 
     @Override
@@ -149,12 +148,7 @@ public class MainPresenter implements IMainPresenter {
             return;
         }
 
-        Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                mDb.locationItemDao().delete(item);
-            }
-        })
+        Completable.fromAction(() -> mDb.locationItemDao().delete(item))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new DeleteLocationItemObserver(item));
@@ -165,13 +159,18 @@ public class MainPresenter implements IMainPresenter {
         mMockServiceInteractor.onMockPermissionsResult(grantedResults);
     }
 
+    @Override
+    public void onDefaultMockAppRequest(int results) {
+        mMockServiceInteractor.onDefaultMockAppRequest(results);
+    }
+
+    @Override
+    public void onDeveloperOptionsEnabledRequest(int results) {
+
+    }
+
     private void saveLocationItem(final LocationItem item) {
-        Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                mDb.locationItemDao().insertAll(item);
-            }
-        })
+        Completable.fromAction(() -> mDb.locationItemDao().insertAll(item))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new SaveLocationItemObserver(item));
@@ -233,25 +232,97 @@ public class MainPresenter implements IMainPresenter {
 
         if (mSetting.getMockLocationItemCode() != null && mMockServiceInteractor.isServiceRunning()) {
             mMockServiceInteractor.stopMockLocationService();
-        } else {
-            mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+            return;
         }
+
+        mLocationManager.getLastLocation(new ILastLocationListener() {
+            @Override
+            public void onSuccess(@Nullable Location location) {
+                if (mMockServiceInteractor.hasRequiredPermissions()) {
+                    mLocationManager.deviceLocationSettingFulfilled(new ISettingsClientResultListener() {
+                        @Override
+                        public void onFailure(int i, @NotNull String s) {
+                            mView.showSnackbar(R.string.error_1024, -1, null, Snackbar.LENGTH_LONG);
+                        }
+
+                        @Override
+                        public void onSuccess() {
+                            trackLocationDistance(location);
+                            mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+                        }
+                    }, true);
+                } else {
+                    showBackgroundLocationPermissionDialog();
+                }
+            }
+
+            @Override
+            public void onError(int i, @Nullable String s) {
+                showBackgroundLocationPermissionDialog();
+            }
+        }, true, true, true);
+    }
+
+    private void trackLocationDistance(@Nullable Location location) {
+        Location mockLocation = getLocation();
+        if (location == null || mockLocation == null) {
+            return;
+        }
+        final Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, mSelectedItem.getCode());
+        bundle.putFloat("length", location.distanceTo(mockLocation));
+        mAnalyticsService.trackEvent(AnalyticsService.Event.DISTANCE_BETWEEN_USER_LOCATION_AND_MOCK, bundle);
+    }
+
+    @Nullable
+    private Location getLocation() {
+        Object geometry = mSelectedItem.getGeometry();
+        if (geometry instanceof LatLng) {
+            Location location = new Location("gps");
+            location.setLongitude(((LatLng) geometry).longitude);
+            location.setLatitude(((LatLng) geometry).latitude);
+            return location;
+        }
+        return null;
+    }
+
+    private void showBackgroundLocationPermissionDialog() {
+        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+        BackgroundLocationDialog dialog = BackgroundLocationDialog.Companion.newInstance(
+                new DialogListener() {
+                    @Override
+                    public void onAcceptClick() {
+                        mMockServiceInteractor.setLocationItem(mSelectedItem.getCode());
+                        mMockServiceInteractor.requestRequiredPermissions();
+                    }
+
+                    @Override
+                    public void onDeclineClick() {
+                        mView.showSnackbar(R.string.error_1023, -1, null, Snackbar.LENGTH_LONG);
+                    }
+                });
+        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+        dialog.show(fragmentManager, PrivacyUpdateDialog.Companion.getTAG());
     }
 
     private void showPrivacyUpdateDialog() {
+        showPrivacyUpdateDialog(new DialogListener() {
+            @Override
+            public void onAcceptClick() {
+                onPlayStopClicked();
+            }
+
+            @Override
+            public void onDeclineClick() {
+                mView.showSnackbar(R.string.error_1020, -1, null, Snackbar.LENGTH_LONG);
+            }
+        });
+    }
+
+    @Override
+    public void showPrivacyUpdateDialog(@Nullable DialogListener listener) {
         FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
-        PrivacyUpdateDialog dialog = PrivacyUpdateDialog.Companion.newInstance(
-                new PrivacyUpdateDialog.PrivacyUpdateDialogListener() {
-                    @Override
-                    public void onAcceptClick() {
-                        mSetting.acceptCurrentPrivacyStatement();
-                        onPlayStopClicked();
-                    }
-                    @Override
-                    public void onDeclineClick() {
-                        mView.showSnackbar(R.string.error_1020, -1, null, Snackbar.LENGTH_LONG);
-                    }
-                }, mFirebaseRemoteConfig.getString(REMOTE_CONFIG_KEY_URL_PRIVACY_POLICY));
+        PrivacyUpdateDialog dialog = PrivacyUpdateDialog.Companion.newInstance(listener);
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
         dialog.show(fragmentManager, PrivacyUpdateDialog.Companion.getTAG());
     }
@@ -259,12 +330,7 @@ public class MainPresenter implements IMainPresenter {
     private void showEditLocationItemDialog() {
         FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
         EditLocationItemDialog dialog = EditLocationItemDialog.newInstance(
-                new EditLocationItemDialog.EditLocationItemDialogListener() {
-                    @Override
-                    public void onPositiveClick(LocationItem item) {
-                        fetchAll();
-                    }
-                }, mSelectedItem
+                item -> fetchAll(), mSelectedItem
         );
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
         dialog.show(fragmentManager, EditLocationItemDialog.TAG);
@@ -288,25 +354,10 @@ public class MainPresenter implements IMainPresenter {
     }
 
     private void updateItem(final LocationItem item) {
-        Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                mDb.locationItemDao().updateLocationItems(item);
-            }
-        })
+        Completable.fromAction(() -> mDb.locationItemDao().updateLocationItems(item))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new UpdateLocationItemObserver(item));
-    }
-
-    private void setupRemoteConfig() {
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(3600)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
-        mFirebaseRemoteConfig.setDefaultsAsync(R.xml.remote_config_defaults);
-        mFirebaseRemoteConfig.fetchAndActivate();
     }
 
     private class FetchAllLocationItemObserver implements Consumer<List<LocationItem>> {
@@ -386,6 +437,7 @@ public class MainPresenter implements IMainPresenter {
         DeleteLocationItemObserver(LocationItem item) {
             mItem = item;
         }
+
         @Override
         public void onSubscribe(Disposable disposable) {
             mDisposableDeleteItem = disposable;

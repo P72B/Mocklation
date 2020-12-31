@@ -3,7 +3,14 @@ package de.p72b.mocklation.dialog
 import android.app.Dialog
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -11,25 +18,28 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import de.p72b.mocklation.R
+import de.p72b.mocklation.service.AppServices
+import de.p72b.mocklation.service.analytics.IAnalyticsService
+import de.p72b.mocklation.service.setting.ISetting
 import de.p72b.mocklation.util.AppUtil
 
 class PrivacyUpdateDialog : DialogFragment() {
 
     companion object {
         val TAG: String = PrivacyUpdateDialog::class.java.simpleName
-        fun newInstance(listener: PrivacyUpdateDialogListener,
-                        url: String): PrivacyUpdateDialog {
+        fun newInstance(listener: DialogListener?): PrivacyUpdateDialog {
             val dialogFragment = PrivacyUpdateDialog()
             dialogFragment.listener = listener
-            dialogFragment.url = url
             return dialogFragment
         }
     }
 
     private lateinit var checkBox: CheckBox
-    private lateinit var url: String
-    private lateinit var listener: PrivacyUpdateDialogListener
+    private lateinit var checkBoxAnalytics: CheckBox
+    private var listener: DialogListener? = null
     private var isAccepted = false
+    private lateinit var analytics: IAnalyticsService
+    private lateinit var setting: ISetting
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.dialog_privacy_update, container, false)
@@ -51,20 +61,54 @@ class PrivacyUpdateDialog : DialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setting = AppServices.getService(AppServices.SETTINGS) as ISetting
+        analytics = AppServices.getService(AppServices.ANALYTICS) as IAnalyticsService
+
         checkBox = view.findViewById(R.id.privacyPolicyCheckBox)
         checkBox.setOnCheckedChangeListener { _, isChecked ->
             setCheckBoxHintVisibility(false)
+            setting.acceptCurrentPrivacyStatement(isChecked)
             isAccepted = isChecked
         }
+        checkBox.isChecked = setting.isPrivacyStatementAccepted
+
+        checkBoxAnalytics = view.findViewById(R.id.analyticsCheckBox)
+        checkBoxAnalytics.setOnCheckedChangeListener { _, isChecked ->
+            analytics.setAnalyticsCollectionEnabled(isChecked)
+            setting.setAnalyticsCollectionEnabled(isChecked)
+        }
+        checkBoxAnalytics.isChecked = setting.isAnalyticsCollectionEnabled
+
+
+        view.findViewById<Button>(R.id.ctaSave).setOnClickListener {
+            if (isAccepted) {
+                listener?.onAcceptClick()
+                dismiss()
+            } else {
+                setCheckBoxHintVisibility(true)
+            }
+        }
+        view.findViewById<Button>(R.id.discard).setOnClickListener {
+            setting.acceptCurrentPrivacyStatement(false)
+            analytics.setAnalyticsCollectionEnabled(false)
+            setting.setAnalyticsCollectionEnabled(false)
+            listener?.onDeclineClick()
+            dismiss()
+        }
+
         val message = view.findViewById<TextView>(R.id.privacyPolicyMessage)
         val con = context
         if (con != null) {
-            message.text = AppUtil.underline(con, R.string.dialog_privacy_update_message, R.string.dialog_privacy_update_title)
+            message.text = AppUtil.underline(
+                con,
+                R.string.dialog_privacy_update_message,
+                R.string.dialog_privacy_update_link
+            )
         }
 
         message.findViewById<View>(R.id.privacyPolicyMessage).setOnClickListener(View.OnClickListener {
-            val context = context?: return@OnClickListener
-            AppUtil.openInCustomTab(context, url, false)
+            val context = context ?: return@OnClickListener
+            AppUtil.openInCustomTab(context, getString(R.string.privacy_policy_url), false)
         })
     }
 
@@ -79,45 +123,29 @@ class PrivacyUpdateDialog : DialogFragment() {
         return dialog
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
-        activity?.menuInflater?.inflate(R.menu.menu_dialog_edit_location_item, menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_save -> {
-                if (isAccepted) {
-                    listener.onAcceptClick()
-                    dismiss()
-                } else {
-                    setCheckBoxHintVisibility(true)
-                }
-                return true
-            }
+        return when (item.itemId) {
             android.R.id.home -> {
                 if (isAccepted) {
-                    listener.onAcceptClick()
+                    listener?.onAcceptClick()
                 } else {
-                    listener.onDeclineClick()
+                    listener?.onDeclineClick()
                 }
                 dismiss()
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     private fun setCheckBoxHintVisibility(checkBoxHintVisibility: Boolean) {
-        checkBox.setTextColor(ContextCompat.getColor(requireContext(), if (checkBoxHintVisibility)
-            R.color.colorAccent
-        else
-            R.color.eye))
-    }
-
-    interface PrivacyUpdateDialogListener {
-        fun onAcceptClick()
-
-        fun onDeclineClick()
+        checkBox.setTextColor(
+            ContextCompat.getColor(
+                requireContext(), if (checkBoxHintVisibility)
+                    R.color.colorAccent
+                else
+                    R.color.eye
+            )
+        )
     }
 }

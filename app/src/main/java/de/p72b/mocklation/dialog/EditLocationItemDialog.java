@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -149,6 +150,13 @@ public class EditLocationItemDialog extends DialogFragment {
         mDisplayedName.addTextChangedListener(new SimpleTextWatcher(mDisplayedName));
         mLatitude.addTextChangedListener(new SimpleTextWatcher(mLatitude));
         mLongitude.addTextChangedListener(new SimpleTextWatcher(mLongitude));
+
+        ((Button) view.findViewById(R.id.ctaSave)).setOnClickListener((View.OnClickListener) v -> {
+            if (!validateData()) {
+                return;
+            }
+            checkUpdateOrCreateMode();
+        });
     }
 
     @NonNull
@@ -165,26 +173,10 @@ public class EditLocationItemDialog extends DialogFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.getMenuInflater().inflate(R.menu.menu_dialog_edit_location_item, menu);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_save) {
-            if (!validateData()) {
-                return true;
-            }
-
-            checkUpdateOrCreateMode();
-            return true;
-        } else if (id == android.R.id.home) {
+        if (id == android.R.id.home) {
             dismiss();
             return true;
         }
@@ -269,13 +261,13 @@ public class EditLocationItemDialog extends DialogFragment {
         float longitude;
         try {
             longitude = Float.valueOf(mLongitude.getText().toString());
-        } catch (NumberFormatException exception){
+        } catch (NumberFormatException exception) {
             mLongitude.setError(getString(R.string.error_1017));
             return false;
         }
         try {
             latitude = Float.valueOf(mLatitude.getText().toString());
-        } catch (NumberFormatException exception){
+        } catch (NumberFormatException exception) {
             mLatitude.setError(getString(R.string.error_1017));
             return false;
         }

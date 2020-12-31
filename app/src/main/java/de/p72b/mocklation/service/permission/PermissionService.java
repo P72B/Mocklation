@@ -100,12 +100,12 @@ public class PermissionService implements IPermissionService {
     }
 
     private boolean hasAllNeededPermissions(Context context) {
-        final boolean hasBackgroundPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
         final boolean hasFinePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         final boolean hasCoarsePermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
         boolean isGranted = hasFinePermission && hasCoarsePermission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            final boolean hasBackgroundPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
             isGranted = hasBackgroundPermission && isGranted;
         }
         return isGranted;

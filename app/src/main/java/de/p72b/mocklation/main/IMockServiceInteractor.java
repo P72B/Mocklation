@@ -4,6 +4,8 @@ public interface IMockServiceInteractor {
 
     void onMockPermissionsResult(int[] grantedResults);
 
+    void onDefaultMockAppRequest(int results);
+
     void pauseMockLocationService();
 
     void playMockLocationService();
@@ -14,6 +16,20 @@ public interface IMockServiceInteractor {
 
     boolean isServiceRunning();
 
+    boolean hasRequiredPermissions();
+
     @MockServiceInteractor.ServiceStatus
     int getState();
+
+    void requestRequiredPermissions();
+
+    void setLocationItem(String code);
+
+    boolean isDefaultAppForMockLocations();
+
+    boolean areDeveloperOptionsEnabled();
+
+    void requestEnableDeveloperOptions();
+
+    void requestSetMockLocationApp();
 }

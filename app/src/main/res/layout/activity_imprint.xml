@@ -4,21 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/face"
     android:fitsSystemWindows="true"
     tools:context="de.p72b.mocklation.imprint.ImprintActivity">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize" />
-    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -35,7 +22,7 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TitleH1"
+                style="@style/TitleH2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name" />
@@ -44,7 +31,7 @@
                 android:id="@+id/imprint_producer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="developed by p72b" />
+                android:text="@string/imprint_producer" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -58,7 +45,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:autoLink="web"
-                tools:text="https://github.com/P72B/Mocklation" />
+                android:text="@string/imprint_github_project_repository" />
+
+            <TextView
+                style="@style/TitleH1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/imprint_privacy_policy_title" />
+
+            <TextView
+                android:id="@+id/imprint_privacy_policy_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:text="@string/privacy_policy_url" />
 
             <TextView
                 style="@style/TitleH1"
@@ -71,21 +71,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:autoLink="email"
-                tools:text="Willy Riechert" />
+                android:text="@string/imprint_producer_contact_name" />
 
             <TextView
                 android:id="@+id/imprint_producer_contact_mail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:autoLink="web|email"
-                tools:text="willy.riechert@googlemail.com" />
+                android:text="@string/imprint_producer_contact_email" />
 
             <TextView
                 android:id="@+id/imprint_producer_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:autoLink="web|email"
-                tools:text="Berlin, Germany" />
+                android:text="@string/imprint_producer_address" />
 
             <TextView
                 style="@style/TitleH1"
@@ -106,6 +106,12 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
                 />
+
+            <TextView
+                style="@style/TitleH1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/imprint_license" />
 
             <TextView
                 android:layout_width="match_parent"

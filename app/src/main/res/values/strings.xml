@@ -2,7 +2,6 @@
     <string name="app_name" translatable="false">Mocklation</string>
     <string name="error_missing_location_to_start_service">Please select a location</string>
     <string name="title_activity_fixed_mode">Fixed mode</string>
-    <string name="title_activity_route_mode">Route mode</string>
     <string name="title_activity_imprint">Imprint</string>
     <string name="action_settings">Settings</string>
     <string name="location_list_title">Saved Location(s)</string>
@@ -17,19 +16,29 @@
     <string name="empty_data">Please create a new location to be mocked.</string>
     <string name="button_discard">Discard</string>
     <string name="action_save">Save</string>
+    <string name="button_action_decline">Decline</string>
+    <string name="button_action_app_settings">Settings</string>
     <string name="action_pause">Pause</string>
     <string name="action_stop">Stop</string>
     <string name="action_play">Play</string>
     <string name="dialog_edit_title">Edit location</string>
-    <string name="dialog_edit_item_title">Confirm data</string>
-    <string name="dialog_edit_item_message">Please confirm location name and location coordinates. You can edit the location later by choosing the item from the list. Changing latitude of longitude will may result in location change. So if you are not familiar with hoe these coordinates work do not change them.</string>
+    <string name="dialog_edit_item_title">Location</string>
+    <string name="dialog_edit_item_message">Please confirm location name and location coordinates.</string>
     <string name="dialog_edit_item_displayed_name">Name</string>
     <string name="dialog_edit_item_latitude">Latitude</string>
     <string name="dialog_edit_item_longitude">Longitude</string>
-    <string name="dialog_privacy_update_title">Privacy policy</string>
-    <string name="dialog_privacy_update_sub_title">Update of the privacy policy</string>
-    <string name="dialog_privacy_update_message">Mocklation has updated the %1$s to match the requirements by google and the European Union. Please read and accept the privacy statement. It explains usage of your data. You can decline the policy but you will be unable to use the mocking service.</string>
-    <string name="dialog_privacy_update_checkbox">Yes, I accept</string>
+    <string name="dialog_privacy_update_title">Data protection</string>
+    <string name="dialog_privacy_update_link">privacy policy (link)</string>
+    <string name="dialog_privacy_update_sub_title">Privacy policy</string>
+    <string name="dialog_background_location_sub_title">Background location</string>
+    <string name="dialog_background_location_message"><![CDATA[<p>This app collects location data to enable continuous fake location emitting even when the app is closed or in background. You will see a prominent notification during location mocking service execution a so called foreground service.</p><br><p>Make sure to grant location access for this app to <b>%1$s</b> otherwise the service can not operate properly.</p>]]></string>
+    <string name="dialog_background_location_title">Sensitive permission</string>
+    <string name="button_action_ok">Understood</string>
+    <string name="dialog_privacy_update_message">Mocklation fulfills the %1$s requirements by Google and the European Union. Please read and accept the privacy statement. It explains usage of your data. You can decline the policy but you will be unable to use the mocking service.</string>
+    <string name="dialog_privacy_update_checkbox">Yes, I read and accept the privacy policy of Mocklation</string>
+    <string name="dialog_analytics_sub_title">Analytics Data Collection and Usage</string>
+    <string name="dialog_analytics_message">The app will collect tracking data by firebase analytics SDK. Most seen screens and tracking events about usage of the service will be collected. A/B testing and UI/UX improvements can be applied from the data obtained. </string>
+    <string name="dialog_analytics_checkbox">Yes, I accept to collect analytics data <i>[optional]</i></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_divider_readings">Readings</string>
@@ -50,9 +59,9 @@
     <string name="v7_support_custom_tabs_library">support custom tabs library</string>
     <string name="v7_support_dynamic_animation_library_link">https://developer.android.com/topic/libraries/support-library/index.html</string>
     <string name="v7_support_custom_tabs_library_link">https://developer.android.com/reference/android/support/customtabs/package-summary</string>
-    <string name="room_library">Google Room</string>
+    <string name="room_library">AndroidX Room</string>
     <string name="room_library_link">https://developer.android.com/topic/libraries/architecture/room.html</string>
-    <string name="room_rxjava2_library">Google Room RxJava2</string>
+    <string name="room_rxjava2_library">AndroidX Room RxJava2</string>
     <string name="room_rxjava2_library_link">https://developer.android.com/topic/libraries/architecture/room.html</string>
     <string name="maps_api">Google Maps Android API</string>
     <string name="maps_api_link">https://developers.google.com/maps/documentation/android-api</string>
@@ -64,19 +73,33 @@
     <string name="maps_utils_api_link">https://developers.google.com/maps/documentation/android-api/utility</string>
     <string name="google_gson">Google GSON</string>
     <string name="google_gson_link">https://github.com/google/gson</string>
-    <string name="dagger_2">Dagger 2</string>
-    <string name="dagger_2_link">https://github.com/google/dagger</string>
-    <string name="firebase_core">Firebase Core</string>
+    <string name="firebase_core">Firebase-BoM (core, crashlytics, analytics)</string>
     <string name="firebase_core_link">https://firebase.google.com/docs/reference/android/com/google/firebase/package-summary</string>
-    <string name="firebase_config">Firebase Remote Config</string>
-    <string name="firebase_config_link">https://firebase.google.com/docs/reference/android/com/google/firebase/remoteconfig/package-summary</string>
     <string name="rxjava_2">RxJava 2</string>
     <string name="rxjava_2_link">https://github.com/ReactiveX/RxJava</string>
     <string name="rxjava_2_android">RxJava 2 Android</string>
     <string name="rxjava_2_android_link">https://github.com/ReactiveX/RxAndroid</string>
     <string name="imprint_about_text">This application has only educational purpose. It will never
         share any personal data with other people (check also the used libraries by following the
-        provided links below). It is an open source project. You can find the code here:</string>
+        provided links below). It is an open source project. You can find the complete source code here:</string>
+    <string name="imprint_producer">by Willy Marten</string>
+    <string name="imprint_producer_address">Berlin, Germany</string>
+    <string name="imprint_producer_contact_email">willy.riechert@googlemail.com</string>
+    <string name="imprint_producer_contact_name">Willy Marten</string>
+    <string name="imprint_github_project_repository">https://github.com/P72B/Mocklation</string>
+    <string name="imprint_privacy_policy_title">Privacy policy</string>
+    <string name="privacy_policy_url">https://sites.google.com/view/p72b/startseite</string>
+    <string name="imprint_license">App license</string>
+    <string name="browser">AndroidX Browser</string>
+    <string name="browser_link">https://developer.android.com/jetpack/androidx/releases/browser</string>
+    <string name="material">Google Material Components for Android</string>
+    <string name="material_link">https://github.com/material-components/material-components-android</string>
+    <string name="dynamic_animation">AndroidX Dynamicanimation</string>
+    <string name="dynamic_animation_link">https://developer.android.com/jetpack/androidx/releases/dynamicanimation</string>
+    <string name="card_view">AndroidX Cardview</string>
+    <string name="app_compat_link">https://developer.android.com/jetpack/androidx/releases/dynamicanimation</string>
+    <string name="app_compat">AndroidX Appcompat</string>
+    <string name="card_view_link">https://developer.android.com/jetpack/androidx/releases/appcompat</string>
     <string name="error_1001">Service is running.</string>
     <string name="error_1002">Please long press somewhere inside the map first.</string>
     <string name="error_1003">No location data provided.</string>
@@ -99,6 +122,8 @@
     <string name="error_1020">Privacy policy declined</string>
     <string name="error_1022">Trouble to request permission</string>
     <string name="error_1023">Fake location service needs to run in background. Please allow location access all the time.</string>
+    <string name="error_1024">Location disabled on phone</string>
+    <string name="error_1025">Developer options disabled on device</string>
 
     <string name="apache_2_license" tools:ignore="TypographyOther">Apache License
 \nVersion 2.0, January 2004

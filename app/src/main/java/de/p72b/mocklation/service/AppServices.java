@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.StringDef;
-import de.p72b.mocklation.dagger.MocklationApp;
+import de.p72b.mocklation.MocklationApp;
 import de.p72b.mocklation.service.analytics.AnalyticsService;
 import de.p72b.mocklation.service.location.LocationService;
 import de.p72b.mocklation.service.permission.PermissionService;

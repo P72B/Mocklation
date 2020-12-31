@@ -30,5 +30,9 @@ public interface ISetting {
 
     boolean isPrivacyStatementAccepted();
 
-    void acceptCurrentPrivacyStatement();
+    void acceptCurrentPrivacyStatement(Boolean value);
+
+    boolean isAnalyticsCollectionEnabled();
+
+    void setAnalyticsCollectionEnabled(Boolean enabled);
 }

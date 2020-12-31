@@ -8,15 +8,10 @@ import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
 import de.p72b.mocklation.BuildConfig;
@@ -25,18 +20,6 @@ import de.p72b.mocklation.util.AppUtil;
 
 public class ImprintActivity extends AppCompatActivity {
 
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_NAME = "imprint_producer_contact_name";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_CITY = "imprint_procuder_contact_city";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_COUNTRY = "imprint_producer_contact_country";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER = "imprint_producer";
-    private static final String REMOTE_CONFIG_KEY_PRODUCER_MAIL = "imprint_producer_contact_mail";
-    private static final String REMOTE_CONFIG_KEY_GITHUB_REPO = "imprint_github_project_repository";
-
-    private TextView mProducer;
-    private TextView mRepoLink;
-    private TextView mProducerName;
-    private TextView mProducerMail;
-    private TextView mProducerAddress;
     private LinearLayout mWrapperDependencies;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -45,15 +28,9 @@ public class ImprintActivity extends AppCompatActivity {
         setupAppBar();
         initViews();
         setupDependencies();
-        setTextViewsFromRemoteConfig();
     }
 
-    /**
-     * Setup the material toolbar.
-     */
     private void setupAppBar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(R.string.title_activity_imprint);
@@ -72,28 +49,28 @@ public class ImprintActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        mProducer = findViewById(R.id.imprint_producer);
-        mRepoLink = findViewById(R.id.imprint_github_project_repository);
-        mProducerName = findViewById(R.id.imprint_producer_contact_name);
-        mProducerMail = findViewById(R.id.imprint_producer_contact_mail);
-        mProducerAddress = findViewById(R.id.imprint_producer_address);
         mWrapperDependencies = findViewById(R.id.wrapper_dependencies);
-    }
-
-    private void setTextViewsFromRemoteConfig() {
-        final FirebaseRemoteConfig config = FirebaseRemoteConfig.getInstance();
-        mProducer.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER));
-        mRepoLink.setText(config.getString(REMOTE_CONFIG_KEY_GITHUB_REPO));
-        mProducerName.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER_NAME));
-        mProducerMail.setText(config.getString(REMOTE_CONFIG_KEY_PRODUCER_MAIL));
-        String address = config.getString(REMOTE_CONFIG_KEY_PRODUCER_CITY) + " " +
-                config.getString(REMOTE_CONFIG_KEY_PRODUCER_COUNTRY);
-        mProducerAddress.setText(address);
     }
 
     @SuppressLint("StringFormatInvalid")
     private void setupDependencies() {
         List<DependencyItem> items = new ArrayList<>();
+        items.add(new DependencyItem(
+                R.string.browser,
+                R.string.browser_link,
+                String.format(getString(R.string.imprint_dependencies_version),
+                        BuildConfig.BROWSER_VERSION),
+                String.format(getString(R.string.imprint_dependencies_license),
+                        getString(R.string.apache_license)))
+        );
+        items.add(new DependencyItem(
+                R.string.dynamic_animation,
+                R.string.dynamic_animation_link,
+                String.format(getString(R.string.imprint_dependencies_version),
+                        BuildConfig.DYNAMIC_ANIMATION_VERSION),
+                String.format(getString(R.string.imprint_dependencies_license),
+                        getString(R.string.apache_license)))
+        );
         items.add(new DependencyItem(
                 R.string.room_library,
                 R.string.room_library_link,
@@ -107,6 +84,22 @@ public class ImprintActivity extends AppCompatActivity {
                 R.string.room_rxjava2_library_link,
                 String.format(getString(R.string.imprint_dependencies_version),
                         BuildConfig.ROOM_VERSION),
+                String.format(getString(R.string.imprint_dependencies_license),
+                        getString(R.string.apache_license)))
+        );
+        items.add(new DependencyItem(
+                R.string.card_view,
+                R.string.card_view_link,
+                String.format(getString(R.string.imprint_dependencies_version),
+                        BuildConfig.CARD_VIEW_VERSION),
+                String.format(getString(R.string.imprint_dependencies_license),
+                        getString(R.string.apache_license)))
+        );
+        items.add(new DependencyItem(
+                R.string.app_compat,
+                R.string.app_compat_link,
+                String.format(getString(R.string.imprint_dependencies_version),
+                        BuildConfig.APP_COMPAT_VERSION),
                 String.format(getString(R.string.imprint_dependencies_license),
                         getString(R.string.apache_license)))
         );
@@ -130,7 +123,7 @@ public class ImprintActivity extends AppCompatActivity {
                 R.string.google_location,
                 R.string.google_location_link,
                 String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.PLAY_SERVICES_VERSION),
+                        BuildConfig.PLAY_SERVICES_LOCATION_VERSION),
                 String.format(getString(R.string.imprint_dependencies_license),
                         getString(R.string.apache_license)))
         );
@@ -151,24 +144,16 @@ public class ImprintActivity extends AppCompatActivity {
                         getString(R.string.apache_license)))
         );
         items.add(new DependencyItem(
-                R.string.dagger_2,
-                R.string.dagger_2_link,
+                R.string.material,
+                R.string.material_link,
                 String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.DAGGER_VERSION),
+                        BuildConfig.MATERIAL_VERSION),
                 String.format(getString(R.string.imprint_dependencies_license),
                         getString(R.string.apache_license)))
         );
         items.add(new DependencyItem(
                 R.string.firebase_core,
                 R.string.firebase_core_link,
-                String.format(getString(R.string.imprint_dependencies_version),
-                        BuildConfig.FIREBASE_VERSION),
-                String.format(getString(R.string.imprint_dependencies_license),
-                        getString(R.string.apache_license)))
-        );
-        items.add(new DependencyItem(
-                R.string.firebase_config,
-                R.string.firebase_config_link,
                 String.format(getString(R.string.imprint_dependencies_version),
                         BuildConfig.FIREBASE_VERSION),
                 String.format(getString(R.string.imprint_dependencies_license),

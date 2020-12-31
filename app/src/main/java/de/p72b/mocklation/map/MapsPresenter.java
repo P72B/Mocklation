@@ -277,11 +277,7 @@ public class MapsPresenter implements IMapsPresenter {
                 if (geometry instanceof LatLng) {
                     LatLng point = (LatLng) geometry;
                     mView.showLocation(point, 8L, true);
-                } else {
-                    mView.tryToInitCameraPosition();
                 }
-            } else {
-                mView.tryToInitCameraPosition();
             }
             mDisposables.remove(mDisposableGetAll);
         }

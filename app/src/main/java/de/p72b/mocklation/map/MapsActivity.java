@@ -46,6 +46,7 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
+import de.p72b.locator.location.ILastLocationListener;
 import de.p72b.mocklation.BaseActivity;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.AppServices;
@@ -358,15 +359,23 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
         }
     }
 
+    @SuppressWarnings("MissingPermission")
     @Override
     public void showMyLocation(boolean shouldMove) {
-        Location location = mLocationService.getLastKnownLocation();
-        if (mMap == null || location == null) {
-            return;
-        }
-        LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        showLocation(lastKnowLocation, DEFAULT_ZOOM_LEVEL, shouldMove);
-        setFollowGps(true);
+        getLocationManager().getLastLocation(new ILastLocationListener() {
+            @Override
+            public void onSuccess(@Nullable Location location) {
+                mMap.setMyLocationEnabled(true);
+                LatLng lastKnowLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                showLocation(lastKnowLocation, DEFAULT_ZOOM_LEVEL, shouldMove);
+                setFollowGps(true);
+            }
+
+            @Override
+            public void onError(int i, @Nullable String s) {
+                // ignore
+            }
+        }, true, true, true);
     }
 
     @Override
@@ -401,20 +410,6 @@ public class MapsActivity extends BaseActivity implements IMapsView, OnMapReadyC
             snackbar.setAction(action, listener);
         }
         snackbar.show();
-    }
-
-    @Override
-    public void tryToInitCameraPosition() {
-        if (mMap == null) {
-            return;
-        }
-
-        Location location = mLocationService.getLastKnownLocation();
-        if (location != null) {
-            Logger.d(TAG, "SET initial map location:" + location.getLatitude() + "/" + location.getLongitude());
-            LatLng startLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, DEFAULT_ZOOM_LEVEL));
-        }
     }
 
     @Override

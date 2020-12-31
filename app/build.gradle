@@ -13,7 +13,7 @@ android {
 
     Properties props = new Properties()
     def propFile = file('../signing.properties')
-    if (propFile.canRead() && props != null){
+    if (propFile.canRead() && props != null) {
         props.load(new FileInputStream(propFile))
         if (props.containsKey('GOOGLE_MAPS_API_KEY_DEVELOP')) {
             googleMapsApiKeyDevelop = file(props['GOOGLE_MAPS_API_KEY_DEVELOP'])
@@ -30,21 +30,26 @@ android {
 
 
     compileSdkVersion appCompileSdk
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '30.0.2'
     defaultConfig {
         multiDexEnabled true
         applicationId "de.p72b.mocklation"
         minSdkVersion appMinSdk
-        targetSdkVersion 29
+        targetSdkVersion 30
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "ROOM_VERSION", '"' + rootProject.roomVersion + '"'
         buildConfigField "String", "PLAY_SERVICES_VERSION", '"' + playServicesVersion + '"'
+        buildConfigField "String", "PLAY_SERVICES_LOCATION_VERSION", '"' + playServicesLocationVersion + '"'
         buildConfigField "String", "MAP_UTILITIES_VERSION", '"' + mapsUtilsVersion + '"'
         buildConfigField "String", "GSON_VERSION", '"' + gsonVersion + '"'
-        buildConfigField "String", "DAGGER_VERSION", '"' + daggerVersion + '"'
         buildConfigField "String", "FIREBASE_VERSION", '"' + firebaseVersion + '"'
         buildConfigField "String", "RX_JAVA_VERSION", '"' + rxjavaVersion + '"'
         buildConfigField "String", "RX_ANDROID_VERSION", '"' + rxandroidVersion + '"'
+        buildConfigField "String", "BROWSER_VERSION", '"' + browserVersion + '"'
+        buildConfigField "String", "MATERIAL_VERSION", '"' + materialVersion + '"'
+        buildConfigField "String", "DYNAMIC_ANIMATION_VERSION", '"' + dynamicAnimationVersion + '"'
+        buildConfigField "String", "CARD_VIEW_VERSION", '"' + cardViewVersion + '"'
+        buildConfigField "String", "APP_COMPAT_VERSION", '"' + appCompatVersion + '"'
     }
 
     signingConfigs {
@@ -99,32 +104,31 @@ android {
 }
 
 dependencies {
-    api fileTree(include: ['*.jar'], dir: 'libs')
-    api "androidx.appcompat:appcompat:1.3.0-alpha02"
-    api "androidx.cardview:cardview:1.0.0"
-    api "com.google.android.material:material:1.3.0-beta01"
-    api "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
-    api "androidx.browser:browser:1.3.0"
-    api "androidx.room:room-runtime:2.3.0-alpha04"
-    annotationProcessor "androidx.room:room-compiler:2.3.0-alpha04"
-    api "androidx.room:room-rxjava2:2.3.0-alpha04"
-    api "com.google.android.gms:play-services-maps:${playServicesVersion}"
-    api "com.google.android.gms:play-services-places:${playServicesVersion}"
-    api "com.google.android.gms:play-services-location:${playServicesVersion}"
-    api "com.google.maps.android:android-maps-utils:0.4.4"
-    api "com.google.code.gson:gson:${gsonVersion}"
-    api "com.google.dagger:dagger:${daggerVersion}"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation "androidx.appcompat:appcompat:${appCompatVersion}"
+    implementation "androidx.cardview:cardview:${cardViewVersion}"
+    implementation "androidx.dynamicanimation:dynamicanimation:${dynamicAnimationVersion}"
+    implementation "androidx.browser:browser:${browserVersion}"
+    implementation "androidx.room:room-runtime:${roomVersion}"
+    implementation "androidx.room:room-rxjava2:${roomVersion}"
+    annotationProcessor "androidx.room:room-compiler:${roomVersion}"
+
+    implementation "com.google.android.material:material:${materialVersion}"
+    implementation "com.google.android.gms:play-services-maps:${playServicesVersion}"
+    implementation "com.google.android.gms:play-services-places:${playServicesVersion}"
+    implementation "com.google.android.gms:play-services-location:${playServicesLocationVersion}"
+    implementation "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+
+    implementation platform("com.google.firebase:firebase-bom:${firebaseVersion}")
     implementation 'com.google.firebase:firebase-core'
-    implementation 'com.google.firebase:firebase-config'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-    annotationProcessor rootProject.ext.daggerCompiler
-    api "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
-    api "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    api 'ru.bullyboo.ecryption:encoder:1.0.3'
+    implementation "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
+    implementation "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.github.p72b:locator-library:1.6.0'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -3,11 +3,6 @@ package de.p72b.mocklation.service.setting
 import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
-import de.p72b.mocklation.util.SecuredConstants
-
-import ru.bullyboo.encoder.Encoder
-import ru.bullyboo.encoder.builders.BuilderAES
-import ru.bullyboo.encoder.methods.AES
 
 class Setting(context: Context) : ISetting {
     companion object {
@@ -18,14 +13,10 @@ class Setting(context: Context) : ISetting {
         private const val ACTIVE_MOCK_LOCATION_CODE = "ACTIVE_MOCK_LOCATION_CODE"
         private const val LAST_SELECTED_LOCATION_CODE = "LAST_SELECTED_LOCATION_CODE"
         private const val PRIVACY_UPDATE_ACCEPTED = "PRIVACY_UPDATE_ACCEPTED"
+        private const val ANALYTICS_TRACKING_ENABLED = "ANALYTICS_TRACKING_ENABLED"
     }
 
     private val preferences: SharedPreferences = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
-    private var encryption: BuilderAES = Encoder.BuilderAES()
-            .method(AES.Method.AES_CBC_PKCS5PADDING)
-            .key(SecuredConstants.ENCRYPTION_KEY)
-            .keySize(AES.Key.SIZE_128)
-            .iVector(SecuredConstants.ENCRYPTION_I_VECTOR)
 
     override fun saveLocation(latitude: Double, longitude: Double) {
         val edit = preferences.edit()
@@ -46,7 +37,7 @@ class Setting(context: Context) : ISetting {
 
     private fun resolvePermissionPreferencesKey(permission: String): String? {
         return when (permission) {
-            Manifest.permission.ACCESS_FINE_LOCATION -> Setting.PERMISSION_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION -> PERMISSION_LOCATION
             else -> null
         }
     }
@@ -75,9 +66,19 @@ class Setting(context: Context) : ISetting {
         return preferences.getBoolean(PRIVACY_UPDATE_ACCEPTED, false)
     }
 
-    override fun acceptCurrentPrivacyStatement() {
+    override fun acceptCurrentPrivacyStatement(value: Boolean) {
         val edit = preferences.edit()
-        edit.putBoolean(PRIVACY_UPDATE_ACCEPTED, true)
+        edit.putBoolean(PRIVACY_UPDATE_ACCEPTED, value)
+        edit.apply()
+    }
+
+    override fun isAnalyticsCollectionEnabled(): Boolean {
+        return preferences.getBoolean(ANALYTICS_TRACKING_ENABLED, false)
+    }
+
+    override fun setAnalyticsCollectionEnabled(value: Boolean) {
+        val edit = preferences.edit()
+        edit.putBoolean(ANALYTICS_TRACKING_ENABLED, value)
         edit.apply()
     }
 }

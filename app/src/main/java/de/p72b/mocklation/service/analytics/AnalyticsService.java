@@ -16,6 +16,7 @@ public class AnalyticsService implements IAnalyticsService {
         public static final String PAUSE_MOCK_LOCATION_SERVICE = "pause_mock_location_service";
         public static final String STOP_MOCK_LOCATION_SERVICE = "stop_mock_location_service";
         public static final String START_MOCK_LOCATION_SERVICE = "start_mock_location_service";
+        public static final String DISTANCE_BETWEEN_USER_LOCATION_AND_MOCK = "distance_between_user_location_and_mock";
 
         protected Event() {
         }
@@ -38,5 +39,10 @@ public class AnalyticsService implements IAnalyticsService {
             bundle = new Bundle();
         }
         mFirebaseAnalytics.logEvent(name, bundle);
+    }
+
+    @Override
+    public void setAnalyticsCollectionEnabled(Boolean enabled) {
+        mFirebaseAnalytics.setAnalyticsCollectionEnabled(enabled);
     }
 }

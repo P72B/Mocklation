@@ -6,12 +6,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import de.p72b.locator.location.LocationAwareAppCompatActivity;
 import de.p72b.mocklation.service.AppServices;
 import de.p72b.mocklation.service.permission.IPermissionService;
 import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.Logger;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends LocationAwareAppCompatActivity {
     private static final String TAG = BaseActivity.class.getSimpleName();
 
     protected ISetting mSetting;

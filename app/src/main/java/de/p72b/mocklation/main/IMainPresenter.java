@@ -1,8 +1,7 @@
 package de.p72b.mocklation.main;
 
-
-import android.view.View;
-
+import androidx.annotation.Nullable;
+import de.p72b.mocklation.dialog.DialogListener;
 import de.p72b.mocklation.service.room.LocationItem;
 
 public interface IMainPresenter {
@@ -15,7 +14,13 @@ public interface IMainPresenter {
 
     void onMockPermissionsResult(int[] grantedResults);
 
+    void onDefaultMockAppRequest(int result);
+
     void onClick(int viewId);
 
     void locationItemRemoved(LocationItem item);
+
+    void showPrivacyUpdateDialog(@Nullable DialogListener listener);
+
+    void onDeveloperOptionsEnabledRequest(int result);
 }

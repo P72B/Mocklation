@@ -29,6 +29,4 @@ public interface IMapsView {
     void addMarkers(List<LocationItem> items);
 
     void addNewMarker(LocationItem item);
-
-    void tryToInitCameraPosition();
 }

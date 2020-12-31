@@ -9,4 +9,6 @@ public interface IAnalyticsService {
     void trackEvent(@NonNull String name);
 
     void trackEvent(@NonNull String name, @Nullable Bundle bundle);
+
+    void setAnalyticsCollectionEnabled(Boolean enabled);
 }

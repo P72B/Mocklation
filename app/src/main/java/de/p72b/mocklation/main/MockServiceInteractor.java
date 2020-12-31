@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import java.lang.annotation.Retention;
@@ -21,6 +22,7 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import de.p72b.locator.location.LocationManager;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.location.MockLocationService;
@@ -31,6 +33,8 @@ import de.p72b.mocklation.util.Logger;
 public class MockServiceInteractor implements IMockServiceInteractor {
 
     static final int PERMISSIONS_MOCKING = 115;
+    static final int REQUEST_CODE_DEFAULT_MOCK_APP = 9902;
+    static final int REQUEST_CODE_ENABLE_DEVELOPER_OPTIONS = 9877;
     static final int SERVICE_STATE_STOP = 0;
     static final int SERVICE_STATE_RUNNING = 1;
     static final int SERVICE_STATE_PAUSE = 2;
@@ -38,6 +42,7 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     private static final String TAG = MockServiceInteractor.class.getSimpleName();
     private final ISetting mSetting;
     private Activity mActivity;
+    private LocationManager mLocationManager;
     private List<Class<?>> mRunningServices;
     private Context mContext;
     private String mLocationItemCode;
@@ -74,7 +79,8 @@ public class MockServiceInteractor implements IMockServiceInteractor {
         }
     };
 
-    MockServiceInteractor(Activity activity, ISetting setting, MockServiceListener listener) {
+    MockServiceInteractor(Activity activity, ISetting setting, MockServiceListener listener, LocationManager locationManager) {
+        mLocationManager = locationManager;
         mActivity = activity;
         mSetting = setting;
         mContext = activity.getApplicationContext();
@@ -90,7 +96,21 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     }
 
     @Override
+    public void onDefaultMockAppRequest(int results) {
+        if (isDefaultAppForMockLocations()) {
+            Logger.d(TAG, "MockLocations is now enabled APP for Mocklation");
+            startMockLocationService(MockLocationService.class);
+        } else {
+            Toast.makeText(mContext, R.string.error_1019, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
     public void onMockPermissionsResult(int[] grantResults) {
+        if (hasRequiredPermissions()) {
+            checkDefaultMockLocationApp();
+            return;
+        }
         if (grantResults.length < 3) {
             Toast.makeText(mContext, R.string.error_1022, Toast.LENGTH_LONG).show();
             return;
@@ -142,31 +162,43 @@ public class MockServiceInteractor implements IMockServiceInteractor {
     }
 
     @Override
-    public void startMockLocation(@NonNull String locationItemCode) {
-        mLocationItemCode = locationItemCode;
-        Logger.d(TAG, "startMockLocation");
-
-        boolean shouldRequestPermission = false;
-        final String[] permissionsToBeRequired = getRequiredPermissions();
-
-        for (String permission : permissionsToBeRequired) {
+    public boolean hasRequiredPermissions() {
+        boolean allPermissionsGranted = true;
+        for (String permission : getRequiredPermissions()) {
             if (!hasPermission(permission)) {
                 Logger.d(TAG, permission + " not granted.");
-                shouldRequestPermission = true;
+                allPermissionsGranted = false;
                 break;
             }
         }
+        return allPermissionsGranted;
+    }
 
-        if (shouldRequestPermission) {
-            Logger.d(TAG, "Some permissions aren't granted.");
-            ActivityCompat.requestPermissions(
-                    mActivity,
-                    permissionsToBeRequired,
-                    PERMISSIONS_MOCKING);
-        } else {
+    @Override
+    public void setLocationItem(String code) {
+        mLocationItemCode = code;
+    }
+
+    @Override
+    public void startMockLocation(@NonNull String locationItemCode) {
+        setLocationItem(locationItemCode);
+        Logger.d(TAG, "startMockLocation");
+
+        if (hasRequiredPermissions()) {
             Logger.d(TAG, "All permissions are granted.");
             checkDefaultMockLocationApp();
+        } else {
+            Logger.d(TAG, "Some permissions aren't granted.");
+            requestRequiredPermissions();
         }
+    }
+
+    @Override
+    public void requestRequiredPermissions() {
+        ActivityCompat.requestPermissions(
+                mActivity,
+                getRequiredPermissions(),
+                PERMISSIONS_MOCKING);
     }
 
     @Override
@@ -252,20 +284,35 @@ public class MockServiceInteractor implements IMockServiceInteractor {
 
     private void checkDefaultMockLocationApp() {
         Logger.d(TAG, "checkDefaultMockLocationApp");
-        if (isMockLocationEnabled()) {
+        if (isDefaultAppForMockLocations()) {
             Logger.d(TAG, "MockLocations is enabled APP for Mocklation");
             startMockLocationService(MockLocationService.class);
         } else {
-            // TODO: tutorial how to enable default permission app.
             try {
-                mActivity.startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+                mActivity.startActivityForResult(new Intent(android.provider.Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS), REQUEST_CODE_DEFAULT_MOCK_APP);
             } catch (ActivityNotFoundException activityNotFound) {
                 Toast.makeText(mContext, R.string.error_1019, Toast.LENGTH_LONG).show();
             }
         }
     }
 
-    private boolean isMockLocationEnabled() {
+    @Override
+    public boolean areDeveloperOptionsEnabled() {
+       return Settings.Secure.getInt(mActivity.getContentResolver(), Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) == 0;
+    }
+
+    @Override
+    public void requestEnableDeveloperOptions() {
+        mActivity.startActivityForResult(new Intent(Settings.ACTION_DEVICE_INFO_SETTINGS), REQUEST_CODE_ENABLE_DEVELOPER_OPTIONS);
+    }
+
+    @Override
+    public void requestSetMockLocationApp() {
+        checkDefaultMockLocationApp();
+    }
+
+    @Override
+    public boolean isDefaultAppForMockLocations() {
         boolean isMockLocation = false;
         try {
             //if marshmallow

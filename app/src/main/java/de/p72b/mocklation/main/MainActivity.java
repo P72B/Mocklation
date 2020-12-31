@@ -13,25 +13,26 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import de.p72b.locator.location.LocationAwareAppCompatActivity;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.imprint.ImprintActivity;
@@ -42,7 +43,7 @@ import de.p72b.mocklation.service.setting.ISetting;
 import de.p72b.mocklation.util.Logger;
 import de.p72b.mocklation.util.VisibilityAnimationListener;
 
-public class MainActivity extends AppCompatActivity implements IMainView, View.OnClickListener,
+public class MainActivity extends LocationAwareAppCompatActivity implements IMainView, View.OnClickListener,
         NavigationView.OnNavigationItemSelectedListener {
 
 private static final String TAG = MainActivity.class.getSimpleName();
@@ -71,7 +72,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
         ISetting setting = (ISetting) AppServices.getService(AppServices.SETTINGS);
         IAnalyticsService analytics = (IAnalyticsService) AppServices.getService(AppServices.ANALYTICS);
-        mPresenter = new MainPresenter(this, setting, analytics);
+        mPresenter = new MainPresenter(this, setting, analytics, getLocationManager());
         mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
         mFadeInAnimation.setAnimationListener(mFadeInListener);
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);
@@ -88,6 +89,19 @@ private static final String TAG = MainActivity.class.getSimpleName();
     protected void onDestroy() {
         mPresenter.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case MockServiceInteractor.REQUEST_CODE_DEFAULT_MOCK_APP: {
+                mPresenter.onDefaultMockAppRequest(resultCode);
+            }
+            case MockServiceInteractor.REQUEST_CODE_ENABLE_DEVELOPER_OPTIONS: {
+                mPresenter.onDeveloperOptionsEnabledRequest(resultCode);
+            }
+        }
     }
 
     @Override
@@ -172,11 +186,11 @@ private static final String TAG = MainActivity.class.getSimpleName();
         switch(item.getItemId()) {
             case R.id.nav_fixed_mode:
                 break;
-            case R.id.nav_route_mode:
-                Toast.makeText(this, R.string.error_1016, Toast.LENGTH_LONG).show();
-                return false;
             case R.id.nav_imprint:
                 startActivity(new Intent(this, ImprintActivity.class));
+                break;
+            case R.id.nav_data_protection:
+                mPresenter.showPrivacyUpdateDialog(null);
                 break;
         }
 
