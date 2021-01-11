@@ -1,5 +1,6 @@
 package de.p72b.mocklation.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -60,7 +61,7 @@ public class MainPresenter implements IMainPresenter {
     private IAnalyticsService mAnalyticsService;
     private List<LocationItem> mLocationItems;
 
-    MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics, LocationManager locationManager) {
+    MainPresenter(FragmentActivity activity, ISetting setting, IAnalyticsService analytics, LocationManager locationManager, android.location.LocationManager androidLocationManager) {
         Logger.d(TAG, "new MainPresenter");
         mLocationManager = locationManager;
         mActivity = activity;
@@ -69,7 +70,7 @@ public class MainPresenter implements IMainPresenter {
         mAnalyticsService = analytics;
         mDb = Room.databaseBuilder(mActivity, AppDatabase.class, AppDatabase.DB_NAME_LOCATIONS).build();
         mMockServiceInteractor = new MockServiceInteractor(mActivity, mSetting,
-                new MockServiceListener(), locationManager);
+                new MockServiceListener(), androidLocationManager);
 
         mView.setPlayPauseStopStatus(mMockServiceInteractor.getState());
     }
@@ -247,8 +248,14 @@ public class MainPresenter implements IMainPresenter {
 
                         @Override
                         public void onSuccess() {
-                            trackLocationDistance(location);
-                            mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+                            if (mMockServiceInteractor.hasLocationProviderAvailable()) {
+                                trackLocationDistance(location);
+                                mMockServiceInteractor.startMockLocation(mSelectedItem.getCode());
+                            } else {
+                                // device has no matching location provider available
+                                mAnalyticsService.trackEvent(AnalyticsService.Event.ERROR_NO_LOCATION_PROVIDER_FOUND);
+                                mView.showSnackbar(R.string.error_1026, -1, null, Snackbar.LENGTH_LONG);
+                            }
                         }
                     }, true);
                 } else {

@@ -57,10 +57,17 @@ class BackgroundLocationDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         val message = view.findViewById<TextView>(R.id.privacyPolicyMessage)
-        val unformattedText = String.format(
-            getString(R.string.dialog_background_location_message),
-            activity?.packageManager?.backgroundPermissionOptionLabel
-        )
+        val unformattedText = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            String.format(
+                getString(R.string.dialog_background_location_message),
+                activity?.packageManager?.backgroundPermissionOptionLabel
+            )
+        } else {
+            String.format(
+                getString(R.string.dialog_background_location_message),
+                getString(R.string.dialog_background_location_message_snipped)
+            )
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             message.text = Html.fromHtml(unformattedText, Html.FROM_HTML_MODE_COMPACT)
         } else {

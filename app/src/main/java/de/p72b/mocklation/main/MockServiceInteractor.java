@@ -9,6 +9,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
@@ -22,7 +24,6 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import de.p72b.locator.location.LocationManager;
 import de.p72b.mocklation.BuildConfig;
 import de.p72b.mocklation.R;
 import de.p72b.mocklation.service.location.MockLocationService;
@@ -329,6 +330,14 @@ public class MockServiceInteractor implements IMockServiceInteractor {
             return false;
         }
         return isMockLocation;
+    }
+
+    @Override
+    public boolean hasLocationProviderAvailable() {
+        final Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        final String provider = mLocationManager.getBestProvider(criteria, true);
+        return provider != null;
     }
 
     private boolean hasPermission(String permission) {

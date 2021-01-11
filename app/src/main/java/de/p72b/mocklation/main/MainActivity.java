@@ -1,7 +1,9 @@
 package de.p72b.mocklation.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.MenuItem;
@@ -72,7 +74,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
 
         ISetting setting = (ISetting) AppServices.getService(AppServices.SETTINGS);
         IAnalyticsService analytics = (IAnalyticsService) AppServices.getService(AppServices.ANALYTICS);
-        mPresenter = new MainPresenter(this, setting, analytics, getLocationManager());
+        mPresenter = new MainPresenter(this, setting, analytics, getLocationManager(), (LocationManager) getSystemService(Context.LOCATION_SERVICE));
         mFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in_animation);
         mFadeInAnimation.setAnimationListener(mFadeInListener);
         mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out_animation);

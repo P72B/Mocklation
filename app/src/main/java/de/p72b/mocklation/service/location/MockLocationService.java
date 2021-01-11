@@ -399,7 +399,7 @@ public class MockLocationService extends Service implements GoogleApiClient.Conn
     private String getBestFittingProvider() {
         final Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        final String provider = mLocationManager.getBestProvider( criteria, true );
+        final String provider = mLocationManager.getBestProvider(criteria, true);
 
         if (provider == null || LocationManager.PASSIVE_PROVIDER.equals(provider)
                 || !mLocationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)

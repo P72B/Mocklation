@@ -27,6 +27,8 @@ public interface IMockServiceInteractor {
 
     boolean isDefaultAppForMockLocations();
 
+    boolean hasLocationProviderAvailable();
+
     boolean areDeveloperOptionsEnabled();
 
     void requestEnableDeveloperOptions();

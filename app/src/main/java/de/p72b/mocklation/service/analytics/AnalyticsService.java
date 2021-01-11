@@ -17,6 +17,7 @@ public class AnalyticsService implements IAnalyticsService {
         public static final String STOP_MOCK_LOCATION_SERVICE = "stop_mock_location_service";
         public static final String START_MOCK_LOCATION_SERVICE = "start_mock_location_service";
         public static final String DISTANCE_BETWEEN_USER_LOCATION_AND_MOCK = "distance_between_user_location_and_mock";
+        public static final String ERROR_NO_LOCATION_PROVIDER_FOUND = "error_no_location_provider_found";
 
         protected Event() {
         }
