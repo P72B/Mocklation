@@ -64,6 +64,10 @@
                 android:value=".main.MainActivity" />
         </activity>
 
+        <activity
+            android:name=".settings.DataProtectionSettingsActivity"
+            android:theme="@style/AppThemeDayNight" />
+
         <receiver android:name=".notification.NotificationBroadcastReceiver">
             <intent-filter>
                 <action android:name="EVENT_PAUSE" />

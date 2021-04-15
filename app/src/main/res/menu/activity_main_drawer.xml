@@ -18,7 +18,7 @@
                 android:title="@string/title_activity_imprint" />
             <item
                 android:id="@+id/nav_data_protection"
-                android:icon="@drawable/ic_data_protection_24"
+                android:icon="@drawable/lock_24px"
                 android:title="@string/dialog_privacy_update_title" />
         </menu>
     </item>

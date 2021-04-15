@@ -33,4 +33,6 @@
     <color name="r16">#476d8f</color>
     <color name="r17">#a53d69</color>
     <!-- END random color select -->
+
+    <color name="colorOnBackground">#121212</color>
 </resources>

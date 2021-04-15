@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: "kotlin-kapt"
 apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
@@ -106,28 +108,30 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation "androidx.appcompat:appcompat:${appCompatVersion}"
-    implementation "androidx.cardview:cardview:${cardViewVersion}"
-    implementation "androidx.dynamicanimation:dynamicanimation:${dynamicAnimationVersion}"
-    implementation "androidx.browser:browser:${browserVersion}"
-    implementation "androidx.room:room-runtime:${roomVersion}"
-    implementation "androidx.room:room-rxjava2:${roomVersion}"
-    annotationProcessor "androidx.room:room-compiler:${roomVersion}"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "androidx.cardview:cardview:$cardViewVersion"
+    implementation "androidx.dynamicanimation:dynamicanimation:$dynamicAnimationVersion"
+    implementation "androidx.browser:browser:$browserVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+    implementation "androidx.room:room-rxjava2:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
+    implementation "androidx.preference:preference-ktx:$preferenceVersion"
 
-    implementation "com.google.android.material:material:${materialVersion}"
-    implementation "com.google.android.gms:play-services-maps:${playServicesVersion}"
-    implementation "com.google.android.gms:play-services-places:${playServicesVersion}"
-    implementation "com.google.android.gms:play-services-location:${playServicesLocationVersion}"
-    implementation "com.google.maps.android:android-maps-utils:${mapsUtilsVersion}"
-    implementation "com.google.code.gson:gson:${gsonVersion}"
+    implementation "com.google.android.material:material:$materialVersion"
+    implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-places:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-location:$playServicesLocationVersion"
+    implementation "com.google.maps.android:android-maps-utils:$mapsUtilsVersion"
+    implementation "com.google.code.gson:gson:$gsonVersion"
 
-    implementation platform("com.google.firebase:firebase-bom:${firebaseVersion}")
+    implementation platform("com.google.firebase:firebase-bom:$firebaseVersion")
     implementation 'com.google.firebase:firebase-core'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-    implementation "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
-    implementation "io.reactivex.rxjava2:rxandroid:${rxandroidVersion}"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.github.p72b:locator-library:1.6.0'
 }

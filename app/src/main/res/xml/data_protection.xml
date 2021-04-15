@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/data_protection_terms_and_conditions">
+
+        <Preference
+            android:key="link_tnc"
+            android:summary="@string/dialog_privacy_update_message"
+            android:title="@string/data_protection_tnc_title"
+            android:icon="@drawable/lock_24px" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="@string/pref_key_accept_tnc"
+            android:summary="@string/dialog_privacy_update_checkbox" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/data_protection_tracking">
+
+        <SwitchPreferenceCompat
+            android:icon="@drawable/analytics_24px"
+            android:key="@string/pref_key_use_analytics"
+            android:summary="@string/dialog_analytics_message"
+            android:title="@string/dialog_analytics_sub_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+</PreferenceScreen>

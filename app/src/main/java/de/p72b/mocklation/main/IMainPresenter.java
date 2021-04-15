@@ -20,7 +20,7 @@ public interface IMainPresenter {
 
     void locationItemRemoved(LocationItem item);
 
-    void showPrivacyUpdateDialog(@Nullable DialogListener listener);
+    void showPrivacyUpdateDialog();
 
     void onDeveloperOptionsEnabledRequest(int result);
 }

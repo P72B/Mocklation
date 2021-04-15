@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Mocklation.iml" filepath="$PROJECT_DIR$/Mocklation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Mocklation-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Mocklation-app.iml" group="Mocklation/app" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/code-Mocklation.iml" filepath="$PROJECT_DIR$/.idea/modules/code-Mocklation.iml" group="Mocklation" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Mocklation.iml" filepath="$PROJECT_DIR$/.idea/modules/Mocklation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Mocklation.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Mocklation.app.iml" />
     </modules>
   </component>
 </project>

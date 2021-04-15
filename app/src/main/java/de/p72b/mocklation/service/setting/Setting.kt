@@ -3,6 +3,7 @@ package de.p72b.mocklation.service.setting
 import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 
 class Setting(context: Context) : ISetting {
     companion object {
@@ -17,6 +18,7 @@ class Setting(context: Context) : ISetting {
     }
 
     private val preferences: SharedPreferences = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE)
+    private val preferencesDefault = PreferenceManager.getDefaultSharedPreferences(context)
 
     override fun saveLocation(latitude: Double, longitude: Double) {
         val edit = preferences.edit()
@@ -63,7 +65,7 @@ class Setting(context: Context) : ISetting {
     }
 
     override fun isPrivacyStatementAccepted(): Boolean {
-        return preferences.getBoolean(PRIVACY_UPDATE_ACCEPTED, false)
+        return preferencesDefault.getBoolean(PRIVACY_UPDATE_ACCEPTED, false)
     }
 
     override fun acceptCurrentPrivacyStatement(value: Boolean) {

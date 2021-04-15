@@ -27,19 +27,18 @@
     <string name="dialog_edit_item_displayed_name">Name</string>
     <string name="dialog_edit_item_latitude">Latitude</string>
     <string name="dialog_edit_item_longitude">Longitude</string>
+    <string name="data_protection_terms_and_conditions">Terms and conditions</string>
     <string name="dialog_privacy_update_title">Data protection</string>
-    <string name="dialog_privacy_update_link">privacy policy (link)</string>
-    <string name="dialog_privacy_update_sub_title">Privacy policy</string>
     <string name="dialog_background_location_sub_title">Background location</string>
     <string name="dialog_background_location_message"><![CDATA[<p>This app collects location data to enable continuous fake location emitting even when the app is closed or in background. You will see a prominent notification during location mocking service execution a so called foreground service.</p><br><p>Make sure to grant location access for this app to <b>%1$s</b> otherwise the service can not operate properly.</p>]]></string>
     <string name="dialog_background_location_message_snipped">Allow all the time</string>
     <string name="dialog_background_location_title">Sensitive permission</string>
     <string name="button_action_ok">Understood</string>
-    <string name="dialog_privacy_update_message">Mocklation fulfills the %1$s requirements by Google and the European Union. Please read and accept the privacy statement. It explains usage of your data. You can decline the policy but you will be unable to use the mocking service.</string>
-    <string name="dialog_privacy_update_checkbox">Yes, I read and accept the privacy policy of Mocklation</string>
+    <string name="dialog_privacy_update_message">Mocklation fulfills the requirements by Google and the European Union. Please read and accept the <b>privacy statement</b>.\nIt explains usage of your data. You can decline the policy but you will be unable to use the app.</string>
+    <string name="dialog_privacy_update_checkbox">Yes,\nI read and accept the privacy policy</string>
+    <string name="data_protection_tnc_title">Data privacy</string>
     <string name="dialog_analytics_sub_title">Analytics Data Collection and Usage</string>
     <string name="dialog_analytics_message">The app will collect tracking data by firebase analytics SDK. Most seen screens and tracking events about usage of the service will be collected. A/B testing and UI/UX improvements can be applied from the data obtained. </string>
-    <string name="dialog_analytics_checkbox">Yes, I accept to collect analytics data <i>[optional]</i></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_divider_readings">Readings</string>
@@ -126,6 +125,9 @@
     <string name="error_1024">Location disabled on phone</string>
     <string name="error_1025">Developer options disabled on device</string>
     <string name="error_1026">Device has no suitable location provider available</string>
+    <string name="pref_key_use_analytics">ANALYTICS_TRACKING_ENABLED</string>
+    <string name="pref_key_accept_tnc">PRIVACY_UPDATE_ACCEPTED</string>
+    <string name="data_protection_tracking">Tracking</string>
 
     <string name="apache_2_license" tools:ignore="TypographyOther">Apache License
 \nVersion 2.0, January 2004

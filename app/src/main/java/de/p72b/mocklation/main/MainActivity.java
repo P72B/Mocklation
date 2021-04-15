@@ -192,7 +192,7 @@ private static final String TAG = MainActivity.class.getSimpleName();
                 startActivity(new Intent(this, ImprintActivity.class));
                 break;
             case R.id.nav_data_protection:
-                mPresenter.showPrivacyUpdateDialog(null);
+                mPresenter.showPrivacyUpdateDialog();
                 break;
         }
 

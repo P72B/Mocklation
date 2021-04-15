@@ -1,6 +1,5 @@
 package de.p72b.mocklation.main;
 
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -26,13 +25,13 @@ import de.p72b.mocklation.R;
 import de.p72b.mocklation.dialog.BackgroundLocationDialog;
 import de.p72b.mocklation.dialog.DialogListener;
 import de.p72b.mocklation.dialog.EditLocationItemDialog;
-import de.p72b.mocklation.dialog.PrivacyUpdateDialog;
 import de.p72b.mocklation.map.MapsActivity;
 import de.p72b.mocklation.service.analytics.AnalyticsService;
 import de.p72b.mocklation.service.analytics.IAnalyticsService;
 import de.p72b.mocklation.service.room.AppDatabase;
 import de.p72b.mocklation.service.room.LocationItem;
 import de.p72b.mocklation.service.setting.ISetting;
+import de.p72b.mocklation.settings.DataProtectionSettingsActivity;
 import de.p72b.mocklation.util.Logger;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
@@ -309,29 +308,12 @@ public class MainPresenter implements IMainPresenter {
                     }
                 });
         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-        dialog.show(fragmentManager, PrivacyUpdateDialog.Companion.getTAG());
-    }
-
-    private void showPrivacyUpdateDialog() {
-        showPrivacyUpdateDialog(new DialogListener() {
-            @Override
-            public void onAcceptClick() {
-                onPlayStopClicked();
-            }
-
-            @Override
-            public void onDeclineClick() {
-                mView.showSnackbar(R.string.error_1020, -1, null, Snackbar.LENGTH_LONG);
-            }
-        });
+        dialog.show(fragmentManager, BackgroundLocationDialog.Companion.getTAG());
     }
 
     @Override
-    public void showPrivacyUpdateDialog(@Nullable DialogListener listener) {
-        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
-        PrivacyUpdateDialog dialog = PrivacyUpdateDialog.Companion.newInstance(listener);
-        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-        dialog.show(fragmentManager, PrivacyUpdateDialog.Companion.getTAG());
+    public void showPrivacyUpdateDialog() {
+        mActivity.startActivity(new Intent(mActivity, DataProtectionSettingsActivity.class));
     }
 
     private void showEditLocationItemDialog() {
