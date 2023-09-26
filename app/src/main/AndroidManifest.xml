@@ -1,93 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="de.p72b.mocklation">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission
-        android:name="android.permission.ACCESS_MOCK_LOCATION"
-        tools:ignore="MockLocation" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.UPDATE_APP_OPS_STATS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
-        android:name=".MocklationApp"
+        android:name=".MocklationApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:resizeableActivity="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="UnusedAttribute">
-
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <meta-data
-            android:name="firebase_analytics_collection_enabled"
-            android:value="false" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_api_key" />
+        android:theme="@style/Theme.AppTheme"
+        tools:targetApi="31">
 
         <activity
-            android:name=".main.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".map.MapsActivity"
-            android:parentActivityName=".main.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.MainActivity" />
-        </activity>
+        <service
+            android:name=".service.ForegroundService"
+            android:enabled="true"
+            android:foregroundServiceType="location" />
 
-        <activity
-            android:name=".imprint.ImprintActivity"
-            android:parentActivityName=".main.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".main.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".settings.DataProtectionSettingsActivity"
-            android:theme="@style/AppThemeDayNight" />
-
-        <receiver android:name=".notification.NotificationBroadcastReceiver">
+        <receiver
+            android:name=".service.ForegroundService$ServiceEchoReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="EVENT_PAUSE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="EVENT_PLAY" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="EVENT_STOP" />
+                <action android:name="APP_SPECIFIC_BROADCAST" />
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".service.location.MockLocationService"
-            android:enabled="true" />
-
-        <service
-            android:name=".service.geocoder.GeocoderIntentService"
-            android:exported="false" />
+        <receiver
+            android:name=".service.ForegroundServiceInteractor$Pong"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="APP_SPECIFIC_BROADCAST" />
+            </intent-filter>
+        </receiver>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
