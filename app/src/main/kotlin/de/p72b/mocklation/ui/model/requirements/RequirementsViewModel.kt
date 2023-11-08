@@ -16,6 +16,8 @@ class RequirementsViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<RequirementsUIState>(RequirementsUIState.Verifying)
     val uiState: StateFlow<RequirementsUIState> = _uiState
+    private val _requestPermission = MutableStateFlow<PermissionRequest?>(null)
+    val requestPermission: StateFlow<PermissionRequest?> = _requestPermission
 
     init {
         viewModelScope.launch {
@@ -28,19 +30,37 @@ class RequirementsViewModel(
                     is RequirementsState.Status -> _uiState.value =
                         RequirementsUIState.Status(
                             status.isDeveloperOptionsEnabled,
-                            status.isSelectedMockLocationApp
+                            status.isSelectedMockLocationApp,
+                            status.isAccessToFineLocationGranted,
+                            status.isAccessToBackgroundLocationGranted,
+                            status.isAllowedToShowNotification
                         )
                 }
             }
         }
     }
 
+    fun onRequestFineLocationPermissionClicked() {
+        _requestPermission.value = PermissionRequest.PermissionFineLocation
+    }
+
+    fun onContinueClicked() {
+        navigator.navigateTo(Navigator.NavTarget.Simulation)
+    }
 }
 
 sealed interface RequirementsUIState {
     data object Verifying : RequirementsUIState
     data class Status(
         val isDeveloperOptionsEnabled: Boolean,
-        val isSelectedMockLocationApp: Boolean
+        val isSelectedMockLocationApp: Boolean,
+        val isAccessToFineLocationGranted: Boolean,
+        val isAccessToBackgroundLocationGranted: Boolean,
+        val isAllowedToShowNotification: Boolean
     ) : RequirementsUIState
+}
+
+sealed interface PermissionRequest {
+    data object PermissionFineLocation: PermissionRequest
+    data object PermissionBackgroundLocation: PermissionRequest
 }

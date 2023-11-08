@@ -12,6 +12,6 @@ val appModule = module {
     single { RequirementsService(get()) }
     single { ForegroundServiceInteractor(get()) }
     single { Navigator() }
+    single { RequirementsViewModel(get(), get()) }
     viewModel { SimulationViewModel(get()) }
-    viewModel { RequirementsViewModel(get(), get()) }
 }
