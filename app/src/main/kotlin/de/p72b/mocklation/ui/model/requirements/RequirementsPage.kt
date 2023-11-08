@@ -17,7 +17,10 @@ import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun RequirementsPage(modifier: Modifier = Modifier, viewModel: RequirementsViewModel = koinViewModel()) {
+fun RequirementsPage(
+    modifier: Modifier = Modifier,
+    viewModel: RequirementsViewModel = koinViewModel()
+) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
         RequirementsUIState.Verifying -> VerifyingScreen(modifier)
@@ -52,6 +55,18 @@ fun StatusScreen(modifier: Modifier = Modifier, items: RequirementsUIState.Statu
                 Text(text = stringResource(id = R.string.developer_options_enabled_requirements))
             } else {
                 Text(text = stringResource(id = R.string.developer_options_disabled_requirements))
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (items.isSelectedMockLocationApp) {
+                Text(text = stringResource(id = R.string.developer_options_selected_mock_location_app_requirements))
+            } else {
+                Text(text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements))
             }
         }
     }

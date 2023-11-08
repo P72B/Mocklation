@@ -1,12 +1,17 @@
 package de.p72b.mocklation.service
 
+import android.app.AppOpsManager
 import android.content.Context
+import android.os.Build
+import android.os.Process
 import android.provider.Settings
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import de.p72b.mocklation.BuildConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+
 
 class RequirementsService(private val application: Context) : LifecycleEventObserver {
 
@@ -25,6 +30,7 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
             }
         }
     }
+
     private fun runChecks() {
         val areDeveloperOptionsEnabledOnPhone = Settings.Secure.getInt(
             application.contentResolver,
@@ -33,14 +39,39 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
         _requirementsState.value = RequirementsState.Status(
             isDeveloperOptionsEnabled = areDeveloperOptionsEnabledOnPhone
         )
+        val opsManager: AppOpsManager =
+            application.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val isMockLocation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            try {
+                opsManager.unsafeCheckOp(
+                    AppOpsManager.OPSTR_MOCK_LOCATION,
+                    Process.myUid(),
+                    BuildConfig.APPLICATION_ID
+                ) == AppOpsManager.MODE_ALLOWED
+            } catch (e: SecurityException) {
+                false
+            }
+        } else {
+            !Settings.Secure.getString(application.contentResolver, "mock_location").equals("0")
+        }
+        _requirementsState.value = RequirementsState.Status(
+            isDeveloperOptionsEnabled = areDeveloperOptionsEnabledOnPhone,
+            isSelectedMockLocationApp = isMockLocation
+        )
 
-        if (areDeveloperOptionsEnabledOnPhone) {
+
+        if (areDeveloperOptionsEnabledOnPhone && isMockLocation) {
+
             _requirementsState.value = RequirementsState.Ready
         }
     }
 }
 
 sealed interface RequirementsState {
-    data class Status(val isDeveloperOptionsEnabled: Boolean = false) : RequirementsState
+    data class Status(
+        val isDeveloperOptionsEnabled: Boolean = false,
+        val isSelectedMockLocationApp: Boolean = false
+    ) : RequirementsState
+
     data object Ready : RequirementsState
 }
