@@ -12,23 +12,31 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.rememberNavController
+import de.p72b.mocklation.service.RequirementsService
 import de.p72b.mocklation.ui.MainNavigation
+import de.p72b.mocklation.ui.Navigator
 import de.p72b.mocklation.ui.theme.AppTheme
 import de.p72b.mocklation.util.Logger
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private val navigator: Navigator by inject()
+    private val requirementsService: RequirementsService by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycle.addObserver(requirementsService)
+
         setContent {
             AppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigation()
+                    MainNavigation(rememberNavController(), navigator)
                 }
             }
         }

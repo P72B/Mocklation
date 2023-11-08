@@ -5,7 +5,7 @@ import android.util.Log
 class Logger {
 
     companion object {
-        private const val defaultTag = "TEST_P72B"
+        private const val defaultTag = "MOCKLATION_V2_P72B"
         private var allowLogging = false
 
         fun setEnabled(isEnabled: Boolean) {

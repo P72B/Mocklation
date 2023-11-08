@@ -11,9 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.p72b.mocklation.R
 
 @Composable
 fun SimulationPage(modifier: Modifier = Modifier, viewModel: SimulationViewModel = koinViewModel()) {
@@ -44,7 +46,7 @@ internal fun LoadingSimulationScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Loading")
+            Text(text = stringResource(id = R.string.loading))
         }
     }
 }
@@ -61,10 +63,8 @@ internal fun StoppedSimulationScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Stopped state")
-
             Button(modifier = Modifier.width(96.dp), onClick = { onRunSimulation() }) {
-                Text("Run")
+                Text(stringResource(id = R.string.play))
             }
         }
     }
@@ -82,10 +82,8 @@ internal fun RunningSimulationScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Running state")
-
             Button(modifier = Modifier.width(96.dp), onClick = { onStopSimulation() }) {
-                Text("Stop")
+                Text(stringResource(id = R.string.stop))
             }
         }
     }
