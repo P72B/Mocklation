@@ -18,9 +18,12 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
 
     private val _requirementsState = MutableStateFlow<RequirementsState>(RequirementsState.Status())
     val requirementsState: StateFlow<RequirementsState> = _requirementsState
-    var foregroundFineLocationPermissionEnabled = false;
-    var backgroundLocationPermissionEnabled = false;
-    private var isAllowedToShowNotification = false;
+    var foregroundFineLocationPermissionEnabled = false
+    var backgroundLocationPermissionEnabled = false
+    var shouldShowDialogRequestLocationPermissionRationale = false
+    var shouldShowDialogRequestBackgroundLocationPermissionRationale = false
+    var shouldShowDialogRequestNotificationPermissionRationale = false
+    var isAllowedToShowNotification = false
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
@@ -37,15 +40,11 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
     }
 
     private fun runChecks() {
-        isAllowedToShowNotification = NotificationManagerCompat.from(application)
-            .areNotificationsEnabled()
         val isDeveloperOptionsEnabled = Settings.Secure.getInt(
             application.contentResolver,
             Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0
         ) != 0
-        _requirementsState.value = RequirementsState.Status(
-            isDeveloperOptionsEnabled = isDeveloperOptionsEnabled
-        )
+
         val opsManager: AppOpsManager =
             application.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val isSelectedMockLocationApp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -61,12 +60,20 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
         } else {
             !Settings.Secure.getString(application.contentResolver, "mock_location").equals("0")
         }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            backgroundLocationPermissionEnabled = true
+        }
+
         _requirementsState.value = RequirementsState.Status(
             isDeveloperOptionsEnabled = isDeveloperOptionsEnabled,
             isSelectedMockLocationApp = isSelectedMockLocationApp,
             isAccessToFineLocationGranted = foregroundFineLocationPermissionEnabled,
             isAccessToBackgroundLocationGranted = backgroundLocationPermissionEnabled,
-            isAllowedToShowNotification = isAllowedToShowNotification
+            isAllowedToShowNotification = isAllowedToShowNotification,
+            shouldShowDialogRequestLocationPermissionRationale = shouldShowDialogRequestLocationPermissionRationale,
+            shouldShowDialogRequestBackgroundLocationPermissionRationale = shouldShowDialogRequestBackgroundLocationPermissionRationale,
+            shouldShowDialogRequestNotificationPermissionRationale = shouldShowDialogRequestNotificationPermissionRationale
         )
 
         if (isDeveloperOptionsEnabled
@@ -74,6 +81,9 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
             && foregroundFineLocationPermissionEnabled
             && backgroundLocationPermissionEnabled
             && isAllowedToShowNotification
+            && shouldShowDialogRequestLocationPermissionRationale.not()
+            && shouldShowDialogRequestBackgroundLocationPermissionRationale.not()
+            && shouldShowDialogRequestNotificationPermissionRationale.not()
         ) {
             _requirementsState.value = RequirementsState.Ready
         }
@@ -86,7 +96,10 @@ sealed interface RequirementsState {
         val isSelectedMockLocationApp: Boolean = false,
         val isAccessToFineLocationGranted: Boolean = false,
         val isAccessToBackgroundLocationGranted: Boolean = false,
-        val isAllowedToShowNotification: Boolean = false
+        val isAllowedToShowNotification: Boolean = false,
+        val shouldShowDialogRequestLocationPermissionRationale: Boolean = false,
+        val shouldShowDialogRequestBackgroundLocationPermissionRationale: Boolean = false,
+        val shouldShowDialogRequestNotificationPermissionRationale: Boolean = false
     ) : RequirementsState
 
     data object Ready : RequirementsState

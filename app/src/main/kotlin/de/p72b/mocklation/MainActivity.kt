@@ -1,5 +1,6 @@
 package de.p72b.mocklation
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -23,14 +25,12 @@ import de.p72b.mocklation.ui.Navigator
 import de.p72b.mocklation.ui.model.requirements.PermissionRequest
 import de.p72b.mocklation.ui.model.requirements.RequirementsViewModel
 import de.p72b.mocklation.ui.theme.AppTheme
-import de.p72b.mocklation.util.Logger
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private val navigator: Navigator by inject()
     private val requirementsService: RequirementsService by inject()
     private val requirementsViewModel: RequirementsViewModel by inject()
@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycle.addObserver(requirementsService)
+
         setContent {
             AppTheme {
                 Surface(
@@ -50,26 +51,78 @@ class MainActivity : ComponentActivity() {
         }
 
         requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            requirementsService.foregroundFineLocationPermissionEnabled = isGranted
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            permissions.entries.forEach {
+                when (it.key) {
+                    android.Manifest.permission.ACCESS_FINE_LOCATION -> {
+                        PermissionUtil.firstTimeAskingPermission(
+                            applicationContext,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            false
+                        )
+                        requirementsService.foregroundFineLocationPermissionEnabled = it.value
+                    }
+
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            return@forEach
+                        }
+                        PermissionUtil.firstTimeAskingPermission(
+                            applicationContext,
+                            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                            false
+                        )
+                        requirementsService.backgroundLocationPermissionEnabled = it.value
+                    }
+
+                    android.Manifest.permission.POST_NOTIFICATIONS -> {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                            return@forEach
+                        }
+                        PermissionUtil.firstTimeAskingPermission(
+                            applicationContext,
+                            android.Manifest.permission.POST_NOTIFICATIONS,
+                            false
+                        )
+                        requirementsService.isAllowedToShowNotification = it.value
+                    }
+                }
+            }
+
         }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 requirementsViewModel.requestPermission.collect { permission ->
                     when (permission) {
-                        PermissionRequest.PermissionBackgroundLocation -> {
-                            requestPermissions(
-                                getLocationForegroundServicePermissions(),
-                                555
+                        is PermissionRequest.PermissionBackgroundLocation -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                requestPermissionLauncher.launch(
+                                    arrayOf(
+                                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                                    )
+                                )
+                            }
+                        }
+
+                        is PermissionRequest.PermissionFineLocation -> {
+                            requestPermissionLauncher.launch(
+                                arrayOf(
+                                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                                )
                             )
                         }
 
-                        PermissionRequest.PermissionFineLocation -> {
-                            requestPermissions(
-                                getFineLocationPermissions(),
-                                556
+                        is PermissionRequest.PermissionNotification -> {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                                return@collect
+                            }
+                            requestPermissionLauncher.launch(
+                                arrayOf(
+                                    android.Manifest.permission.POST_NOTIFICATIONS
+                                )
                             )
                         }
 
@@ -84,52 +137,112 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-
-        if (ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED) {
-            requirementsService.foregroundFineLocationPermissionEnabled = true
-        }
-        if (ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED) {
-            requirementsService.backgroundLocationPermissionEnabled = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requirementsService.isAllowedToShowNotification =
+                NotificationManagerCompat.from(application)
+                    .areNotificationsEnabled()
+        } else {
+            requirementsService.isAllowedToShowNotification = true
         }
 
-        when {
-            ActivityCompat.shouldShowRequestPermissionRationale(
+        requirementsService.foregroundFineLocationPermissionEnabled =
+            ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) -> {
-                requirementsService.foregroundFineLocationPermissionEnabled = false
+            ) == PackageManager.PERMISSION_GRANTED
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requirementsService.backgroundLocationPermissionEnabled =
+                ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+
+            if (PermissionUtil.isFirstTimeAskingPermission(
+                    this,
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            ) {
+                requirementsService.shouldShowDialogRequestBackgroundLocationPermissionRationale =
+                    false
+            } else {
+                if (requirementsService.backgroundLocationPermissionEnabled.not()) {
+                    requirementsService.shouldShowDialogRequestBackgroundLocationPermissionRationale =
+                        true
+                } else {
+                    requirementsService.shouldShowDialogRequestBackgroundLocationPermissionRationale =
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        )
+                }
             }
         }
-    }
 
-    private fun getLocationForegroundServicePermissions(): Array<String> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            arrayOf(
-                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        if (PermissionUtil.isFirstTimeAskingPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
             )
+        ) {
+            requirementsService.shouldShowDialogRequestLocationPermissionRationale = false
         } else {
-            arrayOf(
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION
-            )
+            if (requirementsService.foregroundFineLocationPermissionEnabled.not()) {
+                requirementsService.shouldShowDialogRequestLocationPermissionRationale = true
+            } else {
+                requirementsService.shouldShowDialogRequestLocationPermissionRationale =
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+            }
         }
-    }
 
-    private fun getFineLocationPermissions(): Array<String> {
-        return arrayOf(
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (PermissionUtil.isFirstTimeAskingPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                )
+            ) {
+                requirementsService.shouldShowDialogRequestNotificationPermissionRationale = false
+            } else {
+                if (NotificationManagerCompat.from(application).areNotificationsEnabled().not()) {
+                    requirementsService.shouldShowDialogRequestNotificationPermissionRationale =
+                        true
+                } else {
+                    requirementsService.shouldShowDialogRequestNotificationPermissionRationale =
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            android.Manifest.permission.POST_NOTIFICATIONS
+                        )
+                }
+            }
+
+        }
     }
 
     override fun onDestroy() {
         requestPermissionLauncher.unregister()
         super.onDestroy()
+    }
+
+    object PermissionUtil {
+        private const val PREFS_FILE_NAME = "preference"
+
+        fun firstTimeAskingPermission(context: Context, permission: String, isFirstTime: Boolean) {
+            val sharedPreference = context.getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE)
+            sharedPreference.edit().putBoolean(
+                permission,
+                isFirstTime
+            ).apply()
+        }
+
+        fun isFirstTimeAskingPermission(context: Context, permission: String): Boolean {
+            val sharedPreference = context.getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE)
+            return sharedPreference.getBoolean(
+                permission,
+                true
+            )
+
+        }
     }
 }

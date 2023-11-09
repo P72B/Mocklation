@@ -1,5 +1,6 @@
 package de.p72b.mocklation.ui.model.requirements
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +35,9 @@ fun RequirementsPage(
             modifier,
             items as RequirementsUIState.Status,
             viewModel::onRequestFineLocationPermissionClicked,
+            viewModel::onRequestBackgroundLocationPermissionClicked,
+            viewModel::onRequestNotificationPermissionClicked,
+            viewModel::onGoToSettingsClicked,
             viewModel::onContinueClicked
         )
     }
@@ -57,6 +62,9 @@ fun StatusScreen(
     modifier: Modifier = Modifier,
     items: RequirementsUIState.Status,
     onRequestFineLocationPermissionClicked: () -> Unit,
+    onRequestBackgroundLocationPermissionClicked: () -> Unit,
+    onRequestNotificationPermissionClicked: () -> Unit,
+    onGoToSettingsClicked: () -> Unit,
     onContinueClicked: () -> Unit
 ) {
     Column(modifier) {
@@ -102,30 +110,80 @@ fun StatusScreen(
                         contentDescription = stringResource(R.string.content_description_add_fine_location_permission)
                     )
                 }
+                if (items.isAccessToBackgroundLocationGranted.not() && items.shouldShowDialogRequestLocationPermissionRationale) {
+                    IconButton(onClick = {
+                        onGoToSettingsClicked()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = stringResource(R.string.content_go_to_settings)
+                        )
+                    }
+                }
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            if (items.isAccessToBackgroundLocationGranted) {
-                Text(text = stringResource(id = R.string.background_location_granted_requirements))
-            } else {
-                Text(text = stringResource(id = R.string.background_location_permission_missing_requirements))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                if (items.isAccessToBackgroundLocationGranted) {
+                    Text(text = stringResource(id = R.string.background_location_granted_requirements))
+                } else {
+                    Text(text = stringResource(id = R.string.background_location_permission_missing_requirements))
+                    IconButton(onClick = {
+                        onRequestBackgroundLocationPermissionClicked()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = stringResource(R.string.content_description_add_background_location_permission)
+                        )
+                    }
+                }
+                if (items.isAccessToBackgroundLocationGranted.not() && items.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
+                    IconButton(onClick = {
+                        onGoToSettingsClicked()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = stringResource(R.string.content_go_to_settings)
+                        )
+                    }
+                }
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            if (items.isAllowedToShowNotification) {
-                Text(text = stringResource(id = R.string.enabled_show_notification_requirements))
-            } else {
-                Text(text = stringResource(id = R.string.disabled_show_notification_requirements))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                if (items.isAllowedToShowNotification) {
+                    Text(text = stringResource(id = R.string.enabled_show_notification_requirements))
+                } else {
+                    Text(text = stringResource(id = R.string.disabled_show_notification_requirements))
+                    IconButton(onClick = {
+                        onRequestNotificationPermissionClicked()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = stringResource(R.string.content_description_add_notification_permission)
+                        )
+                    }
+                }
+                if (items.isAllowedToShowNotification.not() && items.shouldShowDialogRequestNotificationPermissionRationale) {
+                    IconButton(onClick = {
+                        onGoToSettingsClicked()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = stringResource(R.string.content_go_to_settings)
+                        )
+                    }
+                }
             }
         }
         Row(
