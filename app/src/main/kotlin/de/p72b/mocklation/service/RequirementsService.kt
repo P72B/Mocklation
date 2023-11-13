@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
 class RequirementsService(private val application: Context) : LifecycleEventObserver {
 
     private val _requirementsState = MutableStateFlow<RequirementsState>(RequirementsState.Status())
+    private val opsManager: AppOpsManager =
+        application.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
     val requirementsState: StateFlow<RequirementsState> = _requirementsState
     var foregroundFineLocationPermissionEnabled = false
     var backgroundLocationPermissionEnabled = false
@@ -45,8 +47,6 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
             Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0
         ) != 0
 
-        val opsManager: AppOpsManager =
-            application.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
         val isSelectedMockLocationApp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             try {
                 opsManager.unsafeCheckOp(

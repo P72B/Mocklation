@@ -9,9 +9,9 @@
     <string name="developer_options_disabled_requirements">Disabled developer options</string>
     <string name="developer_options_selected_mock_location_app_requirements">Is selected mock location app</string>
     <string name="developer_options_unselected_mock_location_app_requirements">Is not selected mock location app</string>
-    <string name="fine_location_granted_requirements">Fine location access possible</string>
+    <string name="fine_location_granted_requirements">Precise location access possible</string>
     <string name="fine_location_permission_missing_requirements">Can\'t access precise location</string>
-    <string name="content_description_add_fine_location_permission">Request fine location permission</string>
+    <string name="content_description_add_fine_location_permission">Request precise location permission</string>
     <string name="content_description_add_background_location_permission">Request background location permission</string>
     <string name="content_description_add_notification_permission">Request notification permission</string>
     <string name="content_go_to_settings">Go to settings</string>
