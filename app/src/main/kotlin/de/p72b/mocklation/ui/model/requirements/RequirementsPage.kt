@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.p72b.mocklation.R
+import de.p72b.mocklation.ui.theme.appColorScheme
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -54,6 +54,8 @@ fun RequirementsPage(
     }
 }
 
+val stationRadius = 16.dp
+
 @Composable
 fun station(
     modifier: Modifier = Modifier,
@@ -63,20 +65,24 @@ fun station(
     isDestination: Boolean = false,
 ) {
     var pathEffect: PathEffect? = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-    val stationRadius = 14.dp
     val strokeWidth = 2.dp
-    var fillColor = Color.Gray
-    var strokeColor = Color.Green
+    val disabledColor = appColorScheme.outline
+    val enabledColor = appColorScheme.primaryContainer
+    var fillColor = disabledColor
+    var strokeColor = enabledColor
     if (isAvailable) {
         if (isAnyPreviousNotAvailable.not()) {
             pathEffect = null
         }
-        fillColor = Color.Green
+        fillColor = enabledColor
     }
     if (pathEffect != null) {
-        strokeColor = Color.Gray
+        strokeColor = disabledColor
     }
-    Canvas(modifier = modifier) {
+    Canvas(
+        modifier = Modifier
+            .padding(end = stationRadius  / 2)
+    ) {
         val height = rowHeight + 24.dp
         var circleRadius = stationRadius / 2
         if (isDestination.not()) {
@@ -92,7 +98,7 @@ fun station(
             circleRadius -= strokeWidth
             drawCircle(
                 center = Offset(0f, 0f),
-                color = Color.Gray,
+                color = disabledColor,
                 radius = circleRadius.toPx() + strokeWidth.toPx()
             )
         }
@@ -121,7 +127,7 @@ fun VerifyingScreen(modifier: Modifier = Modifier) {
 @Composable
 fun StatusScreen(
     modifier: Modifier = Modifier,
-    items: RequirementsUIState.Status,
+    status: RequirementsUIState.Status,
     onRequestFineLocationPermissionClicked: () -> Unit,
     onRequestBackgroundLocationPermissionClicked: () -> Unit,
     onRequestNotificationPermissionClicked: () -> Unit,
@@ -146,7 +152,7 @@ fun StatusScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(start = stationRadius / 2, bottom = 24.dp)
                 .onGloballyPositioned {
                     componentHeightRow1 = with(density) {
                         it.size.height.toDp()
@@ -156,19 +162,16 @@ fun StatusScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val height = componentHeightRow1 + ((componentHeightRow2 - componentHeightRow1) / 2)
-            setIsLineBroken(items.isDeveloperOptionsEnabled)
-            if (items.isDeveloperOptionsEnabled) {
-                station(
-                    rowHeight = height,
-                    isAvailable = true,
-                )
+            setIsLineBroken(status.isDeveloperOptionsEnabled)
+            station(
+                rowHeight = height,
+                isAvailable = status.isDeveloperOptionsEnabled,
+            )
+            if (status.isDeveloperOptionsEnabled) {
                 Text(
                     text = stringResource(id = R.string.developer_options_enabled_requirements)
                 )
             } else {
-                station(
-                    rowHeight = height
-                )
                 Text(
                     text = stringResource(id = R.string.developer_options_disabled_requirements)
                 )
@@ -177,7 +180,7 @@ fun StatusScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(start = stationRadius / 2, bottom = 24.dp)
                 .onGloballyPositioned {
                     componentHeightRow2 = with(density) {
                         it.size.height.toDp()
@@ -187,26 +190,22 @@ fun StatusScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             val height = componentHeightRow2 + ((componentHeightRow3 - componentHeightRow2) / 2)
-            setIsLineBroken(items.isDeveloperOptionsEnabled)
-            if (items.isSelectedMockLocationApp) {
-                station(
-                    rowHeight = height,
-                    isAvailable = true,
-                    isAnyPreviousNotAvailable = isLineBroken,
-                )
+            setIsLineBroken(status.isDeveloperOptionsEnabled)
+            station(
+                rowHeight = height,
+                isAvailable = status.isSelectedMockLocationApp,
+                isAnyPreviousNotAvailable = isLineBroken,
+            )
+            if (status.isSelectedMockLocationApp) {
                 Text(text = stringResource(id = R.string.developer_options_selected_mock_location_app_requirements))
             } else {
-                station(
-                    rowHeight = height,
-                    isAnyPreviousNotAvailable = isLineBroken,
-                )
                 Text(text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements))
             }
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(start = stationRadius / 2, bottom = 24.dp)
                 .onGloballyPositioned {
                     componentHeightRow3 = with(density) {
                         it.size.height.toDp()
@@ -216,19 +215,15 @@ fun StatusScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             val height = componentHeightRow3 + ((componentHeightRow4 - componentHeightRow3) / 2)
-            setIsLineBroken(items.isSelectedMockLocationApp)
-            if (items.isAccessToFineLocationGranted) {
-                station(
-                    rowHeight = height,
-                    isAvailable = true,
-                    isAnyPreviousNotAvailable = isLineBroken,
-                )
+            setIsLineBroken(status.isSelectedMockLocationApp)
+            station(
+                rowHeight = height,
+                isAvailable = status.isAccessToFineLocationGranted,
+                isAnyPreviousNotAvailable = isLineBroken,
+            )
+            if (status.isAccessToFineLocationGranted) {
                 Text(text = stringResource(id = R.string.fine_location_granted_requirements))
             } else {
-                station(
-                    rowHeight = height,
-                    isAnyPreviousNotAvailable = isLineBroken,
-                )
                 Text(text = stringResource(id = R.string.fine_location_permission_missing_requirements))
                 IconButton(onClick = {
                     onRequestFineLocationPermissionClicked()
@@ -238,7 +233,7 @@ fun StatusScreen(
                         contentDescription = stringResource(R.string.content_description_add_fine_location_permission)
                     )
                 }
-                if (items.isAccessToBackgroundLocationGranted.not() && items.shouldShowDialogRequestLocationPermissionRationale) {
+                if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestLocationPermissionRationale) {
                     IconButton(onClick = {
                         onGoToSettingsClicked()
                     }) {
@@ -254,7 +249,7 @@ fun StatusScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp)
+                    .padding(start = stationRadius / 2, bottom = 24.dp)
                     .onGloballyPositioned {
                         componentHeightRow4 = with(density) {
                             it.size.height.toDp()
@@ -264,19 +259,15 @@ fun StatusScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val height = componentHeightRow4 + ((componentHeightRow5 - componentHeightRow4) / 2)
-                setIsLineBroken(items.isAccessToFineLocationGranted)
-                if (items.isAccessToBackgroundLocationGranted) {
-                    station(
-                        rowHeight = height,
-                        isAvailable = true,
-                        isAnyPreviousNotAvailable = isLineBroken,
-                    )
+                setIsLineBroken(status.isAccessToFineLocationGranted)
+                station(
+                    rowHeight = height,
+                    isAvailable = status.isAccessToBackgroundLocationGranted,
+                    isAnyPreviousNotAvailable = isLineBroken,
+                )
+                if (status.isAccessToBackgroundLocationGranted) {
                     Text(text = stringResource(id = R.string.background_location_granted_requirements))
                 } else {
-                    station(
-                        rowHeight = height,
-                        isAnyPreviousNotAvailable = isLineBroken,
-                    )
                     Text(text = stringResource(id = R.string.background_location_permission_missing_requirements))
                     IconButton(onClick = {
                         onRequestBackgroundLocationPermissionClicked()
@@ -287,7 +278,7 @@ fun StatusScreen(
                         )
                     }
                 }
-                if (items.isAccessToBackgroundLocationGranted.not() && items.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
+                if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
                     IconButton(onClick = {
                         onGoToSettingsClicked()
                     }) {
@@ -303,7 +294,7 @@ fun StatusScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp)
+                    .padding(start = stationRadius / 2, bottom = 24.dp)
                     .onGloballyPositioned {
                         componentHeightRow5 = with(density) {
                             it.size.height.toDp()
@@ -312,20 +303,16 @@ fun StatusScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                setIsLineBroken(items.isAccessToBackgroundLocationGranted)
-                if (items.isAllowedToShowNotification) {
-                    station(
-                        rowHeight = componentHeightRow5,
-                        isAvailable = true,
-                        isDestination = true,
-                        isAnyPreviousNotAvailable = isLineBroken,
-                    )
+                setIsLineBroken(status.isAccessToBackgroundLocationGranted)
+                station(
+                    rowHeight = componentHeightRow5,
+                    isAvailable = status.isAllowedToShowNotification,
+                    isDestination = true,
+                    isAnyPreviousNotAvailable = isLineBroken,
+                )
+                if (status.isAllowedToShowNotification) {
                     Text(text = stringResource(id = R.string.enabled_show_notification_requirements))
                 } else {
-                    station(
-                        rowHeight = componentHeightRow5,
-                        isAnyPreviousNotAvailable = isLineBroken,
-                    )
                     Text(text = stringResource(id = R.string.disabled_show_notification_requirements))
                     IconButton(onClick = {
                         onRequestNotificationPermissionClicked()
@@ -336,7 +323,7 @@ fun StatusScreen(
                         )
                     }
                 }
-                if (items.isAllowedToShowNotification.not() && items.shouldShowDialogRequestNotificationPermissionRationale) {
+                if (status.isAllowedToShowNotification.not() && status.shouldShowDialogRequestNotificationPermissionRationale) {
                     IconButton(onClick = {
                         onGoToSettingsClicked()
                     }) {
@@ -357,7 +344,11 @@ fun StatusScreen(
             Button(onClick = {
                 onContinueClicked()
             }) {
-                Text(text = stringResource(id = R.string.button_continue))
+                Text(text = if (status.isReady()) {
+                    stringResource(id = R.string.button_continue)
+                } else {
+                    stringResource(id = R.string.button_back)
+                })
             }
         }
     }

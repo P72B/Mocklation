@@ -5,20 +5,21 @@
     <string name="stop">Stop</string>
     <string name="pause">Pause</string>
     <string name="verify_requirements">Checking permissions. Please wait a few moments.</string>
-    <string name="developer_options_enabled_requirements">Developer options are enabled</string>
+    <string name="developer_options_enabled_requirements">Enabled developer options</string>
     <string name="developer_options_disabled_requirements">Disabled developer options</string>
-    <string name="developer_options_selected_mock_location_app_requirements">Is selected mock location app</string>
-    <string name="developer_options_unselected_mock_location_app_requirements">Is not selected mock location app</string>
-    <string name="fine_location_granted_requirements">Precise location access possible</string>
+    <string name="developer_options_selected_mock_location_app_requirements">Set to mock location app</string>
+    <string name="developer_options_unselected_mock_location_app_requirements">Not as mock location app set</string>
+    <string name="fine_location_granted_requirements">Precise location access</string>
     <string name="fine_location_permission_missing_requirements">Can\'t access precise location</string>
     <string name="content_description_add_fine_location_permission">Request precise location permission</string>
     <string name="content_description_add_background_location_permission">Request background location permission</string>
     <string name="content_description_add_notification_permission">Request notification permission</string>
     <string name="content_go_to_settings">Go to settings</string>
-    <string name="background_location_granted_requirements">Background location access possible</string>
-    <string name="background_location_permission_missing_requirements">Can\'t access background location</string>
+    <string name="background_location_granted_requirements">Background location access</string>
+    <string name="background_location_permission_missing_requirements">Can\'t access location in background</string>
     <string name="enabled_show_notification_requirements">Allowed to show notification</string>
     <string name="disabled_show_notification_requirements">Not allowed to show notification</string>
     <string name="should_show_permission_dialog_rationale">Explain user why we really need the location permission</string>
     <string name="button_continue">Continue</string>
+    <string name="button_back">Back</string>
 </resources>

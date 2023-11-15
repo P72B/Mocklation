@@ -2,6 +2,7 @@ package de.p72b.mocklation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
@@ -10,7 +11,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val appLightColorsScheme = lightColorScheme(
+val appLightColorsScheme = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
     primaryContainer = md_theme_light_primaryContainer,
@@ -43,7 +44,7 @@ private val appLightColorsScheme = lightColorScheme(
 )
 
 
-private val appDarkColorsScheme = darkColorScheme(
+val appDarkColorsScheme = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
     primaryContainer = md_theme_dark_primaryContainer,
@@ -75,13 +76,15 @@ private val appDarkColorsScheme = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
+lateinit var appColorScheme: ColorScheme
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable() () -> Unit
 ) {
-    val appColorScheme = when {
+    appColorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)

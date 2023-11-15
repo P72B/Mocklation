@@ -80,7 +80,18 @@ sealed interface RequirementsUIState {
         val shouldShowDialogRequestLocationPermissionRationale: Boolean,
         val shouldShowDialogRequestBackgroundLocationPermissionRationale: Boolean,
         val shouldShowDialogRequestNotificationPermissionRationale: Boolean
-    ) : RequirementsUIState
+    ) : RequirementsUIState {
+        fun isReady(): Boolean {
+            return isDeveloperOptionsEnabled
+                    && isSelectedMockLocationApp
+                    && isAccessToFineLocationGranted
+                    && isAccessToBackgroundLocationGranted
+                    && isAllowedToShowNotification
+                    && shouldShowDialogRequestLocationPermissionRationale
+                    && shouldShowDialogRequestBackgroundLocationPermissionRationale
+                    && shouldShowDialogRequestNotificationPermissionRationale
+        }
+    }
 }
 
 sealed interface PermissionRequest {
