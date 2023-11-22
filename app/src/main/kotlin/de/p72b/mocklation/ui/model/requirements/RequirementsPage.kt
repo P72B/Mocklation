@@ -5,15 +5,23 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,14 +44,12 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RequirementsPage(
-    modifier: Modifier = Modifier,
-    viewModel: RequirementsViewModel = koinViewModel()
+    modifier: Modifier = Modifier, viewModel: RequirementsViewModel = koinViewModel()
 ) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
         RequirementsUIState.Verifying -> VerifyingScreen(modifier)
         is RequirementsUIState.Status -> StatusScreen(
-            modifier,
             items as RequirementsUIState.Status,
             viewModel::onRequestFineLocationPermissionClicked,
             viewModel::onRequestBackgroundLocationPermissionClicked,
@@ -54,11 +60,11 @@ fun RequirementsPage(
     }
 }
 
-val stationRadius = 16.dp
+val stationRadius = 20.dp
+val stationPadding = 32.dp
 
 @Composable
 fun station(
-    modifier: Modifier = Modifier,
     rowHeight: Dp,
     isAnyPreviousNotAvailable: Boolean = false,
     isAvailable: Boolean = false,
@@ -80,8 +86,7 @@ fun station(
         strokeColor = disabledColor
     }
     Canvas(
-        modifier = Modifier
-            .padding(end = stationRadius  / 2)
+        modifier = Modifier.padding(end = stationRadius / 2)
     ) {
         val height = rowHeight + 24.dp
         var circleRadius = stationRadius / 2
@@ -94,19 +99,24 @@ fun station(
                 pathEffect = pathEffect,
             )
         }
-        if (isAnyPreviousNotAvailable) {
-            circleRadius -= strokeWidth
-            drawCircle(
-                center = Offset(0f, 0f),
-                color = disabledColor,
-                radius = circleRadius.toPx() + strokeWidth.toPx()
-            )
-        }
         drawCircle(
             center = Offset(0f, 0f),
-            color = fillColor,
-            radius = circleRadius.toPx()
+            color = disabledColor,
+            radius = circleRadius.toPx() + strokeWidth.toPx()
         )
+        if (isAvailable) {
+            drawCircle(
+                center = Offset(0f, 0f),
+                color = fillColor,
+                radius = circleRadius.toPx()
+            )
+        } else {
+            drawCircle(
+                center = Offset(0f, 0f),
+                color = appColorScheme.surface,
+                radius = circleRadius.toPx()
+            )
+        }
     }
 }
 
@@ -126,7 +136,6 @@ fun VerifyingScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun StatusScreen(
-    modifier: Modifier = Modifier,
     status: RequirementsUIState.Status,
     onRequestFineLocationPermissionClicked: () -> Unit,
     onRequestBackgroundLocationPermissionClicked: () -> Unit,
@@ -147,209 +156,276 @@ fun StatusScreen(
             isLineBroken = true
         }
     }
+    Column(
+        Modifier
+            .fillMaxHeight()
+            .padding(start = 16.dp, end = 16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
 
-    Column(modifier) {
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = stationRadius / 2, bottom = 24.dp)
-                .onGloballyPositioned {
-                    componentHeightRow1 = with(density) {
-                        it.size.height.toDp()
-                    }
-                },
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .verticalScroll(rememberScrollState())
+                .weight(1f, false)
         ) {
-            val height = componentHeightRow1 + ((componentHeightRow2 - componentHeightRow1) / 2)
-            setIsLineBroken(status.isDeveloperOptionsEnabled)
-            station(
-                rowHeight = height,
-                isAvailable = status.isDeveloperOptionsEnabled,
-            )
-            if (status.isDeveloperOptionsEnabled) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 28.dp, top = 16.dp)
+                    .onGloballyPositioned {
+                        componentHeightRow1 = with(density) {
+                            it.size.height.toDp()
+                        }
+                    },
+            ) {
                 Text(
-                    text = stringResource(id = R.string.developer_options_enabled_requirements)
+                    style = MaterialTheme.typography.headlineSmall,
+                    text = stringResource(id = R.string.title_pre_requirements)
                 )
-            } else {
+                Spacer(Modifier.size(16.dp))
                 Text(
-                    text = stringResource(id = R.string.developer_options_disabled_requirements)
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(id = R.string.content_pre_requirements)
                 )
+                Spacer(Modifier.size(16.dp))
             }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = stationRadius / 2, bottom = 24.dp)
-                .onGloballyPositioned {
-                    componentHeightRow2 = with(density) {
-                        it.size.height.toDp()
-                    }
-                },
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val height = componentHeightRow2 + ((componentHeightRow3 - componentHeightRow2) / 2)
-            setIsLineBroken(status.isDeveloperOptionsEnabled)
-            station(
-                rowHeight = height,
-                isAvailable = status.isSelectedMockLocationApp,
-                isAnyPreviousNotAvailable = isLineBroken,
-            )
-            if (status.isSelectedMockLocationApp) {
-                Text(text = stringResource(id = R.string.developer_options_selected_mock_location_app_requirements))
-            } else {
-                Text(text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements))
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = stationRadius / 2, bottom = 24.dp)
-                .onGloballyPositioned {
-                    componentHeightRow3 = with(density) {
-                        it.size.height.toDp()
-                    }
-                },
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val height = componentHeightRow3 + ((componentHeightRow4 - componentHeightRow3) / 2)
-            setIsLineBroken(status.isSelectedMockLocationApp)
-            station(
-                rowHeight = height,
-                isAvailable = status.isAccessToFineLocationGranted,
-                isAnyPreviousNotAvailable = isLineBroken,
-            )
-            if (status.isAccessToFineLocationGranted) {
-                Text(text = stringResource(id = R.string.fine_location_granted_requirements))
-            } else {
-                Text(text = stringResource(id = R.string.fine_location_permission_missing_requirements))
-                IconButton(onClick = {
-                    onRequestFineLocationPermissionClicked()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = stringResource(R.string.content_description_add_fine_location_permission)
-                    )
-                }
-                if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestLocationPermissionRationale) {
-                    IconButton(onClick = {
-                        onGoToSettingsClicked()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = stringResource(R.string.content_go_to_settings)
-                        )
-                    }
-                }
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = stationRadius / 2, bottom = 24.dp)
+                    .padding(start = stationRadius / 2, bottom = stationPadding)
                     .onGloballyPositioned {
-                        componentHeightRow4 = with(density) {
+                        componentHeightRow1 = with(density) {
                             it.size.height.toDp()
                         }
                     },
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                val height = componentHeightRow4 + ((componentHeightRow5 - componentHeightRow4) / 2)
-                setIsLineBroken(status.isAccessToFineLocationGranted)
+                val height = componentHeightRow1 + ((componentHeightRow2 - componentHeightRow1) / 2)
+                setIsLineBroken(status.isDeveloperOptionsEnabled)
                 station(
                     rowHeight = height,
-                    isAvailable = status.isAccessToBackgroundLocationGranted,
-                    isAnyPreviousNotAvailable = isLineBroken,
+                    isAvailable = status.isDeveloperOptionsEnabled,
                 )
-                if (status.isAccessToBackgroundLocationGranted) {
-                    Text(text = stringResource(id = R.string.background_location_granted_requirements))
-                } else {
-                    Text(text = stringResource(id = R.string.background_location_permission_missing_requirements))
-                    IconButton(onClick = {
-                        onRequestBackgroundLocationPermissionClicked()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = stringResource(R.string.content_description_add_background_location_permission)
+                Column {
+                    if (status.isDeveloperOptionsEnabled) {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.developer_options_enabled_requirements)
                         )
-                    }
-                }
-                if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
-                    IconButton(onClick = {
-                        onGoToSettingsClicked()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = stringResource(R.string.content_go_to_settings)
+                    } else {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.developer_options_disabled_requirements)
                         )
+                        OutlinedButton(onClick = { /*TODO*/ }) {
+                            Text(stringResource(id = R.string.button_add))
+                        }
                     }
                 }
             }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = stationRadius / 2, bottom = 24.dp)
+                    .padding(start = stationRadius / 2, bottom = stationPadding)
                     .onGloballyPositioned {
-                        componentHeightRow5 = with(density) {
+                        componentHeightRow2 = with(density) {
                             it.size.height.toDp()
                         }
                     },
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                setIsLineBroken(status.isAccessToBackgroundLocationGranted)
+                val height = componentHeightRow2 + ((componentHeightRow3 - componentHeightRow2) / 2)
+                setIsLineBroken(status.isDeveloperOptionsEnabled)
                 station(
-                    rowHeight = componentHeightRow5,
-                    isAvailable = status.isAllowedToShowNotification,
-                    isDestination = true,
+                    rowHeight = height,
+                    isAvailable = status.isSelectedMockLocationApp,
                     isAnyPreviousNotAvailable = isLineBroken,
                 )
-                if (status.isAllowedToShowNotification) {
-                    Text(text = stringResource(id = R.string.enabled_show_notification_requirements))
+                if (status.isSelectedMockLocationApp) {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = stringResource(id = R.string.developer_options_selected_mock_location_app_requirements)
+                    )
                 } else {
-                    Text(text = stringResource(id = R.string.disabled_show_notification_requirements))
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements)
+                    )
+                    TextButton(onClick = { /*TODO*/ }) {
+                        Text(stringResource(id = R.string.button_add))
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = stationRadius / 2, bottom = stationPadding)
+                    .onGloballyPositioned {
+                        componentHeightRow3 = with(density) {
+                            it.size.height.toDp()
+                        }
+                    },
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val height = componentHeightRow3 + ((componentHeightRow4 - componentHeightRow3) / 2)
+                setIsLineBroken(status.isSelectedMockLocationApp)
+                station(
+                    rowHeight = height,
+                    isAvailable = status.isAccessToFineLocationGranted,
+                    isAnyPreviousNotAvailable = isLineBroken,
+                )
+                if (status.isAccessToFineLocationGranted) {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = stringResource(id = R.string.fine_location_granted_requirements)
+                    )
+                } else {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = stringResource(id = R.string.fine_location_permission_missing_requirements)
+                    )
                     IconButton(onClick = {
-                        onRequestNotificationPermissionClicked()
+                        onRequestFineLocationPermissionClicked()
                     }) {
                         Icon(
                             imageVector = Icons.Default.AddCircle,
-                            contentDescription = stringResource(R.string.content_description_add_notification_permission)
+                            contentDescription = stringResource(R.string.content_description_add_fine_location_permission)
                         )
                     }
+                    if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestLocationPermissionRationale) {
+                        IconButton(onClick = {
+                            onGoToSettingsClicked()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = stringResource(R.string.content_go_to_settings)
+                            )
+                        }
+                    }
                 }
-                if (status.isAllowedToShowNotification.not() && status.shouldShowDialogRequestNotificationPermissionRationale) {
-                    IconButton(onClick = {
-                        onGoToSettingsClicked()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = stringResource(R.string.content_go_to_settings)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = stationRadius / 2, bottom = stationPadding)
+                        .onGloballyPositioned {
+                            componentHeightRow4 = with(density) {
+                                it.size.height.toDp()
+                            }
+                        },
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val height =
+                        componentHeightRow4 + ((componentHeightRow5 - componentHeightRow4) / 2)
+                    setIsLineBroken(status.isAccessToFineLocationGranted)
+                    station(
+                        rowHeight = height,
+                        isAvailable = status.isAccessToBackgroundLocationGranted,
+                        isAnyPreviousNotAvailable = isLineBroken,
+                    )
+                    if (status.isAccessToBackgroundLocationGranted) {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.background_location_granted_requirements)
                         )
+                    } else {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.background_location_permission_missing_requirements)
+                        )
+                        IconButton(onClick = {
+                            onRequestBackgroundLocationPermissionClicked()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.AddCircle,
+                                contentDescription = stringResource(R.string.content_description_add_background_location_permission)
+                            )
+                        }
+                    }
+                    if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
+                        IconButton(onClick = {
+                            onGoToSettingsClicked()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = stringResource(R.string.content_go_to_settings)
+                            )
+                        }
+                    }
+                }
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = stationRadius / 2, bottom = stationPadding)
+                        .onGloballyPositioned {
+                            componentHeightRow5 = with(density) {
+                                it.size.height.toDp()
+                            }
+                        },
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    setIsLineBroken(status.isAccessToBackgroundLocationGranted)
+                    station(
+                        rowHeight = componentHeightRow5,
+                        isAvailable = status.isAllowedToShowNotification,
+                        isDestination = true,
+                        isAnyPreviousNotAvailable = isLineBroken,
+                    )
+                    if (status.isAllowedToShowNotification) {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.enabled_show_notification_requirements)
+                        )
+                    } else {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.disabled_show_notification_requirements)
+                        )
+                        IconButton(onClick = {
+                            onRequestNotificationPermissionClicked()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.AddCircle,
+                                contentDescription = stringResource(R.string.content_description_add_notification_permission)
+                            )
+                        }
+                    }
+                    if (status.isAllowedToShowNotification.not() && status.shouldShowDialogRequestNotificationPermissionRationale) {
+                        IconButton(onClick = {
+                            onGoToSettingsClicked()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Warning,
+                                contentDescription = stringResource(R.string.content_go_to_settings)
+                            )
+                        }
                     }
                 }
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Button(onClick = {
+
+        Button(
+            onClick = {
                 onContinueClicked()
-            }) {
-                Text(text = if (status.isReady()) {
+            }, modifier = Modifier
+                .padding(bottom = 16.dp)
+                .align(alignment = Alignment.End)
+        ) {
+            Text(
+                text = if (status.isReady()) {
                     stringResource(id = R.string.button_continue)
                 } else {
                     stringResource(id = R.string.button_back)
-                })
-            }
+                }
+            )
         }
     }
 }

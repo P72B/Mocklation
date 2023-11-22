@@ -26,7 +26,7 @@ class RequirementsViewModel(
                 when (status) {
                     RequirementsState.Ready -> {
                         delay(2_000)
-                        navigator.navigateTo(Navigator.NavTarget.Simulation)
+                        //navigator.navigateTo(Navigator.NavTarget.Simulation)
                     }
 
                     is RequirementsState.Status -> _uiState.value =
