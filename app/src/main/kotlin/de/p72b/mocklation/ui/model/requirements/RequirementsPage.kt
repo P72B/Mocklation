@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -56,6 +58,25 @@ fun RequirementsPage(
             viewModel::onRequestNotificationPermissionClicked,
             viewModel::onGoToSettingsClicked,
             viewModel::onContinueClicked
+        )
+    }
+}
+
+@Composable
+fun showRationale() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = stringResource(R.string.content_go_to_settings)
+        )
+        Spacer(Modifier.size(8.dp))
+        Text(
+            style = MaterialTheme.typography.bodySmall,
+            text = stringResource(id = R.string.requirements_enable_permission_manually_hint)
         )
     }
 }
@@ -89,7 +110,7 @@ fun station(
         modifier = Modifier.padding(end = stationRadius / 2)
     ) {
         val height = rowHeight + 24.dp
-        var circleRadius = stationRadius / 2
+        val circleRadius = stationRadius / 2
         if (isDestination.not()) {
             drawLine(
                 start = Offset(0f, 0f),
@@ -207,19 +228,20 @@ fun StatusScreen(
                     rowHeight = height,
                     isAvailable = status.isDeveloperOptionsEnabled,
                 )
-                Column {
-                    if (status.isDeveloperOptionsEnabled) {
-                        Text(
-                            style = MaterialTheme.typography.bodyLarge,
-                            text = stringResource(id = R.string.developer_options_enabled_requirements)
-                        )
-                    } else {
+                if (status.isDeveloperOptionsEnabled) {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = stringResource(id = R.string.developer_options_enabled_requirements)
+                    )
+                } else {
+                    Column {
                         Text(
                             style = MaterialTheme.typography.bodyLarge,
                             text = stringResource(id = R.string.developer_options_disabled_requirements)
                         )
-                        OutlinedButton(onClick = { /*TODO*/ }) {
-                            Text(stringResource(id = R.string.button_add))
+                        Spacer(Modifier.size(8.dp))
+                        Button(onClick = { /*TODO*/ }) {
+                            Text(stringResource(id = R.string.button_enable))
                         }
                     }
                 }
@@ -249,12 +271,15 @@ fun StatusScreen(
                         text = stringResource(id = R.string.developer_options_selected_mock_location_app_requirements)
                     )
                 } else {
-                    Text(
-                        style = MaterialTheme.typography.bodyLarge,
-                        text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements)
-                    )
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(stringResource(id = R.string.button_add))
+                    Column {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements)
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        Button(onClick = { /*TODO*/ }) {
+                            Text(stringResource(id = R.string.button_appoint))
+                        }
                     }
                 }
             }
@@ -283,26 +308,24 @@ fun StatusScreen(
                         text = stringResource(id = R.string.fine_location_granted_requirements)
                     )
                 } else {
-                    Text(
-                        style = MaterialTheme.typography.bodyLarge,
-                        text = stringResource(id = R.string.fine_location_permission_missing_requirements)
-                    )
-                    IconButton(onClick = {
-                        onRequestFineLocationPermissionClicked()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = stringResource(R.string.content_description_add_fine_location_permission)
+                    Column {
+                        Text(
+                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(id = R.string.fine_location_permission_missing_requirements)
                         )
-                    }
-                    if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestLocationPermissionRationale) {
-                        IconButton(onClick = {
-                            onGoToSettingsClicked()
+                        Spacer(Modifier.size(8.dp))
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = stringResource(id = R.string.fine_location_permission_missing_requirements_explanation)
+                        )
+                        if (status.shouldShowDialogRequestLocationPermissionRationale) {
+                            showRationale()
+                        }
+                        Spacer(Modifier.size(8.dp))
+                        Button(onClick = {
+                            onRequestFineLocationPermissionClicked()
                         }) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = stringResource(R.string.content_go_to_settings)
-                            )
+                            Text(stringResource(id = R.string.content_description_add_fine_location_permission))
                         }
                     }
                 }
@@ -327,6 +350,7 @@ fun StatusScreen(
                         rowHeight = height,
                         isAvailable = status.isAccessToBackgroundLocationGranted,
                         isAnyPreviousNotAvailable = isLineBroken,
+                        isDestination = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                     )
                     if (status.isAccessToBackgroundLocationGranted) {
                         Text(
@@ -334,27 +358,28 @@ fun StatusScreen(
                             text = stringResource(id = R.string.background_location_granted_requirements)
                         )
                     } else {
-                        Text(
-                            style = MaterialTheme.typography.bodyLarge,
-                            text = stringResource(id = R.string.background_location_permission_missing_requirements)
-                        )
-                        IconButton(onClick = {
-                            onRequestBackgroundLocationPermissionClicked()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.AddCircle,
-                                contentDescription = stringResource(R.string.content_description_add_background_location_permission)
+                        Column {
+                            Text(
+                                style = MaterialTheme.typography.bodyLarge,
+                                text = stringResource(id = R.string.background_location_permission_missing_requirements)
                             )
-                        }
-                    }
-                    if (status.isAccessToBackgroundLocationGranted.not() && status.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
-                        IconButton(onClick = {
-                            onGoToSettingsClicked()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = stringResource(R.string.content_go_to_settings)
+                            Spacer(Modifier.size(8.dp))
+                            Text(
+                                style = MaterialTheme.typography.bodyMedium,
+                                text = stringResource(id = R.string.background_location_permission_missing_requirements_explanation)
                             )
+                            if (status.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
+                                showRationale()
+                            }
+                            Spacer(Modifier.size(8.dp))
+                            Button(
+                                onClick = {
+                                    onRequestBackgroundLocationPermissionClicked()
+                                },
+                                enabled = status.isAccessToFineLocationGranted
+                            ) {
+                                Text(stringResource(R.string.content_description_add_background_location_permission))
+                            }
                         }
                     }
                 }
@@ -385,27 +410,25 @@ fun StatusScreen(
                             text = stringResource(id = R.string.enabled_show_notification_requirements)
                         )
                     } else {
-                        Text(
-                            style = MaterialTheme.typography.bodyLarge,
-                            text = stringResource(id = R.string.disabled_show_notification_requirements)
-                        )
-                        IconButton(onClick = {
-                            onRequestNotificationPermissionClicked()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.AddCircle,
-                                contentDescription = stringResource(R.string.content_description_add_notification_permission)
+                        Column {
+                            Text(
+                                style = MaterialTheme.typography.bodyLarge,
+                                text = stringResource(id = R.string.disabled_show_notification_requirements)
                             )
-                        }
-                    }
-                    if (status.isAllowedToShowNotification.not() && status.shouldShowDialogRequestNotificationPermissionRationale) {
-                        IconButton(onClick = {
-                            onGoToSettingsClicked()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Warning,
-                                contentDescription = stringResource(R.string.content_go_to_settings)
+                            Spacer(Modifier.size(8.dp))
+                            Text(
+                                style = MaterialTheme.typography.bodyMedium,
+                                text = stringResource(id = R.string.disabled_show_notification_requirements_explanation)
                             )
+                            if (status.shouldShowDialogRequestNotificationPermissionRationale) {
+                                showRationale()
+                            }
+                            Spacer(Modifier.size(8.dp))
+                            Button(onClick = {
+                                onRequestNotificationPermissionClicked()
+                            }) {
+                                Text(stringResource(R.string.content_description_add_notification_permission))
+                            }
                         }
                     }
                 }
@@ -416,7 +439,7 @@ fun StatusScreen(
             onClick = {
                 onContinueClicked()
             }, modifier = Modifier
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp, top = 8.dp)
                 .align(alignment = Alignment.End)
         ) {
             Text(
