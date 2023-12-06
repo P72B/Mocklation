@@ -2,6 +2,7 @@ package de.p72b.mocklation.ui.model.requirements
 
 import android.os.Build
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,16 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -56,18 +51,25 @@ fun RequirementsPage(
             viewModel::onRequestFineLocationPermissionClicked,
             viewModel::onRequestBackgroundLocationPermissionClicked,
             viewModel::onRequestNotificationPermissionClicked,
-            viewModel::onGoToSettingsClicked,
-            viewModel::onContinueClicked
+            viewModel::onGoToAppSettingsClicked,
+            viewModel::onContinueClicked,
+            viewModel::onGoToDeveloperSettingsClicked,
+            viewModel::onGoToAboutPhoneSettingsClicked
         )
     }
 }
 
 @Composable
-fun showRationale() {
+fun showRationale(
+    onGoToSettingsClicked: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
+            .clickable {
+                onGoToSettingsClicked()
+            }
     ) {
         Icon(
             imageVector = Icons.Default.Warning,
@@ -162,7 +164,9 @@ fun StatusScreen(
     onRequestBackgroundLocationPermissionClicked: () -> Unit,
     onRequestNotificationPermissionClicked: () -> Unit,
     onGoToSettingsClicked: () -> Unit,
-    onContinueClicked: () -> Unit
+    onContinueClicked: () -> Unit,
+    onGoToDeveloperSettingsClicked: () -> Unit,
+    onGoToAboutPhoneSettingsClicked: () -> Unit
 ) {
     var componentHeightRow1 by remember { mutableStateOf(0.dp) }
     var componentHeightRow2 by remember { mutableStateOf(0.dp) }
@@ -240,7 +244,12 @@ fun StatusScreen(
                             text = stringResource(id = R.string.developer_options_disabled_requirements)
                         )
                         Spacer(Modifier.size(8.dp))
-                        Button(onClick = { /*TODO*/ }) {
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = stringResource(id = R.string.developer_options_disabled_explanation_requirements)
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        Button(onClick = { onGoToAboutPhoneSettingsClicked() }) {
                             Text(stringResource(id = R.string.button_enable))
                         }
                     }
@@ -277,7 +286,22 @@ fun StatusScreen(
                             text = stringResource(id = R.string.developer_options_unselected_mock_location_app_requirements)
                         )
                         Spacer(Modifier.size(8.dp))
-                        Button(onClick = { /*TODO*/ }) {
+                        Text(
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = stringResource(id = R.string.developer_options_unselected_mock_location_app_explanation_requirements)
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        if (status.isDeveloperOptionsEnabled.not()) {
+                            Text(
+                                style = MaterialTheme.typography.bodySmall,
+                                text = stringResource(id = R.string.developer_options_unselected_mock_location_app_without_developer_options_requirements)
+                            )
+                            Spacer(Modifier.size(8.dp))
+                        }
+                        Button(
+                            onClick = { onGoToDeveloperSettingsClicked() },
+                            enabled = status.isDeveloperOptionsEnabled
+                        ) {
                             Text(stringResource(id = R.string.button_appoint))
                         }
                     }
@@ -319,7 +343,7 @@ fun StatusScreen(
                             text = stringResource(id = R.string.fine_location_permission_missing_requirements_explanation)
                         )
                         if (status.shouldShowDialogRequestLocationPermissionRationale) {
-                            showRationale()
+                            showRationale(onGoToSettingsClicked)
                         }
                         Spacer(Modifier.size(8.dp))
                         Button(onClick = {
@@ -369,9 +393,16 @@ fun StatusScreen(
                                 text = stringResource(id = R.string.background_location_permission_missing_requirements_explanation)
                             )
                             if (status.shouldShowDialogRequestBackgroundLocationPermissionRationale) {
-                                showRationale()
+                                showRationale(onGoToSettingsClicked)
                             }
                             Spacer(Modifier.size(8.dp))
+                            if (status.isAccessToFineLocationGranted.not()) {
+                                Text(
+                                    style = MaterialTheme.typography.bodySmall,
+                                    text = stringResource(id = R.string.background_location_permission_missing_without_fine_location_permission_requirements_explanation)
+                                )
+                                Spacer(Modifier.size(8.dp))
+                            }
                             Button(
                                 onClick = {
                                     onRequestBackgroundLocationPermissionClicked()
@@ -421,7 +452,7 @@ fun StatusScreen(
                                 text = stringResource(id = R.string.disabled_show_notification_requirements_explanation)
                             )
                             if (status.shouldShowDialogRequestNotificationPermissionRationale) {
-                                showRationale()
+                                showRationale(onGoToSettingsClicked)
                             }
                             Spacer(Modifier.size(8.dp))
                             Button(onClick = {
@@ -443,7 +474,7 @@ fun StatusScreen(
                 .align(alignment = Alignment.End)
         ) {
             Text(
-                text = if (status.isReady()) {
+                text = if (status.canContinue) {
                     stringResource(id = R.string.button_continue)
                 } else {
                     stringResource(id = R.string.button_back)

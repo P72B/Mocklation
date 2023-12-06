@@ -1,9 +1,12 @@
 package de.p72b.mocklation
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -22,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import de.p72b.mocklation.service.RequirementsService
 import de.p72b.mocklation.ui.MainNavigation
 import de.p72b.mocklation.ui.Navigator
+import de.p72b.mocklation.ui.model.requirements.Action
 import de.p72b.mocklation.ui.model.requirements.PermissionRequest
 import de.p72b.mocklation.ui.model.requirements.RequirementsViewModel
 import de.p72b.mocklation.ui.theme.AppTheme
@@ -90,6 +94,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                requirementsViewModel.action.collect { target ->
+                    when (target) {
+                        Action.OpenAppSettings -> openAppSystemSettings()
+                        Action.OpenDeveloperSettings -> openDeveloperSettings()
+                        Action.OpenAboutPhoneSettings -> openAboutPhoneSettings()
+                        null -> {
+                            // nothing to do here
+                        }
+                    }
+                }
+            }
         }
 
         lifecycleScope.launch {
@@ -223,6 +242,21 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         requestPermissionLauncher.unregister()
         super.onDestroy()
+    }
+
+    private fun openAppSystemSettings() {
+        startActivity(Intent().apply {
+            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = Uri.fromParts("package", packageName, null)
+        })
+    }
+
+    private fun openDeveloperSettings() {
+        startActivity(Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS))
+    }
+
+    private fun openAboutPhoneSettings() {
+        startActivity(Intent(Settings.ACTION_DEVICE_INFO_SETTINGS))
     }
 
     object PermissionUtil {

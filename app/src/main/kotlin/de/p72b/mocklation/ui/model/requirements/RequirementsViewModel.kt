@@ -18,6 +18,8 @@ class RequirementsViewModel(
     val uiState: StateFlow<RequirementsUIState> = _uiState
     private val _requestPermission = MutableStateFlow<PermissionRequest?>(null)
     val requestPermission: StateFlow<PermissionRequest?> = _requestPermission
+    private val _action = MutableStateFlow<Action?>(null)
+    val action: StateFlow<Action?> = _action
     private var count = 0
 
     init {
@@ -25,6 +27,17 @@ class RequirementsViewModel(
             requirementsService.requirementsState.collect { status ->
                 when (status) {
                     RequirementsState.Ready -> {
+                        _uiState.value = RequirementsUIState.Status(
+                            isDeveloperOptionsEnabled = true,
+                            isSelectedMockLocationApp = true,
+                            isAccessToFineLocationGranted = true,
+                            isAccessToBackgroundLocationGranted = true,
+                            isAllowedToShowNotification = true,
+                            shouldShowDialogRequestLocationPermissionRationale = true,
+                            shouldShowDialogRequestBackgroundLocationPermissionRationale = true,
+                            shouldShowDialogRequestNotificationPermissionRationale = true,
+                            canContinue = true
+                        )
                         delay(2_000)
                         //navigator.navigateTo(Navigator.NavTarget.Simulation)
                     }
@@ -38,7 +51,8 @@ class RequirementsViewModel(
                             isAllowedToShowNotification = status.isAllowedToShowNotification,
                             shouldShowDialogRequestLocationPermissionRationale = status.shouldShowDialogRequestLocationPermissionRationale,
                             shouldShowDialogRequestBackgroundLocationPermissionRationale = status.shouldShowDialogRequestBackgroundLocationPermissionRationale,
-                            shouldShowDialogRequestNotificationPermissionRationale = status.shouldShowDialogRequestNotificationPermissionRationale
+                            shouldShowDialogRequestNotificationPermissionRationale = status.shouldShowDialogRequestNotificationPermissionRationale,
+                            canContinue = false
                         )
                 }
             }
@@ -48,20 +62,34 @@ class RequirementsViewModel(
     fun onRequestFineLocationPermissionClicked() {
         count++
         _requestPermission.value = PermissionRequest.PermissionFineLocation(count++)
+        _requestPermission.value = null
     }
 
     fun onRequestBackgroundLocationPermissionClicked() {
         count++
         _requestPermission.value = PermissionRequest.PermissionBackgroundLocation(count++)
+        _requestPermission.value = null
     }
 
     fun onRequestNotificationPermissionClicked() {
         count++
         _requestPermission.value = PermissionRequest.PermissionNotification(count++)
+        _requestPermission.value = null
     }
 
-    fun onGoToSettingsClicked() {
+    fun onGoToAppSettingsClicked() {
+        _action.value = Action.OpenAppSettings
+        _action.value = null
+    }
 
+    fun onGoToDeveloperSettingsClicked() {
+        _action.value = Action.OpenDeveloperSettings
+        _action.value = null
+    }
+
+    fun onGoToAboutPhoneSettingsClicked() {
+        _action.value = Action.OpenAboutPhoneSettings
+        _action.value = null
     }
 
     fun onContinueClicked() {
@@ -72,30 +100,26 @@ class RequirementsViewModel(
 sealed interface RequirementsUIState {
     data object Verifying : RequirementsUIState
     data class Status(
-        val isDeveloperOptionsEnabled: Boolean,
-        val isSelectedMockLocationApp: Boolean,
-        val isAccessToFineLocationGranted: Boolean,
-        val isAccessToBackgroundLocationGranted: Boolean,
-        val isAllowedToShowNotification: Boolean,
-        val shouldShowDialogRequestLocationPermissionRationale: Boolean,
-        val shouldShowDialogRequestBackgroundLocationPermissionRationale: Boolean,
-        val shouldShowDialogRequestNotificationPermissionRationale: Boolean
-    ) : RequirementsUIState {
-        fun isReady(): Boolean {
-            return isDeveloperOptionsEnabled
-                    && isSelectedMockLocationApp
-                    && isAccessToFineLocationGranted
-                    && isAccessToBackgroundLocationGranted
-                    && isAllowedToShowNotification
-                    && shouldShowDialogRequestLocationPermissionRationale
-                    && shouldShowDialogRequestBackgroundLocationPermissionRationale
-                    && shouldShowDialogRequestNotificationPermissionRationale
-        }
-    }
+        val isDeveloperOptionsEnabled: Boolean = false,
+        val isSelectedMockLocationApp: Boolean = false,
+        val isAccessToFineLocationGranted: Boolean = false,
+        val isAccessToBackgroundLocationGranted: Boolean = false,
+        val isAllowedToShowNotification: Boolean = false,
+        val shouldShowDialogRequestLocationPermissionRationale: Boolean = false,
+        val shouldShowDialogRequestBackgroundLocationPermissionRationale: Boolean = false,
+        val shouldShowDialogRequestNotificationPermissionRationale: Boolean = false,
+        val canContinue: Boolean = false
+    ) : RequirementsUIState
 }
 
 sealed interface PermissionRequest {
     data class PermissionFineLocation(val count: Int = 0) : PermissionRequest
     data class PermissionBackgroundLocation(val count: Int = 0) : PermissionRequest
     data class PermissionNotification(val count: Int = 0) : PermissionRequest
+}
+
+sealed interface Action {
+    data object OpenAppSettings : Action
+    data object OpenDeveloperSettings : Action
+    data object OpenAboutPhoneSettings : Action
 }

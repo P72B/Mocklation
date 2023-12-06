@@ -80,12 +80,15 @@ class RequirementsService(private val application: Context) : LifecycleEventObse
             && isSelectedMockLocationApp
             && foregroundFineLocationPermissionEnabled
             && backgroundLocationPermissionEnabled
-            && isAllowedToShowNotification
             && shouldShowDialogRequestLocationPermissionRationale.not()
             && shouldShowDialogRequestBackgroundLocationPermissionRationale.not()
-            && shouldShowDialogRequestNotificationPermissionRationale.not()
         ) {
-            _requirementsState.value = RequirementsState.Ready
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                _requirementsState.value = RequirementsState.Ready
+            } else if (isAllowedToShowNotification
+                && shouldShowDialogRequestNotificationPermissionRationale.not()) {
+                _requirementsState.value = RequirementsState.Ready
+            }
         }
     }
 }
