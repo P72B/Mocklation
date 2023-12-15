@@ -5,6 +5,9 @@ plugins {
     id("com.android.library") version "8.1.1" apply false
 }
 
-val androidCoreKtxVersion by extra { "1.12.0" }
-val mapsUtilsKtxVersion by extra { "3.4.0" }
-val koinVersion by extra { "3.5.0" }
+val androidMinSdk by extra { 26 }
+val appVersionName by extra { "2.0.0" }
+val androidVersionCode by extra { 503 }
+val androidCompileSdk by extra { 34 }
+val javaTarget by extra { "17" }
+val javaVersion by extra { JavaVersion.VERSION_17 }

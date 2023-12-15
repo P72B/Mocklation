@@ -3,12 +3,17 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val androidMinSdk: Int by rootProject.extra
+val androidCompileSdk: Int by rootProject.extra
+val javaTarget: String by rootProject.extra
+val javaVersion: JavaVersion by rootProject.extra
+
 android {
     namespace = "de.p72b.mocklation.data"
-    compileSdk = 33
+    compileSdk = androidCompileSdk
 
     defaultConfig {
-        minSdk = 24
+        minSdk = androidMinSdk
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -24,20 +29,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = javaTarget
     }
 }
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

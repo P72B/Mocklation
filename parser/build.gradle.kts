@@ -5,12 +5,17 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+val androidMinSdk: Int by rootProject.extra
+val androidCompileSdk: Int by rootProject.extra
+val javaTarget: String by rootProject.extra
+val javaVersion: JavaVersion by rootProject.extra
+
 android {
     namespace = "de.p72b.mocklation.parser"
-    compileSdk = 33
+    compileSdk = androidCompileSdk
 
     defaultConfig {
-        minSdk = 24
+        minSdk = androidMinSdk
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -26,21 +31,18 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = javaTarget
     }
 }
-val androidCoreKtxVersion: String by rootProject.extra
-val mapsUtilsKtxVersion: String by rootProject.extra
-val koinVersion: String by rootProject.extra
 
 dependencies {
     implementation(project(":data"))
 
-    implementation("androidx.core:core-ktx:$androidCoreKtxVersion")
-    implementation("com.google.maps.android:maps-utils-ktx:$mapsUtilsKtxVersion")
-    implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.google.maps.utils)
+    implementation(libs.koin.compose)
 }
