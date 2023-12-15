@@ -1,6 +1,7 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 val androidMinSdk: Int by rootProject.extra
@@ -69,4 +70,5 @@ dependencies {
 
     implementation(libs.google.play.services.location)
     implementation(libs.google.maps.utils)
+    ksp(libs.androidx.room.compiler)
 }

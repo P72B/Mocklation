@@ -20,6 +20,9 @@ fun CollectionPage(modifier: Modifier = Modifier, viewModel: CollectionViewModel
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
         CollectionUIState.Loading -> LoadingCollectionScreen(modifier)
+        is CollectionUIState.Data -> DataCollectionScreen(modifier)
+        CollectionUIState.Empty -> EmptyCollectionScreen(modifier)
+        CollectionUIState.Error -> TODO()
     }
 }
 
@@ -36,5 +39,23 @@ internal fun LoadingCollectionScreen(
         ) {
             Text(text = stringResource(id = R.string.loading))
         }
+    }
+}
+
+@Composable
+internal fun EmptyCollectionScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        Text(text = "Empty TODO")
+    }
+}
+
+@Composable
+internal fun DataCollectionScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        Text(text = "List TODO")
     }
 }

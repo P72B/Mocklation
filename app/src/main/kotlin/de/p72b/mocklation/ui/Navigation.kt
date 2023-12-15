@@ -56,13 +56,22 @@ fun MainNavigation(
     navController: NavHostController,
     navigator: Navigator
 ) {
+    val buttonsVisible = remember { mutableStateOf(true) }
     LaunchedEffect("navigation") {
         navigator.sharedFlow.onEach {
+            when (it.label) {
+                Navigator.NavTarget.Dashboard.label,
+                Navigator.NavTarget.Collection.label -> {
+                    buttonsVisible.value = true
+                }
+                else -> {
+                    buttonsVisible.value = false
+                }
+            }
             navController.navigate(it.label)
         }.launchIn(this)
     }
 
-    val buttonsVisible = remember { mutableStateOf(true) }
     Scaffold(
         bottomBar = {
             BottomNavigation(
@@ -73,13 +82,17 @@ fun MainNavigation(
         },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    // TODO
-                },
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(id = R.string.button_add))
+            val navBackStackEntry = navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry.value?.destination?.route
+            if (Navigator.NavTarget.Collection.label == currentRoute) {
+                FloatingActionButton(
+                    onClick = {
+                        // TODO
+                    },
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(id = R.string.button_add))
+                }
             }
         }
     ) { paddingValues ->
@@ -95,7 +108,7 @@ fun MainNavigation(
 fun NavigationGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Navigator.NavTarget.Requirements.label
+        startDestination = Navigator.NavTarget.Dashboard.label
     ) {
         composable(Navigator.NavTarget.Simulation.label) {
             SimulationPage(
@@ -140,31 +153,32 @@ fun BottomNavigation(
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
-
-    NavigationBar(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
-        screens.forEach { screen ->
-            NavigationBarItem(
-                icon = {
-                    Icon(imageVector = screen.icon!!, contentDescription = "")
-                },
-                selected = currentRoute == screen.label,
-                onClick = {
-                    navController.navigate(screen.label) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+    if (state.value) {
+        NavigationBar(
+            modifier = modifier,
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            screens.forEach { screen ->
+                NavigationBarItem(
+                    icon = {
+                        if (currentRoute == screen.label) {
+                            Icon(imageVector = screen.selectedIcon!!, contentDescription = screen.label)
+                        } else {
+                            Icon(imageVector = screen.icon!!, contentDescription = screen.label)
                         }
-                        launchSingleTop = true
-                        restoreState = true
+                    },
+                    selected = currentRoute == screen.label,
+                    onClick = {
+                        navController.navigate(screen.label) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    unselectedTextColor = LocalContentColor.current.copy(alpha = 0f),
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface
-                ),
-            )
+                )
+            }
         }
     }
 }

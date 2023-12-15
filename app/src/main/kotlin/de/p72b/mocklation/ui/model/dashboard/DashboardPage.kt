@@ -9,22 +9,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.p72b.mocklation.R
 
 @Composable
 fun DashboardPage(modifier: Modifier = Modifier, viewModel: DashboardViewModel = koinViewModel()) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
-        DashboardUIState.Loading -> LoadingDashboardScreen(modifier)
+        DashboardUIState.HomeDashboard -> HomeDashboardScreen(modifier)
     }
 }
 
 @Composable
-internal fun LoadingDashboardScreen(
+internal fun HomeDashboardScreen(
     modifier: Modifier = Modifier
 ) {
     Column(modifier) {
@@ -34,7 +32,7 @@ internal fun LoadingDashboardScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = stringResource(id = R.string.loading))
+            Text(text = "Home TODO")
         }
     }
 }

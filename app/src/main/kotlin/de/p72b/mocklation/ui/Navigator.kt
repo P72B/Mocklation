@@ -1,6 +1,8 @@
 package de.p72b.mocklation.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,11 +21,12 @@ class Navigator {
 
     enum class NavTarget(
         val label: String,
-        val icon: ImageVector? = null
+        val icon: ImageVector? = null,
+        val selectedIcon: ImageVector? = null,
     ) {
         Simulation("simulation"),
         Requirements("requirements"),
-        Dashboard("dashboard", Icons.Outlined.Home),
-        Collection("collection", Icons.Outlined.List)
+        Dashboard("dashboard", Icons.Outlined.Home, Icons.Filled.Home),
+        Collection("collection", Icons.Outlined.List, Icons.Filled.List)
     }
 }

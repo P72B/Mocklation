@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class DashboardViewModel() : ViewModel() {
 
-    private val _uiState = MutableStateFlow<DashboardUIState>(DashboardUIState.Loading)
+    private val _uiState = MutableStateFlow<DashboardUIState>(DashboardUIState.HomeDashboard)
     val uiState: StateFlow<DashboardUIState> = _uiState
 
     private fun updateUi(uiState: DashboardUIState) {
@@ -16,5 +16,5 @@ class DashboardViewModel() : ViewModel() {
 }
 
 sealed interface DashboardUIState {
-    data object Loading : DashboardUIState
+    data object HomeDashboard : DashboardUIState
 }
