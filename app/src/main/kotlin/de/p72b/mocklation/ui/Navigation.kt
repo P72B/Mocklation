@@ -16,6 +16,7 @@
 
 package de.p72b.mocklation.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -36,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -46,6 +48,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import de.p72b.mocklation.R
 import de.p72b.mocklation.ui.model.collection.CollectionPage
 import de.p72b.mocklation.ui.model.dashboard.DashboardPage
+import de.p72b.mocklation.ui.model.map.MapActivity
 import de.p72b.mocklation.ui.model.requirements.RequirementsPage
 import de.p72b.mocklation.ui.model.simulation.SimulationPage
 import kotlinx.coroutines.flow.launchIn
@@ -56,6 +59,7 @@ fun MainNavigation(
     navController: NavHostController,
     navigator: Navigator
 ) {
+    val context = LocalContext.current
     val buttonsVisible = remember { mutableStateOf(true) }
     LaunchedEffect("navigation") {
         navigator.sharedFlow.onEach {
@@ -87,7 +91,7 @@ fun MainNavigation(
             if (Navigator.NavTarget.Collection.label == currentRoute) {
                 FloatingActionButton(
                     onClick = {
-                        // TODO
+                        context.startActivity(Intent(context, MapActivity::class.java))
                     },
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {

@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-    class SimulationViewModel(private val simulationService: ForegroundServiceInteractor) : ViewModel() {
+class SimulationViewModel(
+    private val simulationService: ForegroundServiceInteractor
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SimulationUIState>(SimulationUIState.Loading)
     val uiState: StateFlow<SimulationUIState> = _uiState

@@ -22,6 +22,10 @@
         android:theme="@style/Theme.AppTheme"
         tools:targetApi="31">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -31,6 +35,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.model.map.MapActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppTheme"/>
 
         <service
             android:name=".service.ForegroundService"

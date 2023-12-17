@@ -13,7 +13,7 @@ class FeatureRepository(
     private val featureMapper: FeatureMapper
 ) {
 
-    suspend fun getCoinCollection(): Resource<List<Feature>> {
+    suspend fun getFeatureCollection(): Resource<List<Feature>> {
         return withContext(Dispatchers.IO) {
             Resource(status = Status.SUCCESS, data = mapFeatures(featureDatabase.featureDao().getAll()))
         }

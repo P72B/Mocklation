@@ -8,6 +8,6 @@ class GetCollectionUseCase(
     private val repository: FeatureRepository
 ) {
     suspend fun invoke(): Resource<List<Feature>> {
-        return repository.getCoinCollection()
+        return repository.getFeatureCollection()
     }
 }

@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -10,6 +12,8 @@ val androidVersionCode: Int by rootProject.extra
 val appVersionName: String by rootProject.extra
 val javaTarget: String by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
+
+val key: String = gradleLocalProperties(rootDir).getProperty("GOOGLE_MAPS_API_KEY")
 
 android {
     namespace = "de.p72b.mocklation"
@@ -26,9 +30,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            resValue("string", "google_maps_key", key)
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            resValue("string", "google_maps_key", key)
         }
     }
 
@@ -67,6 +75,7 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.google.maps.compose)
 
     implementation(libs.google.play.services.location)
     implementation(libs.google.maps.utils)
