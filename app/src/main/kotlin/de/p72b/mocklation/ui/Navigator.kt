@@ -26,7 +26,7 @@ class Navigator {
         val icon: ImageVector? = null,
         val selectedIcon: ImageVector? = null,
     ) {
-        Simulation("simulation", Icons.Outlined.PlayArrow, Icons.Filled.PlayArrow),
+        Simulation("simulation"),
         Requirements("requirements"),
         Dashboard("dashboard", Icons.Outlined.Home, Icons.Filled.Home),
         Collection("collection", Icons.Outlined.List, Icons.Filled.List)

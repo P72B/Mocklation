@@ -21,22 +21,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -45,20 +47,30 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import de.p72b.mocklation.R
 import de.p72b.mocklation.ui.model.collection.CollectionPage
 import de.p72b.mocklation.ui.model.dashboard.DashboardPage
 import de.p72b.mocklation.ui.model.map.MapActivity
+import de.p72b.mocklation.ui.model.map.MapBottomSheet
 import de.p72b.mocklation.ui.model.requirements.RequirementsPage
 import de.p72b.mocklation.ui.model.simulation.SimulationPage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigation(
     navController: NavHostController,
     navigator: Navigator
 ) {
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Expanded
+    )
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = sheetState
+    )
+
     val context = LocalContext.current
     val buttonsVisible = remember { mutableStateOf(true) }
     LaunchedEffect("navigation") {
@@ -68,6 +80,7 @@ fun MainNavigation(
                 Navigator.NavTarget.Collection.label -> {
                     buttonsVisible.value = true
                 }
+
                 else -> {
                     buttonsVisible.value = false
                 }
@@ -95,15 +108,28 @@ fun MainNavigation(
                     },
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(id = R.string.button_add))
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(id = R.string.button_add)
+                    )
                 }
             }
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier.padding(paddingValues)
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetContent = {
+                SimulationPage(
+                    modifier = Modifier.padding(paddingValues)
+                )
+            },
+            sheetPeekHeight = 0.dp,
         ) {
-            NavigationGraph(navController = navController)
+            Box(
+                modifier = Modifier.padding(paddingValues)
+            ) {
+                NavigationGraph(navController = navController)
+            }
         }
     }
 }
@@ -150,7 +176,7 @@ fun BottomNavigation(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Navigator.NavTarget.Simulation,
+        Navigator.NavTarget.Dashboard,
         Navigator.NavTarget.Collection
     )
     navController.currentBackStackEntryAsState()
@@ -166,7 +192,10 @@ fun BottomNavigation(
                 NavigationBarItem(
                     icon = {
                         if (currentRoute == screen.label) {
-                            Icon(imageVector = screen.selectedIcon!!, contentDescription = screen.label)
+                            Icon(
+                                imageVector = screen.selectedIcon!!,
+                                contentDescription = screen.label
+                            )
                         } else {
                             Icon(imageVector = screen.icon!!, contentDescription = screen.label)
                         }

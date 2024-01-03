@@ -18,7 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.p72b.mocklation.R
 
 @Composable
-fun SimulationPage(modifier: Modifier = Modifier, viewModel: SimulationViewModel = koinViewModel()) {
+fun SimulationPage(modifier: Modifier, viewModel: SimulationViewModel = koinViewModel()) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
         SimulationUIState.Loading -> LoadingSimulationScreen(modifier)

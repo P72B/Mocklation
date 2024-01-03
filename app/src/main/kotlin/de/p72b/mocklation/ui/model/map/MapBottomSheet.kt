@@ -1,6 +1,5 @@
 package de.p72b.mocklation.ui.model.map
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,11 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.p72b.mocklation.R
 import de.p72b.mocklation.data.Node
-import de.p72b.mocklation.util.roundTo
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun BottomSheet(
+fun MapBottomSheet(
     viewModel: MapViewModel = koinViewModel(),
 ) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
@@ -71,19 +69,5 @@ fun NodeView(
                 text = stringResource(id = R.string.button_save)
             )
         }
-    }
-}
-
-@Composable
-fun Empty() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Sorry empty"
-        )
     }
 }
