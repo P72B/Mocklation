@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.jetbrains.kotlinx.json)
 }
 
 val androidMinSdk: Int by rootProject.extra
@@ -52,7 +53,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
 
     kotlinOptions {
@@ -68,6 +69,7 @@ dependencies {
     implementation(composeBom)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.compose.material3)
+    //implementation(libs.androidx.compose.preview)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
@@ -76,6 +78,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.google.maps.compose)
+    implementation(libs.kotlinx.json)
 
     implementation(libs.google.play.services.location)
     implementation(libs.google.maps.utils)

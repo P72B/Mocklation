@@ -1,6 +1,7 @@
 package de.p72b.mocklation.di
 
 import de.p72b.mocklation.data.FeatureRepository
+import de.p72b.mocklation.data.mapper.FeatureEntityMapper
 import de.p72b.mocklation.data.mapper.FeatureMapper
 import de.p72b.mocklation.data.room.FeatureDatabase
 import de.p72b.mocklation.usecase.GetCollectionUseCase
@@ -12,6 +13,7 @@ import de.p72b.mocklation.ui.model.dashboard.DashboardViewModel
 import de.p72b.mocklation.ui.model.map.MapViewModel
 import de.p72b.mocklation.ui.model.requirements.RequirementsViewModel
 import de.p72b.mocklation.ui.model.simulation.SimulationViewModel
+import de.p72b.mocklation.usecase.SetFeatureUseCase
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -23,7 +25,8 @@ val appModule = module {
         )
         FeatureRepository(
             featureDatabase = FeatureDatabase.database,
-            featureMapper = FeatureMapper()
+            featureMapper = FeatureMapper(),
+            featureEntityMapper = FeatureEntityMapper(),
         )
     }
     single { RequirementsService(get()) }
@@ -33,13 +36,26 @@ val appModule = module {
             repository = get()
         )
     }
+    factory {
+        SetFeatureUseCase(
+            repository = get()
+        )
+    }
     single { RequirementsViewModel(get(), get()) }
-    viewModel {
+    single {
         CollectionViewModel(
             getCollectionUseCase = get()
         )
     }
     viewModel { DashboardViewModel() }
-    viewModel { SimulationViewModel(get()) }
-    viewModel { MapViewModel() }
+    viewModel {
+        SimulationViewModel(
+            get()
+        )
+    }
+    viewModel {
+        MapViewModel(
+            get()
+        )
+    }
 }

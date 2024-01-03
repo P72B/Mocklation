@@ -7,16 +7,20 @@ androidx-navigation = "2.7.6"
 koin = "3.5.0"
 room = "2.6.1"
 play-services-location = "21.0.1"
-maps-utils = "3.4.0"
+maps-utils = "5.0.0"
 ksp = "1.9.10-1.0.13"
 kotlin = "1.9.10"
 androidGradlePlugin = "8.2.0"
 google-maps = "4.3.0"
+json = "1.5.1"
+json-serialisation = "1.9.21"
+#compose-preview = "1.5.4"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+#androidx-compose-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose-preview"}
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core-ktx" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle-runtime-compose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
@@ -28,6 +32,7 @@ koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = 
 google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "play-services-location" }
 google-maps-utils = { group = "com.google.maps.android", name = "maps-utils-ktx", version.ref = "maps-utils" }
 google-maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "google-maps"}
+kotlinx-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "json"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -35,3 +40,4 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-kotlinx-json = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "json-serialisation" }

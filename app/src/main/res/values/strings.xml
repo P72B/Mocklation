@@ -34,6 +34,7 @@
     <string name="button_set">Set</string>
     <string name="button_appoint">Appoint</string>
     <string name="button_plus">+</string>
+    <string name="button_save">Save</string>
     <string name="title_pre_requirements">Pre requirements</string>
     <string name="content_pre_requirements">To start with mocking your phone location there where a couple of steps required to do before.</string>
 </resources>

@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import de.p72b.mocklation.service.RequirementsService
 import de.p72b.mocklation.ui.MainNavigation
 import de.p72b.mocklation.ui.Navigator
+import de.p72b.mocklation.ui.model.collection.CollectionViewModel
 import de.p72b.mocklation.ui.model.requirements.Action
 import de.p72b.mocklation.ui.model.requirements.PermissionRequest
 import de.p72b.mocklation.ui.model.requirements.RequirementsViewModel
@@ -39,11 +40,13 @@ class MainActivity : ComponentActivity() {
     private val navigator: Navigator by inject()
     private val requirementsService: RequirementsService by inject()
     private val requirementsViewModel: RequirementsViewModel by inject()
+    private val collectionViewModel: CollectionViewModel by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         lifecycle.addObserver(requirementsService)
+        lifecycle.addObserver(collectionViewModel)
 
         setContent {
             AppTheme {

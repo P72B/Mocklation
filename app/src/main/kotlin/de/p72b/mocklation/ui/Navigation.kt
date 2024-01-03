@@ -150,7 +150,7 @@ fun BottomNavigation(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Navigator.NavTarget.Dashboard,
+        Navigator.NavTarget.Simulation,
         Navigator.NavTarget.Collection
     )
     navController.currentBackStackEntryAsState()
