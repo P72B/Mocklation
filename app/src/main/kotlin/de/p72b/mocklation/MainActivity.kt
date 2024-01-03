@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
+import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.service.RequirementsService
 import de.p72b.mocklation.ui.MainNavigation
 import de.p72b.mocklation.ui.Navigator
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
     private val requirementsService: RequirementsService by inject()
     private val requirementsViewModel: RequirementsViewModel by inject()
     private val collectionViewModel: CollectionViewModel by inject()
+    private val preferencesRepository: PreferencesRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -65,8 +67,7 @@ class MainActivity : ComponentActivity() {
             permissions.entries.forEach {
                 when (it.key) {
                     android.Manifest.permission.ACCESS_FINE_LOCATION -> {
-                        PermissionUtil.firstTimeAskingPermission(
-                            applicationContext,
+                        preferencesRepository.firstTimeAskingPermission(
                             android.Manifest.permission.ACCESS_FINE_LOCATION,
                             false
                         )
@@ -77,8 +78,7 @@ class MainActivity : ComponentActivity() {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                             return@forEach
                         }
-                        PermissionUtil.firstTimeAskingPermission(
-                            applicationContext,
+                        preferencesRepository.firstTimeAskingPermission(
                             android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
                             false
                         )
@@ -89,8 +89,7 @@ class MainActivity : ComponentActivity() {
                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                             return@forEach
                         }
-                        PermissionUtil.firstTimeAskingPermission(
-                            applicationContext,
+                        preferencesRepository.firstTimeAskingPermission(
                             android.Manifest.permission.POST_NOTIFICATIONS,
                             false
                         )
@@ -182,8 +181,7 @@ class MainActivity : ComponentActivity() {
                     android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
 
-            if (PermissionUtil.isFirstTimeAskingPermission(
-                    this,
+            if (preferencesRepository.isFirstTimeAskingPermission(
                     android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 )
             ) {
@@ -203,8 +201,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if (PermissionUtil.isFirstTimeAskingPermission(
-                this,
+        if (preferencesRepository.isFirstTimeAskingPermission(
                 android.Manifest.permission.ACCESS_FINE_LOCATION
             )
         ) {
@@ -222,8 +219,7 @@ class MainActivity : ComponentActivity() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (PermissionUtil.isFirstTimeAskingPermission(
-                    this,
+            if (preferencesRepository.isFirstTimeAskingPermission(
                     android.Manifest.permission.POST_NOTIFICATIONS
                 )
             ) {
@@ -262,26 +258,5 @@ class MainActivity : ComponentActivity() {
 
     private fun openAboutPhoneSettings() {
         startActivity(Intent(Settings.ACTION_DEVICE_INFO_SETTINGS))
-    }
-
-    object PermissionUtil {
-        private const val PREFS_FILE_NAME = "preference"
-
-        fun firstTimeAskingPermission(context: Context, permission: String, isFirstTime: Boolean) {
-            val sharedPreference = context.getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE)
-            sharedPreference.edit().putBoolean(
-                permission,
-                isFirstTime
-            ).apply()
-        }
-
-        fun isFirstTimeAskingPermission(context: Context, permission: String): Boolean {
-            val sharedPreference = context.getSharedPreferences(PREFS_FILE_NAME, MODE_PRIVATE)
-            return sharedPreference.getBoolean(
-                permission,
-                true
-            )
-
-        }
     }
 }

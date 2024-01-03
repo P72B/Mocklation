@@ -1,6 +1,7 @@
 package de.p72b.mocklation.di
 
 import de.p72b.mocklation.data.FeatureRepository
+import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.data.mapper.FeatureEntityMapper
 import de.p72b.mocklation.data.mapper.FeatureMapper
 import de.p72b.mocklation.data.room.FeatureDatabase
@@ -18,6 +19,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
+    single { PreferencesRepository(get()) }
     single { Navigator() }
     single {
         FeatureDatabase.provide(
@@ -33,29 +35,30 @@ val appModule = module {
     single { ForegroundServiceInteractor(get()) }
     factory {
         GetCollectionUseCase(
-            repository = get()
+            repository = get(),
         )
     }
     factory {
         SetFeatureUseCase(
-            repository = get()
+            repository = get(),
         )
     }
     single { RequirementsViewModel(get(), get()) }
     single {
         CollectionViewModel(
-            getCollectionUseCase = get()
+            getCollectionUseCase = get(),
+            preferencesRepository = get(),
         )
     }
     viewModel { DashboardViewModel() }
     viewModel {
         SimulationViewModel(
-            get()
+            get(),
         )
     }
     viewModel {
         MapViewModel(
-            get()
+            get(),
         )
     }
 }
