@@ -18,6 +18,7 @@ package de.p72b.mocklation.ui
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -47,12 +48,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import de.p72b.mocklation.R
 import de.p72b.mocklation.ui.model.collection.CollectionPage
 import de.p72b.mocklation.ui.model.dashboard.DashboardPage
 import de.p72b.mocklation.ui.model.map.MapActivity
-import de.p72b.mocklation.ui.model.map.MapBottomSheet
 import de.p72b.mocklation.ui.model.requirements.RequirementsPage
 import de.p72b.mocklation.ui.model.simulation.SimulationPage
 import kotlinx.coroutines.flow.launchIn
@@ -89,6 +88,9 @@ fun MainNavigation(
         }.launchIn(this)
     }
 
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+
     Scaffold(
         bottomBar = {
             BottomNavigation(
@@ -99,8 +101,6 @@ fun MainNavigation(
         },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            val navBackStackEntry = navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry.value?.destination?.route
             if (Navigator.NavTarget.Collection.label == currentRoute) {
                 FloatingActionButton(
                     onClick = {
@@ -116,21 +116,30 @@ fun MainNavigation(
             }
         }
     ) { paddingValues ->
-        BottomSheetScaffold(
-            scaffoldState = scaffoldState,
-            sheetContent = {
-                SimulationPage(
-                    modifier = Modifier.padding(paddingValues)
-                )
-            },
-            sheetPeekHeight = 0.dp,
-        ) {
-            Box(
-                modifier = Modifier.padding(paddingValues)
+        if (Navigator.NavTarget.Dashboard.label == currentRoute) {
+            BottomSheetScaffold(
+                scaffoldState = scaffoldState,
+                sheetContent = {
+                    SimulationPage(
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                },
+                sheetPeekHeight = 0.dp,
             ) {
-                NavigationGraph(navController = navController)
+                ContentBox(paddingValues, navController)
             }
+        } else {
+            ContentBox(paddingValues, navController)
         }
+    }
+}
+
+@Composable
+fun ContentBox(paddingValues: PaddingValues, navController: NavHostController) {
+    Box(
+        modifier = Modifier.padding(paddingValues)
+    ) {
+        NavigationGraph(navController = navController)
     }
 }
 
