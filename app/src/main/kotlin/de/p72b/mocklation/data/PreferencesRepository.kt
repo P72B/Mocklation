@@ -2,6 +2,8 @@ package de.p72b.mocklation.data
 
 import android.content.Context
 import androidx.activity.ComponentActivity
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 
 private const val PREFS_FILE_NAME = "preference"
@@ -10,6 +12,12 @@ private const val KEY_SELECTED_FEATURE = "selected_feature"
 class PreferencesRepository(
     private val context: Context
 ) {
+    private val _featureSelectedState = MutableStateFlow(
+        getSelectedFeature().let {
+            SelectedIdState.Status(it)
+        }
+    )
+    val featureSelectedState: StateFlow<SelectedIdState> = _featureSelectedState
 
     fun firstTimeAskingPermission(permission: String, isFirstTime: Boolean) {
         val sharedPreference = context.getSharedPreferences(
@@ -43,6 +51,7 @@ class PreferencesRepository(
             KEY_SELECTED_FEATURE,
             id
         ).apply()
+        _featureSelectedState.value = SelectedIdState.Status(id)
     }
 
     fun getSelectedFeature(): String? {
@@ -54,6 +63,8 @@ class PreferencesRepository(
             KEY_SELECTED_FEATURE,
             null
         )
-
+    }
+    sealed interface SelectedIdState {
+        data class Status(val id: String?) : SelectedIdState
     }
 }

@@ -38,8 +38,6 @@ class RequirementsViewModel(
                             shouldShowDialogRequestNotificationPermissionRationale = true,
                             canContinue = true
                         )
-                        delay(2_000)
-                        //navigator.navigateTo(Navigator.NavTarget.Simulation)
                     }
 
                     is RequirementsState.Status -> _uiState.value =
@@ -93,7 +91,7 @@ class RequirementsViewModel(
     }
 
     fun onContinueClicked() {
-        navigator.navigateTo(Navigator.NavTarget.Simulation)
+        navigator.navigateTo(Navigator.NavTarget.Dashboard)
     }
 }
 

@@ -3,7 +3,9 @@ package de.p72b.mocklation.ui.model.simulation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -63,6 +65,7 @@ internal fun StoppedSimulationScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Spacer(modifier = Modifier.height(400.dp))
             Button(modifier = Modifier.width(96.dp), onClick = { onRunSimulation() }) {
                 Text(stringResource(id = R.string.play))
             }

@@ -60,6 +60,8 @@ val appModule = module {
     viewModel {
         SimulationViewModel(
             get(),
+            get(),
+            get()
         )
     }
     viewModel {

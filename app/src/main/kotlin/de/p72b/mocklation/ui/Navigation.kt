@@ -37,18 +37,22 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import de.p72b.mocklation.R
+import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.ui.model.collection.CollectionPage
 import de.p72b.mocklation.ui.model.dashboard.DashboardPage
 import de.p72b.mocklation.ui.model.map.MapActivity
@@ -56,19 +60,43 @@ import de.p72b.mocklation.ui.model.requirements.RequirementsPage
 import de.p72b.mocklation.ui.model.simulation.SimulationPage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigation(
     navController: NavHostController,
-    navigator: Navigator
+    navigator: Navigator,
+    preferencesRepository: PreferencesRepository = koinInject()
 ) {
+    val scope = rememberCoroutineScope()
     val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Expanded
+        initialValue = SheetValue.PartiallyExpanded,
+        skipHiddenState = false,
+        confirmValueChange = {
+            it != SheetValue.Hidden
+        }
     )
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = sheetState
     )
+
+    val items by preferencesRepository.featureSelectedState.collectAsStateWithLifecycle()
+    when (items) {
+        is PreferencesRepository.SelectedIdState.Status -> {
+            val status = items as PreferencesRepository.SelectedIdState.Status
+            status.id.let {
+                scope.launch {
+                    if (it.isNullOrEmpty()) {
+                        sheetState.hide()
+                    } else {
+                        sheetState.expand()
+                    }
+                }
+            }
+        }
+    }
 
     val context = LocalContext.current
     val buttonsVisible = remember { mutableStateOf(true) }
