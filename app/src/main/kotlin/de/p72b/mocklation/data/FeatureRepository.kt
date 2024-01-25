@@ -34,7 +34,7 @@ class FeatureRepository(
         }
     }
 
-    suspend fun findFeature(id: Int): Resource<Feature> {
+    suspend fun findFeature(id: String): Resource<Feature> {
         return withContext(Dispatchers.IO) {
             featureDatabase.featureDao().findById(id).let {
                 if (it == null) {

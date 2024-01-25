@@ -15,7 +15,7 @@ interface FeatureDao {
     fun loadAllByIds(coinIds: IntArray): List<FeatureEntity>
 
     @Query("SELECT * FROM featureEntity WHERE uid LIKE :id LIMIT 1")
-    fun findById(id: Int): FeatureEntity?
+    fun findById(id: String): FeatureEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg feature: FeatureEntity)

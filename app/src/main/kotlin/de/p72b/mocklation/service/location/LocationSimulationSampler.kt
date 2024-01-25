@@ -5,20 +5,30 @@ import android.location.LocationManager
 import android.os.SystemClock
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.SphericalUtil
+import de.p72b.mocklation.data.Feature
 import de.p72b.mocklation.data.WayPoint
 import de.p72b.mocklation.parser.TrackImport
-import de.p72b.mocklation.util.Logger
-import java.security.Provider
 import java.util.Date
 
-class LocationSimulationSampler(importer: TrackImport) {
-    private var track: List<WayPoint>
+class LocationSimulationSampler(importer: TrackImport, feature: Feature) {
+    private var track: MutableList<WayPoint> = mutableListOf()
 
     private var startTime: Long = -1
     private var currentWayPointIndex = 0
 
     init {
-        track = importer.read()
+        feature.nodes.forEach {
+            val location = Location(LocationManager.GPS_PROVIDER).apply {
+                latitude = it.geometry.latLng.latitude
+                longitude = it.geometry.latLng.longitude
+                accuracy = 12f
+                elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
+                time = Date().time
+                speed = (60 / 3.6).toFloat()
+            }
+            track.add(WayPoint(speedInKmh = 60, location = location, isTunnel = false))
+        }
+        //track = importer.read()
     }
 
     fun getNextInstruction(): Instruction {

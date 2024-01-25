@@ -11,13 +11,25 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import de.p72b.mocklation.MainActivity
 import de.p72b.mocklation.R
+import de.p72b.mocklation.data.Feature
+import de.p72b.mocklation.data.PreferencesRepository
+import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.service.location.LocationSimulation
+import de.p72b.mocklation.ui.model.collection.CollectionUIState
+import de.p72b.mocklation.usecase.GetFeatureUseCase
 import de.p72b.mocklation.util.Logger
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.koin.android.ext.android.inject
 
 
 class ForegroundService : Service() {
+
+    private val getFeatureUseCase: GetFeatureUseCase by inject()
+    private val preferencesRepository: PreferencesRepository by inject()
 
     companion object {
         private const val NOTIFICATION_CHANNEL_ID = "location simulation"
@@ -27,6 +39,7 @@ class ForegroundService : Service() {
     private var startMode: Int = 0
     private val echoReceiver = ServiceEchoReceiver()
     private lateinit var simulation: LocationSimulation
+    private lateinit var feature: Feature
 
     override fun onCreate() {
         Logger.d(msg = "ForegroundService onCreate")
@@ -37,14 +50,36 @@ class ForegroundService : Service() {
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
-        createNotificationChannel(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+        preferencesRepository.getSelectedFeature().let {
+            if (it.isNullOrEmpty()) {
+                stopSelf()
+                return
+            }
+            runBlocking {
+                launch {
+                    val result = getFeatureUseCase.invoke(it)
+                    when (result.status) {
+                        Status.SUCCESS -> {
+                            if (result.data == null) {
+                                stopSelf()
+                                return@launch
+                            }
+                            feature = result.data
 
-        startForeground(SERVICE_ID, getServiceNotification())
+                            createNotificationChannel(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+                            startForeground(SERVICE_ID, getServiceNotification())
+                        }
+
+                        Status.ERROR -> stopSelf()
+                    }
+                }
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d(msg = "ForegroundService onStartCommand")
-        simulation = LocationSimulation(applicationContext)
+        simulation = LocationSimulation(applicationContext, feature)
         simulation.run()
         return startMode
     }

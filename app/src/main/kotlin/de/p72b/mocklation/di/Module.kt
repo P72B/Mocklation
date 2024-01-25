@@ -14,6 +14,7 @@ import de.p72b.mocklation.ui.model.dashboard.DashboardViewModel
 import de.p72b.mocklation.ui.model.map.MapViewModel
 import de.p72b.mocklation.ui.model.requirements.RequirementsViewModel
 import de.p72b.mocklation.ui.model.simulation.SimulationViewModel
+import de.p72b.mocklation.usecase.GetFeatureUseCase
 import de.p72b.mocklation.usecase.SetFeatureUseCase
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -40,6 +41,11 @@ val appModule = module {
     }
     factory {
         SetFeatureUseCase(
+            repository = get(),
+        )
+    }
+    factory {
+        GetFeatureUseCase(
             repository = get(),
         )
     }
