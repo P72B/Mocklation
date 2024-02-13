@@ -8,6 +8,7 @@ import de.p72b.mocklation.data.LatLng
 import de.p72b.mocklation.data.Node
 import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.usecase.SetFeatureUseCase
+import de.p72b.mocklation.util.TWO_DIGITS_COUNTRY_CODE_LOCATION_LIST
 import de.p72b.mocklation.util.roundTo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +33,7 @@ class MapViewModel(
         val currentId = determineNextNodeId(feature.nodes)
         val node = Node(
             id = currentId,
-            geometry = Geometry(LatLng(lat.roundTo(6), lng.roundTo(6)   ))
+            geometry = Geometry(LatLng(lat.roundTo(6), lng.roundTo(6)))
         )
         feature.nodes.add(node)
 
@@ -41,6 +42,15 @@ class MapViewModel(
             feature = feature,
             tstamp = Date().time
         )
+    }
+
+    fun getDefaultMapCameraLocation(twoDigitCountryCode: String?): LatLng {
+        twoDigitCountryCode?.let { code ->
+            TWO_DIGITS_COUNTRY_CODE_LOCATION_LIST[code.uppercase()]?.let {
+                return LatLng(latitude = it.latitude, longitude = it.longitude)
+            }
+        }
+        return LatLng(1.3588227, 103.8742114)
     }
 
     fun onNodeClicked(node: Node) {

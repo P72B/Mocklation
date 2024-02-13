@@ -1,7 +1,9 @@
 package de.p72b.mocklation.ui.model.map
 
+import android.content.Context
 import androidx.activity.ComponentActivity
 import android.os.Bundle
+import android.telephony.TelephonyManager
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -56,7 +58,8 @@ class MapActivity : ComponentActivity() {
                             onMapLoaded = {
                                 isMapLoaded = true
                             },
-                            bottomSheetState = sheetState
+                            bottomSheetState = sheetState,
+                            countryCode = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).networkCountryIso
                         )
                         if (isMapLoaded.not()) {
                             AnimatedVisibility(

@@ -65,7 +65,6 @@ internal fun StoppedSimulationScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(400.dp))
             Button(modifier = Modifier.width(96.dp), onClick = { onRunSimulation() }) {
                 Text(stringResource(id = R.string.play))
             }

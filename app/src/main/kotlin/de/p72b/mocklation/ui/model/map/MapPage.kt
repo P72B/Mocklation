@@ -7,14 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -27,16 +25,16 @@ import de.p72b.mocklation.data.Node
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-val defaultLocation = LatLng(1.3588227, 103.8742114)
-val defaultCameraPosition = CameraPosition.fromLatLngZoom(defaultLocation, 11f)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoogleMapView(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = koinViewModel(),
+    countryCode: String?,
     cameraPositionState: CameraPositionState = rememberCameraPositionState {
-        position = defaultCameraPosition
+        viewModel.getDefaultMapCameraLocation(countryCode).let {
+            position = CameraPosition.fromLatLngZoom(LatLng(it.latitude, it.longitude), 5f)
+        }
     },
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
@@ -67,12 +65,6 @@ fun GoogleMapView(
         else -> {
 
         }
-    }
-
-    val startLocationMarkerState = rememberMarkerState(position = defaultLocation)
-    var circleCenter by remember { mutableStateOf(defaultLocation) }
-    if (startLocationMarkerState.dragState == DragState.END) {
-        circleCenter = startLocationMarkerState.position
     }
 
     val uiSettings by remember {
