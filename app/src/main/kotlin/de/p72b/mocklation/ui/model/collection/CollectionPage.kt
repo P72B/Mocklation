@@ -17,13 +17,16 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +48,8 @@ fun CollectionPage(
                 modifier,
                 data.items,
                 data.selectedItem,
-                viewModel::onItemClicked
+                viewModel::onItemClicked,
+                viewModel::onDelete,
             )
         }
 
@@ -85,6 +89,7 @@ internal fun DataCollectionScreen(
     listData: List<Feature>,
     selectedId: String? = null,
     onItemClicked: KFunction1<Feature, Unit>,
+    onDelete: KFunction1<Feature, Unit>,
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         listData.forEach { feature ->
@@ -94,12 +99,14 @@ internal fun DataCollectionScreen(
                     feature = feature,
                     isSelected = isSelected,
                     onItemClicked = onItemClicked,
+                    onDelete = onDelete,
                 )
             } else {
                 RouteCard(
                     feature = feature,
                     isSelected = isSelected,
                     onItemClicked = onItemClicked,
+                    onDelete = onDelete,
                 )
             }
         }
@@ -114,6 +121,7 @@ internal fun PointCard(
     feature: Feature,
     isSelected: Boolean = false,
     onItemClicked: KFunction1<Feature, Unit>,
+    onDelete: KFunction1<Feature, Unit>,
 ) {
     Card(
         modifier = modifier
@@ -131,7 +139,26 @@ internal fun PointCard(
             feature.nodes.forEach {
                 Text(text = "${it.geometry.latLng.latitude} / ${it.geometry.latLng.longitude}")
             }
+            ButtonBar(
+                modifier = modifier,
+                feature = feature,
+                onDelete = onDelete,
+            )
         }
+    }
+}
+
+@Composable
+internal fun ButtonBar(
+    modifier: Modifier = Modifier,
+    feature: Feature,
+    onDelete: KFunction1<Feature, Unit>,
+) {
+    IconButton(onClick = { onDelete(feature) }) {
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24),
+            contentDescription = stringResource(id = R.string.delete)
+        )
     }
 }
 
@@ -142,6 +169,7 @@ internal fun RouteCard(
     feature: Feature,
     isSelected: Boolean = false,
     onItemClicked: KFunction1<Feature, Unit>,
+    onDelete: KFunction1<Feature, Unit>,
 ) {
     Card(
         modifier = modifier
@@ -156,6 +184,11 @@ internal fun RouteCard(
             feature.nodes.forEach {
                 Text(text = "${it.geometry.latLng.latitude} / ${it.geometry.latLng.longitude}")
             }
+            ButtonBar(
+                modifier = modifier,
+                feature = feature,
+                onDelete = onDelete,
+            )
         }
     }
 }

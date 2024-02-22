@@ -74,10 +74,6 @@ fun MainNavigation(
     navigator: Navigator,
     preferencesRepository: PreferencesRepository = koinInject()
 ) {
-    val configuration = LocalConfiguration.current
-    val screenDensity = configuration.densityDpi / DisplayMetrics.DENSITY_DEFAULT
-    val screenHeightPixel = configuration.screenHeightDp.toFloat() * screenDensity
-
     val scope = rememberCoroutineScope()
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
@@ -152,23 +148,14 @@ fun MainNavigation(
         }
     }
 
-    var bottomPadding = 16.dp
-    when (sheetState.currentValue) {
-        SheetValue.Hidden,
-        SheetValue.Expanded -> {
-            val delta = screenHeightPixel - sheetState.requireOffset()
-            val fraction = 100 - (sheetState.requireOffset() * 100 / screenHeightPixel)
-            var newDp =
-                (1000 - (sheetState.requireOffset() / (configuration.densityDpi / DisplayMetrics.DENSITY_DEFAULT))) - 105
-            if (newDp < 0) {
-                newDp = 0f
-            }
-            Logger.d(msg = "${sheetState.currentValue}: ${sheetState.requireOffset()}px ${screenHeightPixel}px ${delta}px ${fraction}% ${newDp}dp")
-            bottomPadding = newDp.dp
+    val bottomPadding = when (sheetState.currentValue) {
+        SheetValue.Hidden -> {
+            16.dp
         }
 
-        SheetValue.PartiallyExpanded -> {
-            bottomPadding = 150.dp
+        SheetValue.PartiallyExpanded,
+        SheetValue.Expanded -> {
+            150.dp
         }
     }
     Scaffold(
@@ -260,8 +247,7 @@ fun NavigationGraph(
             CollectionPage(
                 modifier = Modifier.padding(
                     16.dp
-                ),
-                sheetState
+                )
             )
         }
     }

@@ -34,6 +34,15 @@ class FeatureRepository(
         }
     }
 
+    suspend fun deleteFeature(feature: Feature): Resource<Unit> {
+        return withContext(Dispatchers.IO) {
+            Resource(
+                status = Status.SUCCESS,
+                data = featureDatabase.featureDao().delete(featureEntityMapper.map(feature))
+            )
+        }
+    }
+
     suspend fun findFeature(id: String): Resource<Feature> {
         return withContext(Dispatchers.IO) {
             featureDatabase.featureDao().findById(id).let {

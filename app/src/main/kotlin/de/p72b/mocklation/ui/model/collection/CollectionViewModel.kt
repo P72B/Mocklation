@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import de.p72b.mocklation.data.Feature
 import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.data.util.Status
+import de.p72b.mocklation.usecase.DeleteFeatureUseCase
 import de.p72b.mocklation.usecase.GetCollectionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class CollectionViewModel(
     private val getCollectionUseCase: GetCollectionUseCase,
+    private val deleteFeatureUseCase: DeleteFeatureUseCase,
     private val preferencesRepository: PreferencesRepository
 ) : ViewModel(), LifecycleEventObserver {
 
@@ -33,6 +35,19 @@ class CollectionViewModel(
             preferencesRepository.setSelectedFeature(feature.uuid)
         }
         fetchDatabaseData()
+    }
+
+    fun onDelete(feature: Feature) {
+        viewModelScope.launch {
+            val result = deleteFeatureUseCase.invoke(feature)
+            when (result.status) {
+                Status.SUCCESS -> {
+                    fetchDatabaseData()
+                }
+
+                Status.ERROR -> updateUi(CollectionUIState.Error)
+            }
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
