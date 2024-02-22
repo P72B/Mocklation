@@ -4,6 +4,7 @@
     <string name="play">Play</string>
     <string name="stop">Stop</string>
     <string name="pause">Pause</string>
+    <string name="close">Close</string>
     <string name="verify_requirements">Checking permissions. Please wait a few moments.</string>
     <string name="developer_options_enabled_requirements">Enabled developer options</string>
     <string name="developer_options_disabled_requirements">Disabled developer options</string>

@@ -5,10 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
@@ -83,7 +86,7 @@ internal fun DataCollectionScreen(
     selectedId: String? = null,
     onItemClicked: KFunction1<Feature, Unit>,
 ) {
-    Column {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         listData.forEach { feature ->
             val isSelected = feature.uuid == selectedId
             if (feature.nodes.size == 1) {
@@ -100,6 +103,7 @@ internal fun DataCollectionScreen(
                 )
             }
         }
+        Spacer(Modifier.size(150.dp))
     }
 }
 

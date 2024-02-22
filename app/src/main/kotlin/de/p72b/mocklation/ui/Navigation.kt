@@ -17,6 +17,7 @@
 package de.p72b.mocklation.ui
 
 import android.content.Intent
+import android.util.DisplayMetrics
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -31,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -42,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -58,6 +61,7 @@ import de.p72b.mocklation.ui.model.dashboard.DashboardPage
 import de.p72b.mocklation.ui.model.map.MapActivity
 import de.p72b.mocklation.ui.model.requirements.RequirementsPage
 import de.p72b.mocklation.ui.model.simulation.SimulationPage
+import de.p72b.mocklation.util.Logger
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -70,6 +74,10 @@ fun MainNavigation(
     navigator: Navigator,
     preferencesRepository: PreferencesRepository = koinInject()
 ) {
+    val configuration = LocalConfiguration.current
+    val screenDensity = configuration.densityDpi / DisplayMetrics.DENSITY_DEFAULT
+    val screenHeightPixel = configuration.screenHeightDp.toFloat() * screenDensity
+
     val scope = rememberCoroutineScope()
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
@@ -82,36 +90,10 @@ fun MainNavigation(
         bottomSheetState = sheetState
     )
 
-    val items by preferencesRepository.featureSelectedState.collectAsStateWithLifecycle()
-    when (items) {
-        is PreferencesRepository.SelectedIdState.Status -> {
-            val status = items as PreferencesRepository.SelectedIdState.Status
-            status.id.let {
-                scope.launch {
-                    if (it.isNullOrEmpty()) {
-                        sheetState.hide()
-                    } else {
-                        sheetState.expand()
-                    }
-                }
-            }
-        }
-    }
-
     val context = LocalContext.current
     val buttonsVisible = remember { mutableStateOf(true) }
     LaunchedEffect("navigation") {
         navigator.sharedFlow.onEach {
-            when (it.label) {
-                Navigator.NavTarget.Dashboard.label,
-                Navigator.NavTarget.Collection.label -> {
-                    buttonsVisible.value = true
-                }
-
-                else -> {
-                    buttonsVisible.value = false
-                }
-            }
             navController.navigate(it.label)
         }.launchIn(this)
     }
@@ -119,6 +101,76 @@ fun MainNavigation(
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
 
+    when (currentRoute) {
+        Navigator.NavTarget.Dashboard.label,
+        Navigator.NavTarget.Simulation.label,
+        Navigator.NavTarget.Collection.label -> {
+            buttonsVisible.value = true
+        }
+
+        Navigator.NavTarget.Requirements.label -> {
+            buttonsVisible.value = false
+        }
+
+        else -> {
+            buttonsVisible.value = true
+        }
+    }
+
+    val items by preferencesRepository.featureSelectedState.collectAsStateWithLifecycle()
+    when (items) {
+        is PreferencesRepository.SelectedIdState.Status -> {
+            val status = items as PreferencesRepository.SelectedIdState.Status
+            status.id.let {
+                scope.launch {
+                    when (currentRoute) {
+                        Navigator.NavTarget.Dashboard.label,
+                        Navigator.NavTarget.Collection.label -> {
+                            if (it.isNullOrEmpty()) {
+                                if (sheetState.currentValue == SheetValue.Expanded
+                                    || sheetState.currentValue == SheetValue.PartiallyExpanded
+                                ) {
+                                    sheetState.hide()
+                                }
+                            } else {
+                                if (sheetState.currentValue == SheetValue.Hidden) {
+                                    sheetState.expand()
+                                }
+                            }
+                        }
+
+                        else -> {
+                            if (sheetState.currentValue == SheetValue.Expanded
+                                || sheetState.currentValue == SheetValue.PartiallyExpanded
+                            ) {
+                                sheetState.hide()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var bottomPadding = 16.dp
+    when (sheetState.currentValue) {
+        SheetValue.Hidden,
+        SheetValue.Expanded -> {
+            val delta = screenHeightPixel - sheetState.requireOffset()
+            val fraction = 100 - (sheetState.requireOffset() * 100 / screenHeightPixel)
+            var newDp =
+                (1000 - (sheetState.requireOffset() / (configuration.densityDpi / DisplayMetrics.DENSITY_DEFAULT))) - 105
+            if (newDp < 0) {
+                newDp = 0f
+            }
+            Logger.d(msg = "${sheetState.currentValue}: ${sheetState.requireOffset()}px ${screenHeightPixel}px ${delta}px ${fraction}% ${newDp}dp")
+            bottomPadding = newDp.dp
+        }
+
+        SheetValue.PartiallyExpanded -> {
+            bottomPadding = 150.dp
+        }
+    }
     Scaffold(
         bottomBar = {
             BottomNavigation(
@@ -131,6 +183,7 @@ fun MainNavigation(
         floatingActionButton = {
             if (Navigator.NavTarget.Collection.label == currentRoute) {
                 FloatingActionButton(
+                    modifier = Modifier.padding(bottom = bottomPadding),
                     onClick = {
                         context.startActivity(Intent(context, MapActivity::class.java))
                     },
@@ -144,35 +197,40 @@ fun MainNavigation(
             }
         }
     ) { paddingValues ->
-        if (Navigator.NavTarget.Dashboard.label == currentRoute) {
-            BottomSheetScaffold(
-                scaffoldState = scaffoldState,
-                sheetContent = {
-                    SimulationPage(
-                        modifier = Modifier.padding(paddingValues)
-                    )
-                },
-                sheetPeekHeight = 0.dp,
-            ) {
-                ContentBox(paddingValues, navController)
-            }
-        } else {
-            ContentBox(paddingValues, navController)
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetContent = {
+                SimulationPage(
+                    modifier = Modifier.padding(paddingValues)
+                )
+            },
+            sheetPeekHeight = 0.dp,
+        ) {
+            ContentBox(paddingValues, navController, sheetState)
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContentBox(paddingValues: PaddingValues, navController: NavHostController) {
+fun ContentBox(
+    paddingValues: PaddingValues,
+    navController: NavHostController,
+    sheetState: SheetState
+) {
     Box(
         modifier = Modifier.padding(paddingValues)
     ) {
-        NavigationGraph(navController = navController)
+        NavigationGraph(navController = navController, sheetState)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationGraph(navController: NavHostController) {
+fun NavigationGraph(
+    navController: NavHostController,
+    sheetState: SheetState
+) {
     NavHost(
         navController = navController,
         startDestination = Navigator.NavTarget.Dashboard.label
@@ -202,7 +260,8 @@ fun NavigationGraph(navController: NavHostController) {
             CollectionPage(
                 modifier = Modifier.padding(
                     16.dp
-                )
+                ),
+                sheetState
             )
         }
     }
@@ -216,8 +275,6 @@ fun BottomNavigation(
         Navigator.NavTarget.Dashboard,
         Navigator.NavTarget.Collection
     )
-    navController.currentBackStackEntryAsState()
-
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
     if (state.value) {
