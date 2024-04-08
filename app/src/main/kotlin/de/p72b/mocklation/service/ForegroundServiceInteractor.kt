@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 class ForegroundServiceInteractor(private val applicationContext: Context) {
 
     private val echoReceiver = Pong()
+    private val commandReceiver = CommandPong()
     private var isServiceRunning = false
     private val _status = MutableStateFlow<StatusEvent>(StatusEvent.Stop)
 
@@ -19,6 +20,7 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
 
     init {
         checkIfServiceIsUp()
+        registerCmdReceiver()
     }
 
     fun doPlay() {
@@ -35,6 +37,16 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
         _status.value = StatusEvent.Stop
         stopForegroundService()
         isServiceRunning = false
+    }
+
+    fun doPause() {
+        if (!isServiceRunning) return
+        applicationContext.sendBroadcast(Intent("cmd_pause"))
+    }
+
+    fun doResume() {
+        if (!isServiceRunning) return
+        applicationContext.sendBroadcast(Intent("cmd_resume"))
     }
 
     private fun launchForegroundService() {
@@ -70,9 +82,26 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
         }
     }
 
+    private fun registerCmdReceiver() {
+        ContextCompat.registerReceiver(
+            applicationContext,
+            commandReceiver,
+            IntentFilter("cmd_pong"),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
     inner class Pong: BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             isServiceRunning = true;
+        }
+    }
+
+    inner class CommandPong: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            _status.value = StatusEvent.Pause
+            _status.value = StatusEvent.Play
+            isServiceRunning = true
         }
     }
 }

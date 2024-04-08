@@ -61,6 +61,7 @@ val appModule = module {
             getCollectionUseCase = get(),
             preferencesRepository = get(),
             deleteFeatureUseCase = get(),
+            simulationService = get(),
         )
     }
     viewModel { DashboardViewModel() }

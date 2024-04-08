@@ -33,11 +33,18 @@ fun SimulationPage(modifier: Modifier, viewModel: SimulationViewModel = koinView
         SimulationUIState.Loading -> LoadingSimulationScreen(modifier)
         SimulationUIState.RunningSimulation -> RunningSimulationScreen(
             onStopSimulation = viewModel::stopSimulation,
+            onPauseSimulation = viewModel::pauseSimulation,
             modifier
         )
 
         SimulationUIState.StoppedSimulation -> StoppedSimulationScreen(
             onRunSimulation = viewModel::runSimulation,
+            modifier
+        )
+
+        SimulationUIState.PausedSimulation -> PausedSimulationScreen(
+            onStopSimulation = viewModel::stopSimulation,
+            onResumeSimulation = viewModel::resumeSimulation,
             modifier
         )
 
@@ -82,12 +89,6 @@ internal fun StoppedSimulationScreen(
                     contentDescription = stringResource(id = R.string.play)
                 )
             }
-            IconButton(onClick = { onRunSimulation() }, enabled = true) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.round_close_24),
-                    contentDescription = stringResource(id = R.string.close)
-                )
-            }
         }
     }
 }
@@ -95,6 +96,7 @@ internal fun StoppedSimulationScreen(
 @Composable
 internal fun RunningSimulationScreen(
     onStopSimulation: () -> Unit,
+    onPauseSimulation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -106,9 +108,41 @@ internal fun RunningSimulationScreen(
                 .padding(bottom = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            IconButton(onClick = { onStopSimulation() }) {
+            IconButton(onClick = { onPauseSimulation() }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.round_pause_24),
+                    contentDescription = stringResource(id = R.string.pause)
+                )
+            }
+            IconButton(onClick = { onStopSimulation() }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.round_stop_24),
+                    contentDescription = stringResource(id = R.string.stop)
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+internal fun PausedSimulationScreen(
+    onStopSimulation: () -> Unit,
+    onResumeSimulation: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            IconButton(onClick = { onResumeSimulation() }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.baseline_not_started_24),
                     contentDescription = stringResource(id = R.string.pause)
                 )
             }

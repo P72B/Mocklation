@@ -25,7 +25,7 @@ class SimulationViewModel(
             simulationService.status.collect { status ->
                 when (status) {
                     StatusEvent.Stop -> updateUi(SimulationUIState.StoppedSimulation)
-                    StatusEvent.Pause -> TODO()
+                    StatusEvent.Pause -> updateUi(SimulationUIState.PausedSimulation)
                     StatusEvent.Play -> updateUi(SimulationUIState.RunningSimulation)
                 }
             }
@@ -48,6 +48,14 @@ class SimulationViewModel(
         simulationService.doStop()
     }
 
+    fun pauseSimulation() {
+        simulationService.doPause()
+    }
+
+    fun resumeSimulation() {
+        simulationService.doResume()
+    }
+
     private fun updateUi(uiState: SimulationUIState) {
         _uiState.value = uiState
     }
@@ -58,6 +66,7 @@ sealed interface SimulationUIState {
     data object Loading : SimulationUIState
     data object StoppedSimulation : SimulationUIState
     data object RunningSimulation : SimulationUIState
+    data object PausedSimulation : SimulationUIState
     data class Error(val throwable: Throwable) : SimulationUIState
     data class Success(val data: List<String>) : SimulationUIState
 }

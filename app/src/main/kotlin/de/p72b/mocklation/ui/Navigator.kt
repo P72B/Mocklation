@@ -1,10 +1,10 @@
 package de.p72b.mocklation.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -27,6 +27,6 @@ class Navigator {
         Simulation("simulation"),
         Requirements("requirements"),
         Dashboard("dashboard", Icons.Outlined.Home, Icons.Filled.Home),
-        Collection("collection", Icons.Outlined.List, Icons.Filled.List)
+        Collection("collection", Icons.AutoMirrored.Outlined.List, Icons.AutoMirrored.Filled.List)
     }
 }

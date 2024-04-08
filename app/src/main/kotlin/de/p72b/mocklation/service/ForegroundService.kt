@@ -50,6 +50,13 @@ class ForegroundService : Service() {
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
+        ContextCompat.registerReceiver(
+            applicationContext,
+            echoReceiver,
+            IntentFilter("cmd"),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+
         preferencesRepository.getSelectedFeature().let {
             if (it.isNullOrEmpty()) {
                 stopSelf()

@@ -14,7 +14,7 @@ val appVersionName: String by rootProject.extra
 val javaTarget: String by rootProject.extra
 val javaVersion: JavaVersion by rootProject.extra
 
-val key: String = gradleLocalProperties(rootDir).getProperty("GOOGLE_MAPS_API_KEY")
+val key: String = gradleLocalProperties(rootDir, providers).getProperty("GOOGLE_MAPS_API_KEY")
 
 android {
     namespace = "de.p72b.mocklation"
@@ -53,7 +53,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 
     kotlinOptions {

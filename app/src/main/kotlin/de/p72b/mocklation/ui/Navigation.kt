@@ -129,7 +129,7 @@ fun MainNavigation(
                                     sheetState.hide()
                                 }
                             } else {
-                                if (sheetState.currentValue == SheetValue.Hidden) {
+                                if (sheetState.currentValue != SheetValue.Expanded) {
                                     sheetState.expand()
                                 }
                             }
@@ -149,13 +149,12 @@ fun MainNavigation(
     }
 
     val bottomPadding = when (sheetState.currentValue) {
-        SheetValue.Hidden -> {
+        SheetValue.Hidden, SheetValue.PartiallyExpanded -> {
             16.dp
         }
 
-        SheetValue.PartiallyExpanded,
         SheetValue.Expanded -> {
-            150.dp
+            165.dp
         }
     }
     Scaffold(
