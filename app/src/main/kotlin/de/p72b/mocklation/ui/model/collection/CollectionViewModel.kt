@@ -35,7 +35,12 @@ class CollectionViewModel(
         if (currentSelectedFeature != null) {
             viewModelScope.launch {
                 if (simulationService.status.value != StatusEvent.Stop) {
-                    updateUi(CollectionUIState.ShowSimulationCancelDialog(feature))
+                    if (preferencesRepository.getShouldAskAgainToStopSimulationService()) {
+                        updateUi(CollectionUIState.ShowSimulationCancelDialog(feature))
+                    } else {
+                        simulationService.doStop()
+                        consumeItemClick(feature, currentSelectedFeature)
+                    }
                 } else {
                     consumeItemClick(feature, currentSelectedFeature)
                 }
@@ -70,7 +75,8 @@ class CollectionViewModel(
         }
     }
 
-    fun onConfirmToCancelOngoingSimulation(feature: Feature) {
+    fun onConfirmToCancelOngoingSimulation(feature: Feature, shouldAskAgain: Boolean = true) {
+        preferencesRepository.setShouldAskAgainToStopSimulationService(shouldAskAgain)
         val currentSelectedFeature = preferencesRepository.getSelectedFeature()
         simulationService.doStop()
         consumeItemClick(feature, currentSelectedFeature)
@@ -128,5 +134,5 @@ sealed interface CollectionUIState {
     data object Empty : CollectionUIState
     data class Data(val items: List<Feature>, val selectedItem: String? = null) : CollectionUIState
     data object Error : CollectionUIState
-    data class ShowSimulationCancelDialog(val feature: Feature): CollectionUIState
+    data class ShowSimulationCancelDialog(val feature: Feature) : CollectionUIState
 }

@@ -44,4 +44,5 @@
     <string name="dialog_title_cancel_message_ongoing_mock">Are you sure to cancel the onging fake location mocking?</string>
     <string name="cta_ok">ok</string>
     <string name="cta_cancel">cancel</string>
+    <string name="checkbox_dont_warn_me_again">Don\'t warn me again</string>
 </resources>

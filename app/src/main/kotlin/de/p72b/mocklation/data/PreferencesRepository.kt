@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 private const val PREFS_FILE_NAME = "preference"
 private const val KEY_SELECTED_FEATURE = "selected_feature"
+private const val KEY_SHOULD_ASK_AGAIN_TO_SHOW_STOP_SIMULATION = "should_ask_again_stop_running_simulation"
 
 class PreferencesRepository(
     private val context: Context
@@ -64,6 +65,29 @@ class PreferencesRepository(
             null
         )
     }
+
+    fun getShouldAskAgainToStopSimulationService(): Boolean {
+        val sharedPreference = context.getSharedPreferences(
+            PREFS_FILE_NAME,
+            ComponentActivity.MODE_PRIVATE
+        )
+        return sharedPreference.getBoolean(
+            KEY_SHOULD_ASK_AGAIN_TO_SHOW_STOP_SIMULATION,
+            true
+        )
+    }
+
+    fun setShouldAskAgainToStopSimulationService(value: Boolean) {
+        val sharedPreference = context.getSharedPreferences(
+            PREFS_FILE_NAME,
+            ComponentActivity.MODE_PRIVATE
+        )
+        sharedPreference.edit().putBoolean(
+            KEY_SHOULD_ASK_AGAIN_TO_SHOW_STOP_SIMULATION,
+            value
+        ).apply()
+    }
+
     sealed interface SelectedIdState {
         data class Status(val id: String?) : SelectedIdState
     }

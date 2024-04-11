@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -244,8 +245,9 @@ internal fun CheckableProfileCircle(
 fun AlertDialogToCancelOngoingSimulation(
     feature: Feature,
     onDismissRequest: () -> Unit,
-    onConfirmation: (feature: Feature) -> Unit,
+    onConfirmation: (feature: Feature, shouldAskAgain: Boolean) -> Unit,
 ) {
+    val checkedState = remember { mutableStateOf(false) }
     AlertDialog(
         icon = {
             Icon(
@@ -257,7 +259,15 @@ fun AlertDialogToCancelOngoingSimulation(
             Text(text = stringResource(id = R.string.dialog_title_cancel_title_ongoing_mock))
         },
         text = {
-            Text(text = stringResource(id = R.string.dialog_title_cancel_message_ongoing_mock))
+            Column {
+                Text(text = stringResource(id = R.string.dialog_title_cancel_message_ongoing_mock))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = checkedState.value,
+                        onCheckedChange = { checkedState.value = it })
+                    Text(text = stringResource(id = R.string.checkbox_dont_warn_me_again))
+                }
+            }
         },
         onDismissRequest = {
             onDismissRequest()
@@ -265,7 +275,7 @@ fun AlertDialogToCancelOngoingSimulation(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onConfirmation(feature)
+                    onConfirmation(feature, !checkedState.value)
                 }
             ) {
                 Text(text = stringResource(id = R.string.cta_ok))
