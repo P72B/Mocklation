@@ -32,21 +32,23 @@ class CollectionViewModel(
 
     fun onItemClicked(feature: Feature) {
         val currentSelectedFeature = preferencesRepository.getSelectedFeature()
-        if (currentSelectedFeature != null) {
-            viewModelScope.launch {
-                if (simulationService.status.value != StatusEvent.Stop) {
-                    if (preferencesRepository.getShouldAskAgainToStopSimulationService()) {
-                        updateUi(CollectionUIState.ShowSimulationCancelDialog(feature))
-                    } else {
-                        simulationService.doStop()
-                        consumeItemClick(feature, currentSelectedFeature)
-                    }
-                } else {
-                    consumeItemClick(feature, currentSelectedFeature)
-                }
-            }
-        } else {
+        if (currentSelectedFeature == null) {
             consumeItemClick(feature, null)
+            return
+        }
+        viewModelScope.launch {
+            if (simulationService.status.value == StatusEvent.Stop) {
+                consumeItemClick(feature, currentSelectedFeature)
+                return@launch
+            }
+
+            if (preferencesRepository.getShouldAskAgainToStopSimulationService()) {
+                updateUi(CollectionUIState.ShowSimulationCancelDialog(feature))
+                return@launch
+            }
+
+            simulationService.doStop()
+            consumeItemClick(feature, currentSelectedFeature)
         }
     }
 
