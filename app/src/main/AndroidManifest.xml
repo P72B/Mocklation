@@ -47,18 +47,18 @@
             android:foregroundServiceType="location" />
 
         <receiver
-            android:name=".service.ForegroundService$ServiceEchoReceiver"
-            android:exported="false">
+            android:name=".service.ForegroundServiceInteractor$CmdPong"
+            android:exported="true">
             <intent-filter>
-                <action android:name="APP_SPECIFIC_BROADCAST" />
+                <action android:name="cmd_pong" />
             </intent-filter>
         </receiver>
 
         <receiver
-            android:name=".service.ForegroundServiceInteractor$Pong"
-            android:exported="false">
+            android:name=".service.ForegroundService$ServiceCmdReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="APP_SPECIFIC_BROADCAST" />
+                <action android:name="cmd" />
             </intent-filter>
         </receiver>
     </application>

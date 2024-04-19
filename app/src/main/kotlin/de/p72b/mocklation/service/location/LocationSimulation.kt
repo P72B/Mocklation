@@ -8,7 +8,10 @@ import android.os.Build
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import de.p72b.mocklation.data.Feature
-import de.p72b.mocklation.parser.TrackImport
+import de.p72b.mocklation.service.location.sampler.Converter
+import de.p72b.mocklation.service.location.sampler.Instruction
+import de.p72b.mocklation.service.location.sampler.LocationSimulationSampler
+import de.p72b.mocklation.service.location.sampler.SamplerBuilder
 import de.p72b.mocklation.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +20,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
-class LocationSimulation(context: Context, feature: Feature) {
+class LocationSimulation(
+    context: Context,
+    feature: Feature,
+    private val listener: (SimulationState) -> Unit
+) {
 
     private lateinit var job: Job
     private val locationManager: LocationManager =
@@ -25,10 +32,12 @@ class LocationSimulation(context: Context, feature: Feature) {
     private val fusedLocationProviderClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
     private val interval: Long = 1000
-    private val sampler = LocationSimulationSampler(TrackImport(context), feature)
 
-    fun run() {
-        Logger.d(msg = "run")
+    // Converter.fromGeoJson(context = context)
+    private val sampler: LocationSimulationSampler =
+        SamplerBuilder.create(Converter.fromRoom(feature))
+
+    fun play() {
         fusedLocationProviderClient.setMockMode(true)
 
         locationManager.addTestProvider(
@@ -54,6 +63,14 @@ class LocationSimulation(context: Context, feature: Feature) {
         fusedLocationProviderClient.setMockMode(false)
     }
 
+    fun pause() {
+        sampler.pause()
+    }
+
+    fun resume() {
+        sampler.resume()
+    }
+
     /**
      * Works only for FusedLocationProviderClient
      */
@@ -70,36 +87,45 @@ class LocationSimulation(context: Context, feature: Feature) {
     private fun startRepeatingJob(timeIntervalInMillis: Long): Job {
         return CoroutineScope(Dispatchers.Default).launch {
             while (true) {
-                val next = sampler.getNextInstruction()
-                if (next.hasFinished()) {
-                    Logger.d(msg = "simulation finished")
+                val instruction: Instruction = sampler.getNextInstruction()
+                val location: Location? = when (instruction) {
+                    is Instruction.FixedInstruction -> instruction.location
+                    is Instruction.RouteInstruction -> instruction.location
+                }
+                if (instruction is Instruction.RouteInstruction && instruction.isLast) {
+                    listener(SimulationState.Finished)
+                    stop()
                     return@launch
                 }
-                next.getLocation()?.let {
-                    publishMockLocation(next.getLocation()!!)
+                location?.let {
+                    publishMockLocation(it)
                 }
-                if (next.getLocation() == null) {
-                    Logger.d(msg = "location is null")
-                }
+                listener(SimulationState.Status(instruction))
                 delay(timeIntervalInMillis)
             }
         }
     }
 
-    private fun publishMockLocation(newLocation: Location) {
-        newLocation.provider = LocationManager.GPS_PROVIDER
-
+    private fun publishMockLocation(location: Location) {
+        location.provider = LocationManager.GPS_PROVIDER
         locationManager.setTestProviderLocation(
             LocationManager.GPS_PROVIDER,
-            newLocation
+            location
         )
 
-        newLocation.provider = getBestProvider()
-        fusedLocationProviderClient.setMockLocation(newLocation)
+        location.provider = getBestProvider()
+        fusedLocationProviderClient.setMockLocation(location)
             .addOnFailureListener { _ ->
                 Logger.d(msg = "Did not worked")
             }
-        Logger.d(msg = "publish mock location: ${newLocation.latitude}/${newLocation.longitude}")
+    }
+
+    sealed interface SimulationState {
+        data class Status(
+            val instruction: Instruction
+        ) : SimulationState
+
+        data object Finished : SimulationState
     }
 
 }

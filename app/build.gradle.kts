@@ -80,7 +80,8 @@ dependencies {
     implementation(libs.google.maps.compose)
     implementation(libs.kotlinx.json)
 
+    implementation(libs.jts.spatial)
+
     implementation(libs.google.play.services.location)
-    implementation(libs.google.maps.utils)
     ksp(libs.androidx.room.compiler)
 }

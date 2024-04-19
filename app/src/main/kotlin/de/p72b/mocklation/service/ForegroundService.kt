@@ -11,16 +11,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
 import de.p72b.mocklation.MainActivity
 import de.p72b.mocklation.R
 import de.p72b.mocklation.data.Feature
 import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.service.location.LocationSimulation
-import de.p72b.mocklation.ui.model.collection.CollectionUIState
+import de.p72b.mocklation.service.location.sampler.Instruction
 import de.p72b.mocklation.usecase.GetFeatureUseCase
 import de.p72b.mocklation.util.Logger
+import de.p72b.mocklation.util.roundTo
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
@@ -28,6 +28,8 @@ import org.koin.android.ext.android.inject
 
 class ForegroundService : Service() {
 
+    private lateinit var notificationBuilder: Notification.Builder
+    private lateinit var notificationManager: NotificationManager
     private val getFeatureUseCase: GetFeatureUseCase by inject()
     private val preferencesRepository: PreferencesRepository by inject()
 
@@ -37,24 +39,33 @@ class ForegroundService : Service() {
     }
 
     private var startMode: Int = 0
-    private val echoReceiver = ServiceEchoReceiver()
+    private lateinit var cmdReceiver: ServiceCmdReceiver
     private lateinit var simulation: LocationSimulation
     private lateinit var feature: Feature
 
     override fun onCreate() {
-        Logger.d(msg = "ForegroundService onCreate")
-        ContextCompat.registerReceiver(
-            applicationContext,
-            echoReceiver,
-            IntentFilter("ping"),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        cmdReceiver = ServiceCmdReceiver {
+            when (it) {
+                "pause" -> {
+                    simulation.pause()
+                }
+
+                "resume" -> {
+                    simulation.resume()
+                }
+
+                else -> {
+                    Logger.d(msg = "ForegroundService unknown simulation command")
+                }
+            }
+        }
 
         ContextCompat.registerReceiver(
             applicationContext,
-            echoReceiver,
+            cmdReceiver,
             IntentFilter("cmd"),
-            ContextCompat.RECEIVER_NOT_EXPORTED
+            ContextCompat.RECEIVER_EXPORTED
         )
 
         preferencesRepository.getSelectedFeature().let {
@@ -74,7 +85,8 @@ class ForegroundService : Service() {
                             feature = result.data
 
                             createNotificationChannel(getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
-                            startForeground(SERVICE_ID, getServiceNotification())
+                            notificationBuilder = getServiceNotification()
+                            startForeground(SERVICE_ID, notificationBuilder.build())
                         }
 
                         Status.ERROR -> stopSelf()
@@ -85,24 +97,63 @@ class ForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Logger.d(msg = "ForegroundService onStartCommand")
-        simulation = LocationSimulation(applicationContext, feature)
-        simulation.run()
+        simulation =
+            LocationSimulation(applicationContext, feature) { state -> onSimulationUpdate(state) }
+        simulation.play()
         return startMode
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        Logger.d(msg = "ForegroundService onBind")
         return null
     }
 
     override fun onDestroy() {
         simulation.stop()
-        applicationContext.unregisterReceiver(echoReceiver)
-        Logger.d(msg = "ForegroundService onDestroy")
+        applicationContext.unregisterReceiver(cmdReceiver)
+        super.onDestroy()
     }
 
-    private fun getServiceNotification(): Notification {
+    private fun onSimulationUpdate(state: LocationSimulation.SimulationState) {
+        when (state) {
+            LocationSimulation.SimulationState.Finished -> {
+                updateNotificationFinished()
+                // TODO finish here maybe
+            }
+
+            is LocationSimulation.SimulationState.Status -> {
+                when (state.instruction) {
+                    is Instruction.FixedInstruction -> updateNoticationFixed(state.instruction)
+                    is Instruction.RouteInstruction -> updateNotificationRoute(state.instruction)
+                }
+            }
+        }
+    }
+
+    private fun updateNoticationFixed(instruction: Instruction.FixedInstruction) {
+        notificationBuilder.setContentText(
+            "lat(y): ${instruction.location!!.latitude.roundTo(6)}\n" +
+                    "lon(x): ${instruction.location.longitude.roundTo(6)}"
+        )
+        notificationManager.notify(SERVICE_ID, notificationBuilder.build())
+    }
+
+    private fun updateNotificationRoute(instruction: Instruction.RouteInstruction) {
+        notificationBuilder.setContentText(
+            "Section ${instruction.activeSectionIndex + 1} from ${instruction.totalSectionsIndex + 1}\n" +
+                    "lat(y): ${instruction.location!!.latitude.roundTo(5)} / " +
+                    "lon(x): ${instruction.location.longitude.roundTo(5)}"
+        )
+        notificationBuilder.setProgress(100, instruction.progressInPercent.toInt(), false)
+        notificationManager.notify(SERVICE_ID, notificationBuilder.build())
+    }
+
+    private fun updateNotificationFinished() {
+        notificationBuilder.setContentText("Finished")
+        notificationBuilder.setProgress(0, 0, false)
+        notificationManager.notify(SERVICE_ID, notificationBuilder.build())
+    }
+
+    private fun getServiceNotification(): Notification.Builder {
         val pendingIntent: PendingIntent =
             Intent(this, MainActivity::class.java).let { notificationIntent ->
                 PendingIntent.getActivity(
@@ -110,13 +161,13 @@ class ForegroundService : Service() {
                     PendingIntent.FLAG_IMMUTABLE
                 )
             }
-        return Notification.Builder(this, Companion.NOTIFICATION_CHANNEL_ID)
+        return Notification.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Simulation")
             .setContentText("Ongoing fake gps ...")
             .setSmallIcon(R.drawable.move_location)
             .setContentIntent(pendingIntent)
+            .setOnlyAlertOnce(true)
             .setOngoing(true)
-            .build()
     }
 
     private fun createNotificationChannel(notificationManager: NotificationManager) {
@@ -128,10 +179,13 @@ class ForegroundService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    class ServiceEchoReceiver : BroadcastReceiver() {
+    class ServiceCmdReceiver(val onSimulationExtraEventListener: (String) -> Unit) :
+        BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Logger.d(msg = "ForegroundService ServiceEchoReceiver onReceive intent action: ${intent.action}")
-            context.sendBroadcast(Intent("pong"))
+            intent.extras?.getString("simulation")?.let {
+                onSimulationExtraEventListener(it)
+            }
+            context.sendBroadcast(Intent("cmd_pong"))
         }
     }
 }

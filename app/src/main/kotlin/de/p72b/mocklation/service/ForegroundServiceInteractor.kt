@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ForegroundServiceInteractor(private val applicationContext: Context) {
 
-    private val echoReceiver = Pong()
-    private val commandReceiver = CommandPong()
+    private val cmdEchoReceiver = CmdPong()
     private var isServiceRunning = false
     private val _status = MutableStateFlow<StatusEvent>(StatusEvent.Stop)
 
@@ -20,7 +19,6 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
 
     init {
         checkIfServiceIsUp()
-        registerCmdReceiver()
     }
 
     fun doPlay() {
@@ -29,6 +27,10 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
         _status.value = StatusEvent.Play
         launchForegroundService()
         isServiceRunning = true
+    }
+
+    fun doRepeat() {
+        if (!isServiceRunning) return
     }
 
     fun doStop() {
@@ -41,12 +43,26 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
 
     fun doPause() {
         if (!isServiceRunning) return
-        applicationContext.sendBroadcast(Intent("cmd_pause"))
+
+        _status.value = StatusEvent.Pause
+
+        applicationContext.sendBroadcast(
+            Intent("cmd").apply {
+                putExtra("simulation", "pause")
+            }
+        )
     }
 
     fun doResume() {
         if (!isServiceRunning) return
-        applicationContext.sendBroadcast(Intent("cmd_resume"))
+
+        _status.value = StatusEvent.Play
+
+        applicationContext.sendBroadcast(
+            Intent("cmd").apply {
+                putExtra("simulation", "resume")
+            }
+        )
     }
 
     private fun launchForegroundService() {
@@ -63,45 +79,27 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
 
     private fun checkIfServiceIsUp() {
         try {
-            applicationContext.unregisterReceiver(echoReceiver)
+            //applicationContext.unregisterReceiver(cmdEchoReceiver)
         } catch (e: IllegalArgumentException) {
             // not bad that unregister not happend. Better would be to unregister on lifecycle end.
-            Logger.d(msg = "echoReceiver not found")
+            Logger.d(msg = "Broadcast echoReceiver not found")
         }
 
         ContextCompat.registerReceiver(
             applicationContext,
-            echoReceiver,
-            IntentFilter("pong"),
-            ContextCompat.RECEIVER_NOT_EXPORTED
+            cmdEchoReceiver,
+            IntentFilter("cmd_pong"),
+            ContextCompat.RECEIVER_EXPORTED
         )
-
-        applicationContext.sendBroadcast(Intent("ping"))
+        applicationContext.sendBroadcast(Intent("cmd"))
         if (isServiceRunning) {
             _status.value = StatusEvent.Play
         }
     }
 
-    private fun registerCmdReceiver() {
-        ContextCompat.registerReceiver(
-            applicationContext,
-            commandReceiver,
-            IntentFilter("cmd_pong"),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-    }
-
-    inner class Pong: BroadcastReceiver() {
+    inner class CmdPong : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             isServiceRunning = true;
-        }
-    }
-
-    inner class CommandPong: BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent) {
-            _status.value = StatusEvent.Pause
-            _status.value = StatusEvent.Play
-            isServiceRunning = true
         }
     }
 }
