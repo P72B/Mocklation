@@ -13,7 +13,7 @@ class Converter {
     companion object {
         fun fromRoom(feature: Feature): List<WayPoint> {
             val track = mutableListOf<WayPoint>()
-            val speedInKmH = 120
+            val speedInKmH = 60
             feature.nodes.forEach {
                 val location = Location(LocationManager.GPS_PROVIDER).apply {
                     latitude = it.geometry.latLng.latitude

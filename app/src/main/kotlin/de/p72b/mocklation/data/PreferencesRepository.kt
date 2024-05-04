@@ -1,5 +1,6 @@
 package de.p72b.mocklation.data
 
+import android.app.Activity
 import android.content.Context
 import androidx.activity.ComponentActivity
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,7 @@ class PreferencesRepository(
     fun firstTimeAskingPermission(permission: String, isFirstTime: Boolean) {
         val sharedPreference = context.getSharedPreferences(
             PREFS_FILE_NAME,
-            ComponentActivity.MODE_PRIVATE
+            Activity.MODE_PRIVATE
         )
         sharedPreference.edit().putBoolean(
             permission,
@@ -34,7 +35,7 @@ class PreferencesRepository(
     fun isFirstTimeAskingPermission(permission: String): Boolean {
         val sharedPreference = context.getSharedPreferences(
             PREFS_FILE_NAME,
-            ComponentActivity.MODE_PRIVATE
+            Activity.MODE_PRIVATE
         )
         return sharedPreference.getBoolean(
             permission,
@@ -46,7 +47,7 @@ class PreferencesRepository(
     fun setSelectedFeature(id: String?) {
         val sharedPreference = context.getSharedPreferences(
             PREFS_FILE_NAME,
-            ComponentActivity.MODE_PRIVATE
+            Activity.MODE_PRIVATE
         )
         sharedPreference.edit().putString(
             KEY_SELECTED_FEATURE,
@@ -58,7 +59,7 @@ class PreferencesRepository(
     fun getSelectedFeature(): String? {
         val sharedPreference = context.getSharedPreferences(
             PREFS_FILE_NAME,
-            ComponentActivity.MODE_PRIVATE
+            Activity.MODE_PRIVATE
         )
         return sharedPreference.getString(
             KEY_SELECTED_FEATURE,
@@ -69,7 +70,7 @@ class PreferencesRepository(
     fun getShouldAskAgainToStopSimulationService(): Boolean {
         val sharedPreference = context.getSharedPreferences(
             PREFS_FILE_NAME,
-            ComponentActivity.MODE_PRIVATE
+            Activity.MODE_PRIVATE
         )
         return sharedPreference.getBoolean(
             KEY_SHOULD_ASK_AGAIN_TO_SHOW_STOP_SIMULATION,
@@ -80,7 +81,7 @@ class PreferencesRepository(
     fun setShouldAskAgainToStopSimulationService(value: Boolean) {
         val sharedPreference = context.getSharedPreferences(
             PREFS_FILE_NAME,
-            ComponentActivity.MODE_PRIVATE
+            Activity.MODE_PRIVATE
         )
         sharedPreference.edit().putBoolean(
             KEY_SHOULD_ASK_AGAIN_TO_SHOW_STOP_SIMULATION,
