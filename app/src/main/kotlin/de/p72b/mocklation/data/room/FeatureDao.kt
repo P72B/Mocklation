@@ -11,8 +11,8 @@ interface FeatureDao {
     @Query("SELECT * FROM featureEntity")
     fun getAll(): List<FeatureEntity>
 
-    @Query("SELECT * FROM featureEntity WHERE uid IN (:coinIds)")
-    fun loadAllByIds(coinIds: IntArray): List<FeatureEntity>
+    @Query("SELECT * FROM featureEntity WHERE uid IN (:id)")
+    fun loadAllByIds(id: IntArray): List<FeatureEntity>
 
     @Query("SELECT * FROM featureEntity WHERE uid LIKE :id LIMIT 1")
     fun findById(id: String): FeatureEntity?

@@ -1,6 +1,6 @@
 package de.p72b.mocklation.service.location.sampler
 
-import de.p72b.mocklation.data.WayPoint
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.util.applyRandomGpsNoice
 import de.p72b.mocklation.util.convertToLineString
 import de.p72b.mocklation.util.distance
@@ -10,11 +10,10 @@ import org.locationtech.jts.linearref.LinearLocation
 import org.locationtech.jts.linearref.LocationIndexedLine
 
 class RouteLocationSimulationSampler(
-    private val track: List<WayPoint>,
-    useExactLocation: Boolean = false,
+    private val mockFeature: MockFeature,
     considerTunnel: Boolean = true
-) : LocationSimulationSampler, SimulationSampler(useExactLocation, considerTunnel) {
-    private val path: LineString = track.convertToLineString()
+) : LocationSimulationSampler, SimulationSampler(considerTunnel) {
+    private val path: LineString = mockFeature.nodes.convertToLineString()
     private val lengthLocationMap = LengthLocationMap(path)
     private val locationIndexedLine = LocationIndexedLine(path)
     //private val lengthIndexedLine = LengthIndexedLine(path)
@@ -23,13 +22,13 @@ class RouteLocationSimulationSampler(
     private val pathLengthInMeter = path.length * 100_000
 
     init {
-        for (i in track.indices) {
-            if (i == track.size - 1) {
+        for (i in mockFeature.nodes.indices) {
+            if (i == mockFeature.nodes.size - 1) {
                 continue
             }
-            val next = track[i + 1]
-            val distanceToNextInMeter = track[i].distance(next) * 100_000
-            val sectionTimeInSeconds = distanceToNextInMeter / (track[i].speedInKmh / 3.6)
+            val next = mockFeature.nodes[i + 1]
+            val distanceToNextInMeter = mockFeature.nodes[i].distance(next) * 100_000
+            val sectionTimeInSeconds = distanceToNextInMeter / (mockFeature.nodes[i].speedInKmh / 3.6)
             totalTravelTimeInSeconds += sectionTimeInSeconds
         }
         avgSpeedInKmh = pathLengthInMeter / totalTravelTimeInSeconds
@@ -49,7 +48,7 @@ class RouteLocationSimulationSampler(
         val distanceTraveledInMeter = avgSpeedInKmh * ((elapsedTimeInMillis - totalElapsedPauseTimeInMillis) / 1_000)
         val linearLocation = lengthLocationMap.getLocation(distanceTraveledInMeter / 100_000)
         val forwardShiftedCoordinate = locationIndexedLine.extractPoint(linearLocation)
-        val currentSectionStartWayPoint = track[linearLocation.segmentIndex]
+        val currentSectionStartWayPoint = mockFeature.nodes[linearLocation.segmentIndex]
         val mockLocation = createLocationFrom(currentSectionStartWayPoint)
         val location: LinearLocation = locationIndexedLine.project(forwardShiftedCoordinate)
         val lengthAlongLine = lengthLocationMap.getLength(location) * 100_000
@@ -59,15 +58,15 @@ class RouteLocationSimulationSampler(
             this.longitude = forwardShiftedCoordinate.y
         }
 
-        if (useExactLocation.not()) {
+        if (mockLocation.accuracy != 0.0f) {
             mockLocation.applyRandomGpsNoice()
         }
 
         return Instruction.RouteInstruction(
-            wayPoint = currentSectionStartWayPoint,
+            node = currentSectionStartWayPoint,
             totalTrackLengthInMeter = pathLengthInMeter,
             activeSectionIndex = linearLocation.segmentIndex,
-            totalSectionsIndex = track.size - 1,
+            totalSectionsIndex = mockFeature.nodes.size - 1,
             location = mockLocation,
             isLast = isLastWayPoint(distanceTraveledInMeter),
             progressInPercent = 100 * lengthAlongLine / pathLengthInMeter,

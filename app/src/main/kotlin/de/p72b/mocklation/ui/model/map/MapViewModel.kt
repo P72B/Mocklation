@@ -2,8 +2,7 @@ package de.p72b.mocklation.ui.model.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.p72b.mocklation.data.Feature
-import de.p72b.mocklation.data.Geometry
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.data.LatLng
 import de.p72b.mocklation.data.Node
 import de.p72b.mocklation.data.util.Status
@@ -20,7 +19,7 @@ class MapViewModel(
 ) : ViewModel() {
 
     private val pointOnly = false
-    private val feature = Feature()
+    private val feature = MockFeature()
     private var savedAt: Long? = null
 
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
@@ -33,7 +32,8 @@ class MapViewModel(
         val currentId = determineNextNodeId(feature.nodes)
         val node = Node(
             id = currentId,
-            geometry = Geometry(LatLng(lat.roundTo(6), lng.roundTo(6)))
+            accuracyInMeter = 6.0f,
+            geometry = LatLng(lat.roundTo(6), lng.roundTo(6))
         )
         feature.nodes.add(node)
 
@@ -97,7 +97,7 @@ sealed interface MapUIState {
     data object Loading : MapUIState
     data class FeatureData(
         val selectedId: Int? = null,
-        val feature: Feature,
+        val feature: MockFeature,
         val tstamp: Long? = null,
     ) : MapUIState
 }

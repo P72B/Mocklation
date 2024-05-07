@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.jetbrains.kotlinx.json)
 }
 
 val androidMinSdk: Int by rootProject.extra
@@ -37,5 +38,5 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.kotlinx.json)
 }

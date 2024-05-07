@@ -1,12 +1,14 @@
 package de.p72b.mocklation.service.location.sampler
 
-import de.p72b.mocklation.data.WayPoint
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.util.applyRandomGpsNoice
 
 class FixedLocationSimulationSampler(
-    private val wayPoint: WayPoint,
+    mockFeature: MockFeature,
     useExactLocation: Boolean = false
 ): LocationSimulationSampler, SimulationSampler(useExactLocation)  {
+
+    private val node = mockFeature.nodes.first()
 
     override fun pause() {
         isPaused = true
@@ -18,15 +20,15 @@ class FixedLocationSimulationSampler(
 
     override fun getNextInstruction(): Instruction {
         super.updateClock()
-        val mockLocation = createLocationFrom(wayPoint)
+        val mockLocation = createLocationFrom(node)
 
-        if (isPaused.not() && useExactLocation.not()) {
+        if (isPaused.not() && node.accuracyInMeter != 0.0f) {
             mockLocation.applyRandomGpsNoice()
         }
 
         return Instruction.FixedInstruction(
-            wayPoint = wayPoint,
-            location = getLocationConsiderTunnel(mockLocation, wayPoint)
+            node = node,
+            location = getLocationConsiderTunnel(mockLocation, node.isTunnel)
         )
     }
 }

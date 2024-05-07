@@ -13,7 +13,7 @@ import android.os.IBinder
 import androidx.core.content.ContextCompat
 import de.p72b.mocklation.MainActivity
 import de.p72b.mocklation.R
-import de.p72b.mocklation.data.Feature
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.service.location.LocationSimulation
@@ -41,7 +41,7 @@ class ForegroundService : Service() {
     private var startMode: Int = 0
     private lateinit var cmdReceiver: ServiceCmdReceiver
     private lateinit var simulation: LocationSimulation
-    private lateinit var feature: Feature
+    private lateinit var feature: MockFeature
 
     override fun onCreate() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

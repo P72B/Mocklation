@@ -31,15 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogWindowProvider
 import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.p72b.mocklation.R
-import de.p72b.mocklation.data.Feature
+import de.p72b.mocklation.data.MockFeature
 import kotlin.reflect.KFunction1
 
 @Composable
@@ -102,10 +100,10 @@ internal fun EmptyCollectionScreen(
 @Composable
 internal fun DataCollectionScreen(
     modifier: Modifier = Modifier,
-    listData: List<Feature>,
+    listData: List<MockFeature>,
     selectedId: String? = null,
-    onItemClicked: KFunction1<Feature, Unit>,
-    onDelete: KFunction1<Feature, Unit>,
+    onItemClicked: KFunction1<MockFeature, Unit>,
+    onDelete: KFunction1<MockFeature, Unit>,
 ) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         listData.forEach { feature ->
@@ -134,10 +132,10 @@ internal fun DataCollectionScreen(
 @Composable
 internal fun PointCard(
     modifier: Modifier = Modifier,
-    feature: Feature,
+    feature: MockFeature,
     isSelected: Boolean = false,
-    onItemClicked: KFunction1<Feature, Unit>,
-    onDelete: KFunction1<Feature, Unit>,
+    onItemClicked: KFunction1<MockFeature, Unit>,
+    onDelete: KFunction1<MockFeature, Unit>,
 ) {
     Card(
         modifier = modifier
@@ -153,7 +151,7 @@ internal fun PointCard(
                 Text(text = it)
             }
             feature.nodes.forEach {
-                Text(text = "${it.geometry.latLng.latitude} / ${it.geometry.latLng.longitude}")
+                Text(text = "${it.geometry.latitude} / ${it.geometry.longitude}")
             }
             ButtonBar(
                 modifier = modifier,
@@ -167,8 +165,8 @@ internal fun PointCard(
 @Composable
 internal fun ButtonBar(
     modifier: Modifier = Modifier,
-    feature: Feature,
-    onDelete: KFunction1<Feature, Unit>,
+    feature: MockFeature,
+    onDelete: KFunction1<MockFeature, Unit>,
 ) {
     IconButton(onClick = { onDelete(feature) }) {
         Icon(
@@ -182,10 +180,10 @@ internal fun ButtonBar(
 @Composable
 internal fun RouteCard(
     modifier: Modifier = Modifier,
-    feature: Feature,
+    feature: MockFeature,
     isSelected: Boolean = false,
-    onItemClicked: KFunction1<Feature, Unit>,
-    onDelete: KFunction1<Feature, Unit>,
+    onItemClicked: KFunction1<MockFeature, Unit>,
+    onDelete: KFunction1<MockFeature, Unit>,
 ) {
     Card(
         modifier = modifier
@@ -198,7 +196,7 @@ internal fun RouteCard(
         Column {
             CheckableProfileCircle(feature.uuid.substring(0, 2), isSelected)
             feature.nodes.forEach {
-                Text(text = "${it.geometry.latLng.latitude} / ${it.geometry.latLng.longitude}")
+                Text(text = "${it.geometry.latitude} / ${it.geometry.longitude}")
             }
             ButtonBar(
                 modifier = modifier,
@@ -243,9 +241,9 @@ internal fun CheckableProfileCircle(
 
 @Composable
 fun AlertDialogToCancelOngoingSimulation(
-    feature: Feature,
+    feature: MockFeature,
     onDismissRequest: () -> Unit,
-    onConfirmation: (feature: Feature, shouldAskAgain: Boolean) -> Unit,
+    onConfirmation: (feature: MockFeature, shouldAskAgain: Boolean) -> Unit,
 ) {
     val checkedState = remember { mutableStateOf(false) }
     AlertDialog(

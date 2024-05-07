@@ -55,8 +55,8 @@ fun NodeView(
             .height(200.dp)
     ) {
         Text(
-            text = "${node.geometry.latLng.latitude} / ${
-                node.geometry.latLng.longitude
+            text = "${node.geometry.latitude} / ${
+                node.geometry.longitude
             }"
         )
         Button(

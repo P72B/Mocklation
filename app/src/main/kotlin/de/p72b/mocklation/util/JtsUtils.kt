@@ -1,7 +1,7 @@
 package de.p72b.mocklation.util
 
 import android.location.Location
-import de.p72b.mocklation.data.WayPoint
+import de.p72b.mocklation.data.Node
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.LineString
@@ -17,11 +17,11 @@ import org.locationtech.jts.shape.random.RandomPointsBuilder
 
 val geometryFactory = GeometryFactory(PrecisionModel(), 4326)
 
-fun List<WayPoint>.convertToLineString(): LineString {
+fun List<Node>.convertToLineString(): LineString {
     val coordinateList = arrayOfNulls<Coordinate>(this.size)
     for (i in this.indices) {
         coordinateList[i] =
-            Coordinate(this[i].location.latitude, this[i].location.longitude)
+            Coordinate(this[i].geometry.latitude, this[i].geometry.longitude)
     }
     return LineString(
         CoordinateArraySequence(coordinateList),
@@ -29,11 +29,11 @@ fun List<WayPoint>.convertToLineString(): LineString {
     )
 }
 
-fun WayPoint.convertToPoint(): Point {
-    return this.location.convertToPoint()
+fun Node.convertToPoint(): Point {
+    return geometryFactory.createPoint(Coordinate(this.geometry.latitude, this.geometry.longitude))
 }
 
-fun WayPoint.distance(to: WayPoint): Double {
+fun Node.distance(to: Node): Double {
     return this.convertToPoint().distance(to.convertToPoint())
 }
 

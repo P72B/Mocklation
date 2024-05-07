@@ -16,7 +16,7 @@ class FeatureRepository(
     private val featureEntityMapper: FeatureEntityMapper,
 ) {
 
-    suspend fun getFeatureCollection(): Resource<List<Feature>> {
+    suspend fun getFeatureCollection(): Resource<List<MockFeature>> {
         return withContext(Dispatchers.IO) {
             Resource(
                 status = Status.SUCCESS,
@@ -25,7 +25,7 @@ class FeatureRepository(
         }
     }
 
-    suspend fun insertFeature(feature: Feature): Resource<Unit> {
+    suspend fun insertFeature(feature: MockFeature): Resource<Unit> {
         return withContext(Dispatchers.IO) {
             Resource(
                 status = Status.SUCCESS,
@@ -34,7 +34,7 @@ class FeatureRepository(
         }
     }
 
-    suspend fun deleteFeature(feature: Feature): Resource<Unit> {
+    suspend fun deleteFeature(feature: MockFeature): Resource<Unit> {
         return withContext(Dispatchers.IO) {
             Resource(
                 status = Status.SUCCESS,
@@ -43,7 +43,7 @@ class FeatureRepository(
         }
     }
 
-    suspend fun findFeature(id: String): Resource<Feature> {
+    suspend fun findFeature(id: String): Resource<MockFeature> {
         return withContext(Dispatchers.IO) {
             featureDatabase.featureDao().findById(id).let {
                 if (it == null) {
@@ -58,7 +58,7 @@ class FeatureRepository(
         }
     }
 
-    private fun mapEntityList2FeatureList(input: List<FeatureEntity>): List<Feature> {
+    private fun mapEntityList2FeatureList(input: List<FeatureEntity>): List<MockFeature> {
         return input.map {
             featureMapper.map(it)
         }

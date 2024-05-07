@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.p72b.mocklation.data.Feature
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.data.PreferencesRepository
 import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.service.ForegroundServiceInteractor
@@ -30,7 +30,7 @@ class CollectionViewModel(
         _uiState.value = uiState
     }
 
-    fun onItemClicked(feature: Feature) {
+    fun onItemClicked(feature: MockFeature) {
         val currentSelectedFeature = preferencesRepository.getSelectedFeature()
         if (currentSelectedFeature == null) {
             consumeItemClick(feature, null)
@@ -52,7 +52,7 @@ class CollectionViewModel(
         }
     }
 
-    private fun consumeItemClick(feature: Feature, currentSelectedFeature: String?) {
+    private fun consumeItemClick(feature: MockFeature, currentSelectedFeature: String?) {
         if (currentSelectedFeature == feature.uuid) {
             preferencesRepository.setSelectedFeature(null)
         } else {
@@ -61,7 +61,7 @@ class CollectionViewModel(
         fetchDatabaseData()
     }
 
-    fun onDelete(feature: Feature) {
+    fun onDelete(feature: MockFeature) {
         viewModelScope.launch {
             val result = deleteFeatureUseCase.invoke(feature)
             when (result.status) {
@@ -77,7 +77,7 @@ class CollectionViewModel(
         }
     }
 
-    fun onConfirmToCancelOngoingSimulation(feature: Feature, shouldAskAgain: Boolean = true) {
+    fun onConfirmToCancelOngoingSimulation(feature: MockFeature, shouldAskAgain: Boolean = true) {
         preferencesRepository.setShouldAskAgainToStopSimulationService(shouldAskAgain)
         val currentSelectedFeature = preferencesRepository.getSelectedFeature()
         simulationService.doStop()
@@ -134,7 +134,7 @@ class CollectionViewModel(
 sealed interface CollectionUIState {
     data object Loading : CollectionUIState
     data object Empty : CollectionUIState
-    data class Data(val items: List<Feature>, val selectedItem: String? = null) : CollectionUIState
+    data class Data(val items: List<MockFeature>, val selectedItem: String? = null) : CollectionUIState
     data object Error : CollectionUIState
-    data class ShowSimulationCancelDialog(val feature: Feature) : CollectionUIState
+    data class ShowSimulationCancelDialog(val feature: MockFeature) : CollectionUIState
 }

@@ -1,22 +1,19 @@
 package de.p72b.mocklation.parser
 
 import android.content.Context
-import android.location.Location
-import android.location.LocationManager
-import com.google.maps.android.data.LineString
-import com.google.maps.android.data.Point
 import com.google.maps.android.data.geojson.GeoJsonParser
-import de.p72b.mocklation.data.WayPoint
+import de.p72b.mocklation.data.MockFeature
 import org.json.JSONObject
 
 class TrackImport(private val context: Context) {
 
-    fun read(): List<WayPoint> {
+    fun read(): List<MockFeature> {
         val text =
             context.resources.openRawResource(R.raw.sample).bufferedReader().use { it.readText() }
         val geoJsonParser = GeoJsonParser(JSONObject(text))
-        val result = mutableListOf<WayPoint>()
+        val result = mutableListOf<MockFeature>()
         for (feature in geoJsonParser.features) {
+            /*
             if (feature.hasGeometry()) {
                 var isTunnel = false
                 var speed = 60
@@ -37,7 +34,7 @@ class TrackImport(private val context: Context) {
                     is LineString -> {
                         for (item in (feature.geometry as LineString).geometryObject) {
                             result.add(
-                                WayPoint(
+                                MockFeature(
                                     speedInKmh = speed,
                                     location = Location(LocationManager.GPS_PROVIDER).apply {
                                         latitude = item.latitude
@@ -52,7 +49,7 @@ class TrackImport(private val context: Context) {
                     is Point -> {
                         val latLng = (feature.geometry as Point).geometryObject
                         result.add(
-                            WayPoint(
+                            MockFeature(
                                 speedInKmh = speed,
                                 location = Location(LocationManager.GPS_PROVIDER).apply {
                                     latitude = latLng.latitude
@@ -68,7 +65,8 @@ class TrackImport(private val context: Context) {
                     }
                 }
             }
+            */
         }
-        return result
+        return emptyList()
     }
 }

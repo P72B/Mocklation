@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import de.p72b.mocklation.data.Node
-import java.util.UUID
 
 @Entity
 data class FeatureEntity(

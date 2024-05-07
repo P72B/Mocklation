@@ -7,8 +7,7 @@ import android.location.LocationManager
 import android.os.Build
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import de.p72b.mocklation.data.Feature
-import de.p72b.mocklation.service.location.sampler.Converter
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.service.location.sampler.Instruction
 import de.p72b.mocklation.service.location.sampler.LocationSimulationSampler
 import de.p72b.mocklation.service.location.sampler.SamplerBuilder
@@ -22,20 +21,17 @@ import kotlinx.coroutines.launch
 @SuppressLint("MissingPermission")
 class LocationSimulation(
     context: Context,
-    feature: Feature,
+    feature: MockFeature,
     private val listener: (SimulationState) -> Unit
 ) {
-
     private lateinit var job: Job
     private val locationManager: LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private val fusedLocationProviderClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
     private val interval: Long = 1000
-
-    // Converter.fromGeoJson(context = context)
     private val sampler: LocationSimulationSampler =
-        SamplerBuilder.create(Converter.fromRoom(feature))
+        SamplerBuilder.create(feature)
 
     fun play() {
         fusedLocationProviderClient.setMockMode(true)

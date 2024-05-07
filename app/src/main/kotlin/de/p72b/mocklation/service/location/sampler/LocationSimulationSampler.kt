@@ -4,8 +4,8 @@ package de.p72b.mocklation.service.location.sampler
 import android.location.Location
 import android.location.LocationManager
 import android.os.SystemClock
-import de.p72b.mocklation.data.WayPoint
-import de.p72b.mocklation.util.Logger
+import de.p72b.mocklation.data.MockFeature
+import de.p72b.mocklation.data.Node
 import java.util.Date
 
 interface LocationSimulationSampler {
@@ -15,17 +15,16 @@ interface LocationSimulationSampler {
 }
 
 object SamplerBuilder {
-    fun create(wayPoints: List<WayPoint>): LocationSimulationSampler {
-        return if (wayPoints.size == 1) {
-            FixedLocationSimulationSampler(wayPoints.first())
+    fun create(mockFeature: MockFeature): LocationSimulationSampler {
+        return if (mockFeature.nodes.size == 1) {
+            FixedLocationSimulationSampler(mockFeature)
         } else {
-            RouteLocationSimulationSampler(wayPoints)
+            RouteLocationSimulationSampler(mockFeature)
         }
     }
 }
 
 open class SimulationSampler(
-    val useExactLocation: Boolean = false,
     private val considerTunnel: Boolean = true
 ) {
     var startTimeInMillis: Long = -1
@@ -60,35 +59,35 @@ open class SimulationSampler(
         }
     }
 
-    fun createLocationFrom(wayPoint: WayPoint): Location {
+    fun createLocationFrom(node: Node): Location {
         return Location(LocationManager.GPS_PROVIDER).apply {
-            latitude = wayPoint.location.latitude
-            longitude = wayPoint.location.longitude
-            accuracy = wayPoint.location.accuracy
+            latitude = node.geometry.latitude
+            longitude = node.geometry.longitude
+            accuracy = node.accuracyInMeter
             elapsedRealtimeNanos = SystemClock.elapsedRealtimeNanos()
             time = nowInMillis
-            speed = (wayPoint.speedInKmh / 3.6).toFloat()
+            speed = (node.speedInKmh / 3.6).toFloat()
         }
     }
 
     fun getLocationConsiderTunnel(
         location: Location,
-        wayPoint: WayPoint
+        isTunnel: Boolean
     ): Location? {
         if (considerTunnel.not()) {
             return location
         }
-        return if (wayPoint.isTunnel) null else location
+        return if (isTunnel) null else location
     }
 }
 sealed interface Instruction {
     data class FixedInstruction(
-        val wayPoint: WayPoint,
+        val node: Node,
         val location: Location?
     ): Instruction
 
     data class RouteInstruction(
-        val wayPoint: WayPoint,
+        val node: Node,
         val location: Location?,
         val totalTrackLengthInMeter: Double,
         val activeSectionIndex: Int,

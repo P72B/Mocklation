@@ -48,7 +48,7 @@ fun GoogleMapView(
             val status = items as MapUIState.FeatureData
             //markerData.clear()
             status.feature.nodes.forEach {
-                val latLng = LatLng(it.geometry.latLng.latitude, it.geometry.latLng.longitude)
+                val latLng = LatLng(it.geometry.latitude, it.geometry.longitude)
                 markerData.add(Pair(it, rememberMarkerState(position = latLng)))
             }
             status.selectedId.let {
