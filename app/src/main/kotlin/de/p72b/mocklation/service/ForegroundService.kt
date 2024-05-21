@@ -117,7 +117,6 @@ class ForegroundService : Service() {
         when (state) {
             LocationSimulation.SimulationState.Finished -> {
                 updateNotificationFinished()
-                // TODO finish here maybe
             }
 
             is LocationSimulation.SimulationState.Status -> {
@@ -148,8 +147,8 @@ class ForegroundService : Service() {
     }
 
     private fun updateNotificationFinished() {
-        notificationBuilder.setContentText("Finished")
-        notificationBuilder.setProgress(0, 0, false)
+        notificationBuilder.setContentText("Destination reached")
+        notificationBuilder.setProgress(100, 100, false)
         notificationManager.notify(SERVICE_ID, notificationBuilder.build())
     }
 

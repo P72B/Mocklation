@@ -9,8 +9,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -59,6 +61,22 @@ fun GoogleMapView(
                         bottomSheetState.expand()
                     }
                 }
+            }
+        }
+
+        is MapUIState.CameraUpdate -> {
+            val cameraUpdate = items as MapUIState.CameraUpdate
+            cameraUpdate.bounds?.let {
+                val southWest = LatLng(it.southWestLatitude, it.southWestLongitude)
+                val northEast = LatLng(it.northEastLatitude, it.northEastLongitude)
+                val latLngBounds = LatLngBounds(southWest, northEast)
+                val boundsUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, 100)
+                cameraPositionState.move(boundsUpdate)
+            }
+            cameraUpdate.point?.let {
+                val center = LatLng(it.centerLatitude, it.centerLongitude)
+                val positionUpdate = CameraUpdateFactory.newLatLng(center)
+                cameraPositionState.move(positionUpdate)
             }
         }
 

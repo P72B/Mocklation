@@ -90,7 +90,6 @@ class LocationSimulation(
                 }
                 if (instruction is Instruction.RouteInstruction && instruction.isLast) {
                     listener(SimulationState.Finished)
-                    stop()
                     return@launch
                 }
                 location?.let {

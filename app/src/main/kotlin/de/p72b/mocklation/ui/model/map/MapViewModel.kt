@@ -6,6 +6,7 @@ import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.data.LatLng
 import de.p72b.mocklation.data.Node
 import de.p72b.mocklation.data.util.Status
+import de.p72b.mocklation.usecase.MapBoundsUseCase
 import de.p72b.mocklation.usecase.SetFeatureUseCase
 import de.p72b.mocklation.util.TWO_DIGITS_COUNTRY_CODE_LOCATION_LIST
 import de.p72b.mocklation.util.roundTo
@@ -15,7 +16,8 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 class MapViewModel(
-    private val setFeatureUseCase: SetFeatureUseCase
+    private val setFeatureUseCase: SetFeatureUseCase,
+    private val mapBoundsUseCase: MapBoundsUseCase
 ) : ViewModel() {
 
     private val pointOnly = false
@@ -24,6 +26,36 @@ class MapViewModel(
 
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
     val uiState: StateFlow<MapUIState> = _uiState
+
+    init {
+        viewModelScope.launch {
+            val result = mapBoundsUseCase.invoke()
+            when (result.status) {
+                Status.SUCCESS -> {
+                    result.data?.let {
+                        val update = MapUIState.CameraUpdate()
+                        if (it.coordinates.size == 1) {
+                            update.point = MapUIState.Point(
+                                centerLatitude = it.coordinates[0].x,
+                                centerLongitude = it.coordinates[0].y
+                            )
+                        } else {
+                            update.bounds = MapUIState.Bounds(
+                                southWestLatitude = it.coordinates[0].x,
+                                southWestLongitude = it.coordinates[0].y,
+                                northEastLatitude = it.coordinates[2].x,
+                                northEastLongitude = it.coordinates[2].y,
+                            )
+                        }
+                        _uiState.value = update
+                    }
+                }
+                Status.ERROR -> {
+                    // can be ignored
+                }
+            }
+        }
+    }
 
     fun onMapLongClick(lat: Double, lng: Double) {
         if (pointOnly && feature.nodes.isEmpty().not()) {
@@ -100,4 +132,21 @@ sealed interface MapUIState {
         val feature: MockFeature,
         val tstamp: Long? = null,
     ) : MapUIState
+
+    data class CameraUpdate(
+        var point: Point? = null,
+        var bounds: Bounds? = null
+    ) : MapUIState
+
+    data class Point(
+        val centerLatitude: Double,
+        val centerLongitude: Double,
+    )
+
+    data class Bounds(
+        val southWestLatitude: Double,
+        val southWestLongitude: Double,
+        val northEastLatitude: Double,
+        val northEastLongitude: Double
+    )
 }

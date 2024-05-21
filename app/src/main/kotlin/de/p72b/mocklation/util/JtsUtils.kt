@@ -5,6 +5,7 @@ import de.p72b.mocklation.data.Node
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import org.locationtech.jts.geom.LineString
+import org.locationtech.jts.geom.MultiPoint
 import org.locationtech.jts.geom.Point
 import org.locationtech.jts.geom.PrecisionModel
 import org.locationtech.jts.geom.impl.CoordinateArraySequence
@@ -27,6 +28,29 @@ fun List<Node>.convertToLineString(): LineString {
         CoordinateArraySequence(coordinateList),
         geometryFactory
     )
+}
+
+fun List<Node>.convertToMultiPoint(): MultiPoint {
+    val pointArray = arrayOfNulls<Point>(this.size)
+    for (i in this.indices) {
+        pointArray[i] = this[i].convertToPoint()
+    }
+    return MultiPoint(
+        pointArray,
+        geometryFactory
+    )
+}
+
+fun Array<Coordinate>.convertToPoints(): Array<Point?> {
+    val pointArray = arrayOfNulls<Point>(this.size)
+    for (i in this.indices) {
+        pointArray[i] = this[i].convertToPoint()
+    }
+    return pointArray
+}
+
+fun Coordinate.convertToPoint(): Point {
+    return geometryFactory.createPoint(Coordinate(this.x, this.y))
 }
 
 fun Node.convertToPoint(): Point {

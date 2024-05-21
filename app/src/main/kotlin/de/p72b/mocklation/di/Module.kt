@@ -16,6 +16,7 @@ import de.p72b.mocklation.ui.model.requirements.RequirementsViewModel
 import de.p72b.mocklation.ui.model.simulation.SimulationViewModel
 import de.p72b.mocklation.usecase.DeleteFeatureUseCase
 import de.p72b.mocklation.usecase.GetFeatureUseCase
+import de.p72b.mocklation.usecase.MapBoundsUseCase
 import de.p72b.mocklation.usecase.SetFeatureUseCase
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -55,6 +56,11 @@ val appModule = module {
             repository = get(),
         )
     }
+    factory {
+        MapBoundsUseCase(
+            getCollectionUseCase = get(),
+        )
+    }
     single { RequirementsViewModel(get(), get()) }
     single {
         CollectionViewModel(
@@ -74,6 +80,7 @@ val appModule = module {
     }
     viewModel {
         MapViewModel(
+            get(),
             get(),
         )
     }
