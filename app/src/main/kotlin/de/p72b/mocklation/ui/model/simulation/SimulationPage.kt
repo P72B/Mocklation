@@ -142,7 +142,7 @@ internal fun PausedSimulationScreen(
         ) {
             IconButton(onClick = { onResumeSimulation() }) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.baseline_not_started_24),
+                    imageVector = ImageVector.vectorResource(R.drawable.resume_24dp_fill1_wght400_grad0_opsz24),
                     contentDescription = stringResource(id = R.string.pause)
                 )
             }

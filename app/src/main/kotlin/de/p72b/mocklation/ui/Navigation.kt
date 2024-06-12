@@ -17,10 +17,10 @@
 package de.p72b.mocklation.ui
 
 import android.content.Intent
-import android.util.DisplayMetrics
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomSheetScaffold
@@ -44,7 +44,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,7 +60,6 @@ import de.p72b.mocklation.ui.model.dashboard.DashboardPage
 import de.p72b.mocklation.ui.model.map.MapActivity
 import de.p72b.mocklation.ui.model.requirements.RequirementsPage
 import de.p72b.mocklation.ui.model.simulation.SimulationPage
-import de.p72b.mocklation.util.Logger
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -154,7 +152,7 @@ fun MainNavigation(
         }
 
         SheetValue.Expanded -> {
-            165.dp
+            125.dp
         }
     }
     Scaffold(
@@ -191,6 +189,9 @@ fun MainNavigation(
                 )
             },
             sheetPeekHeight = 0.dp,
+            sheetDragHandle = {},
+            sheetShape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp),
+            sheetSwipeEnabled = false
         ) {
             ContentBox(paddingValues, navController, sheetState)
         }
