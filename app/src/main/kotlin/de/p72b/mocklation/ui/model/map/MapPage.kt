@@ -3,6 +3,7 @@ package de.p72b.mocklation.ui.model.map
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -46,12 +48,21 @@ fun GoogleMapView(
     val markerData = mutableListOf<Pair<Node, MarkerState>>()
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
-        is MapUIState.FeatureData -> {
-            val status = items as MapUIState.FeatureData
+        is MapUIState.FeatureDataUpdate -> {
+            val status = items as MapUIState.FeatureDataUpdate
             //markerData.clear()
             status.feature.nodes.forEach {
                 val latLng = LatLng(it.geometry.latitude, it.geometry.longitude)
-                markerData.add(Pair(it, rememberMarkerState(position = latLng)))
+                val state = rememberMarkerState(
+                    key = it.id.toString(),
+                    position = latLng
+                )
+                LaunchedEffect(key1 = state.position) {
+                    //if (state.dragState == DragState.END) {
+                        viewModel.onMarkerDragEnd(it, state.position.latitude, state.position.longitude)
+                    //}
+                }
+                markerData.add(Pair(it, state))
             }
             status.selectedId.let {
                 scope.launch {

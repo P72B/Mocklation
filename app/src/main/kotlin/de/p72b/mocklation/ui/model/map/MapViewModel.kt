@@ -8,6 +8,7 @@ import de.p72b.mocklation.data.Node
 import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.usecase.MapBoundsUseCase
 import de.p72b.mocklation.usecase.SetFeatureUseCase
+import de.p72b.mocklation.util.StatisticsCalculator
 import de.p72b.mocklation.util.TWO_DIGITS_COUNTRY_CODE_LOCATION_LIST
 import de.p72b.mocklation.util.roundTo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ class MapViewModel(
 
     private val pointOnly = false
     private val feature = MockFeature()
+    private val stats = StatisticsCalculator(feature)
     private var savedAt: Long? = null
 
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
@@ -50,11 +52,30 @@ class MapViewModel(
                         _uiState.value = update
                     }
                 }
+
                 Status.ERROR -> {
                     // can be ignored
                 }
             }
         }
+    }
+
+    fun onMarkerDragEnd(node: Node, newLatitude: Double, newLongitude: Double) {
+        if (feature.nodes.contains(node).not()) {
+            return
+        }
+        feature.nodes.find { node.id == it.id }?.let {
+            it.geometry.latitude = newLatitude
+            it.geometry.longitude = newLongitude
+        }
+
+        stats.setFeature(feature)
+        _uiState.value = MapUIState.FeatureDataUpdate(
+            selectedId = node.id,
+            feature = feature,
+            tstamp = Date().time,
+            statisticsViewData = getViewData()
+        )
     }
 
     fun onMapLongClick(lat: Double, lng: Double) {
@@ -68,11 +89,13 @@ class MapViewModel(
             geometry = LatLng(lat.roundTo(6), lng.roundTo(6))
         )
         feature.nodes.add(node)
+        stats.setFeature(feature)
 
-        _uiState.value = MapUIState.FeatureData(
+        _uiState.value = MapUIState.FeatureDataUpdate(
             selectedId = currentId,
             feature = feature,
-            tstamp = Date().time
+            tstamp = Date().time,
+            statisticsViewData = getViewData()
         )
     }
 
@@ -86,10 +109,11 @@ class MapViewModel(
     }
 
     fun onNodeClicked(node: Node) {
-        _uiState.value = MapUIState.FeatureData(
+        _uiState.value = MapUIState.FeatureDataUpdate(
             selectedId = node.id,
             feature = feature,
-            tstamp = Date().time
+            tstamp = Date().time,
+            statisticsViewData = getViewData()
         )
     }
 
@@ -123,14 +147,23 @@ class MapViewModel(
         }
         return resultId
     }
+
+    private fun getViewData(): MapUIState.StatisticsViewData {
+        return MapUIState.StatisticsViewData(
+            pathLength = "${stats.pathLengthInMeter.roundTo(2)} m",
+            totalTravelTime = "${stats.totalTravelTimeInSeconds.roundTo(1)} s",
+            avgSpeed = "Ø ${(stats.avgSpeedInKmh * 3.6).toInt()} km/h"
+        )
+    }
 }
 
 sealed interface MapUIState {
     data object Loading : MapUIState
-    data class FeatureData(
+    data class FeatureDataUpdate(
         val selectedId: Int? = null,
         val feature: MockFeature,
         val tstamp: Long? = null,
+        val statisticsViewData: StatisticsViewData
     ) : MapUIState
 
     data class CameraUpdate(
@@ -148,5 +181,11 @@ sealed interface MapUIState {
         val southWestLongitude: Double,
         val northEastLatitude: Double,
         val northEastLongitude: Double
+    )
+
+    data class StatisticsViewData(
+        val pathLength: String,
+        val totalTravelTime: String,
+        val avgSpeed: String
     )
 }

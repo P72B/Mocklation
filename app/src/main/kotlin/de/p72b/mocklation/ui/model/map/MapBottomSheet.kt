@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.p72b.mocklation.R
 import de.p72b.mocklation.data.Node
+import de.p72b.mocklation.util.roundTo
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -23,15 +24,16 @@ fun MapBottomSheet(
 ) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
     when (items) {
-        is MapUIState.FeatureData -> {
-            val status = items as MapUIState.FeatureData
+        is MapUIState.FeatureDataUpdate -> {
+            val status = items as MapUIState.FeatureDataUpdate
             status.selectedId.let { selectedId ->
                 status.feature.nodes.find {
                     it.id == selectedId
                 }?.let {
-                    NodeView(
+                    DetailsView(
+                        statisticsViewData = status.statisticsViewData,
                         node = it,
-                        viewModel::onSaveClicked
+                        onSaveClicked = viewModel::onSaveClicked
                     )
                 }
             }
@@ -44,7 +46,8 @@ fun MapBottomSheet(
 }
 
 @Composable
-fun NodeView(
+fun DetailsView(
+    statisticsViewData: MapUIState.StatisticsViewData,
     node: Node,
     onSaveClicked: () -> Unit
 ) {
@@ -54,11 +57,8 @@ fun NodeView(
             .padding(bottom = 16.dp, start = 16.dp, end = 16.dp)
             .height(200.dp)
     ) {
-        Text(
-            text = "${node.geometry.latitude} / ${
-                node.geometry.longitude
-            }"
-        )
+        StatisticsView(statisticsViewData)
+        NodeListView(node)
         Button(
             onClick = {
                 onSaveClicked()
@@ -70,4 +70,27 @@ fun NodeView(
             )
         }
     }
+}
+
+@Composable
+fun StatisticsView(
+    statisticsViewData: MapUIState.StatisticsViewData,
+) {
+    Text(
+        text = "${statisticsViewData.totalTravelTime} (${statisticsViewData.pathLength})"
+    )
+    Text(
+        text = statisticsViewData.avgSpeed
+    )
+}
+
+@Composable
+fun NodeListView(
+    node: Node,
+) {
+    Text(
+        text = "${node.geometry.latitude.roundTo(6)} / ${
+            node.geometry.longitude.roundTo(6)
+        }"
+    )
 }

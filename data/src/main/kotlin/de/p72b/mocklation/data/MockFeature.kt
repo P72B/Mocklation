@@ -38,4 +38,4 @@ data class Way(
 )
 
 @Serializable
-data class LatLng(val latitude: Double, val longitude: Double)
+data class LatLng(var latitude: Double, var longitude: Double)
