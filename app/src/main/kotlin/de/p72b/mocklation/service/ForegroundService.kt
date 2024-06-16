@@ -138,7 +138,7 @@ class ForegroundService : Service() {
 
     private fun updateNotificationRoute(instruction: Instruction.RouteInstruction) {
         notificationBuilder.setContentText(
-            "Section ${instruction.activeSectionIndex + 1} from ${instruction.totalSectionsIndex + 1}\n" +
+            "Section ${instruction.activeSectionIndex + 1} from ${instruction.totalSectionsIndex}\n" +
                     "lat(y): ${instruction.location!!.latitude.roundTo(5)} / " +
                     "lon(x): ${instruction.location.longitude.roundTo(5)}"
         )
