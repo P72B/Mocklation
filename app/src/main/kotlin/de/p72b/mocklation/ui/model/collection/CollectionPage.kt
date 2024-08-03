@@ -128,7 +128,7 @@ internal fun DataCollectionScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 internal fun PointCard(
     modifier: Modifier = Modifier,
@@ -176,7 +176,6 @@ internal fun ButtonBar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RouteCard(
     modifier: Modifier = Modifier,

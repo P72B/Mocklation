@@ -1,22 +1,40 @@
 package de.p72b.mocklation.ui.model.map
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import de.p72b.mocklation.R
+import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.data.Node
+import de.p72b.mocklation.ui.model.collection.ButtonBar
+import de.p72b.mocklation.ui.model.collection.CheckableProfileCircle
+import de.p72b.mocklation.ui.model.collection.PointCard
+import de.p72b.mocklation.ui.model.collection.RouteCard
 import de.p72b.mocklation.util.roundTo
 import org.koin.androidx.compose.koinViewModel
+import kotlin.reflect.KFunction1
 
 @Composable
 fun MapBottomSheet(
@@ -26,17 +44,14 @@ fun MapBottomSheet(
     when (items) {
         is MapUIState.FeatureDataUpdate -> {
             val status = items as MapUIState.FeatureDataUpdate
-            status.selectedId.let { selectedId ->
-                status.feature.nodes.find {
-                    it.id == selectedId
-                }?.let {
-                    DetailsView(
-                        statisticsViewData = status.statisticsViewData,
-                        node = it,
-                        onSaveClicked = viewModel::onSaveClicked
-                    )
-                }
-            }
+            DetailsView(
+                statisticsViewData = status.statisticsViewData,
+                nodes = status.feature.nodes,
+                onSaveClicked = viewModel::onSaveClicked,
+                selectedNodeId = status.selectedId,
+                onItemClicked = viewModel::onNodeListItemClicked,
+                onDelete = viewModel::onDeleteClicked,
+            )
         }
 
         else -> {
@@ -47,9 +62,13 @@ fun MapBottomSheet(
 
 @Composable
 fun DetailsView(
+    modifier: Modifier = Modifier,
     statisticsViewData: MapUIState.StatisticsViewData,
-    node: Node,
-    onSaveClicked: () -> Unit
+    nodes: List<Node>,
+    selectedNodeId: Int? = null,
+    onSaveClicked: () -> Unit,
+    onItemClicked: KFunction1<Node, Unit>,
+    onDelete: KFunction1<Node, Unit>,
 ) {
     Column(
         modifier = Modifier
@@ -58,7 +77,13 @@ fun DetailsView(
             .height(200.dp)
     ) {
         StatisticsView(statisticsViewData)
-        NodeListView(node)
+        NodeListView(
+            modifier = modifier,
+            nodes = nodes,
+            selectedNodeId = selectedNodeId,
+            onItemClicked = onItemClicked,
+            onDelete = onDelete,
+        )
         Button(
             onClick = {
                 onSaveClicked()
@@ -77,20 +102,75 @@ fun StatisticsView(
     statisticsViewData: MapUIState.StatisticsViewData,
 ) {
     Text(
-        text = "${statisticsViewData.totalTravelTime} (${statisticsViewData.pathLength})"
-    )
-    Text(
-        text = statisticsViewData.avgSpeed
+        text = "${statisticsViewData.totalTravelTime} (${statisticsViewData.pathLength}) ${statisticsViewData.avgSpeed}"
     )
 }
 
 @Composable
 fun NodeListView(
-    node: Node,
+    modifier: Modifier = Modifier,
+    nodes: List<Node>,
+    selectedNodeId: Int? = null,
+    onItemClicked: KFunction1<Node, Unit>,
+    onDelete: KFunction1<Node, Unit>,
 ) {
-    Text(
-        text = "${node.geometry.latitude.roundTo(6)} / ${
-            node.geometry.longitude.roundTo(6)
-        }"
-    )
+    Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+        nodes.forEach { node ->
+            NodeCard(
+                modifier = modifier,
+                node = node,
+                isSelected = selectedNodeId == node.id,
+                onItemClicked = onItemClicked,
+                onDelete = onDelete
+            )
+        }
+        Spacer(Modifier.size(16.dp))
+    }
+}
+
+@Composable
+internal fun NodeCard(
+    modifier: Modifier = Modifier,
+    node: Node,
+    isSelected: Boolean = false,
+    onItemClicked: KFunction1<Node, Unit>,
+    onDelete: KFunction1<Node, Unit>,
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        onClick = {
+            if (isSelected.not()) {
+                onItemClicked(node)
+            }
+        },
+    ) {
+        Column {
+            CheckableProfileCircle(node.id.toString(), isSelected)
+            Text(
+                text = "${node.geometry.latitude.roundTo(6)} / ${
+                    node.geometry.longitude.roundTo(6)
+                }"
+            )
+            NodeButtonBar(
+                node = node,
+                onDelete = onDelete,
+            )
+        }
+    }
+}
+
+
+@Composable
+internal fun NodeButtonBar(
+    node: Node,
+    onDelete: KFunction1<Node, Unit>,
+) {
+    IconButton(onClick = { onDelete(node) }) {
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24),
+            contentDescription = stringResource(id = R.string.delete)
+        )
+    }
 }

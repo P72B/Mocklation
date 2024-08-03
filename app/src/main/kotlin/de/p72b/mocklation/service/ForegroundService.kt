@@ -9,7 +9,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.IBinder
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import de.p72b.mocklation.MainActivity
 import de.p72b.mocklation.R
@@ -121,14 +123,14 @@ class ForegroundService : Service() {
 
             is LocationSimulation.SimulationState.Status -> {
                 when (state.instruction) {
-                    is Instruction.FixedInstruction -> updateNoticationFixed(state.instruction)
+                    is Instruction.FixedInstruction -> updateNotificationFixed(state.instruction)
                     is Instruction.RouteInstruction -> updateNotificationRoute(state.instruction)
                 }
             }
         }
     }
 
-    private fun updateNoticationFixed(instruction: Instruction.FixedInstruction) {
+    private fun updateNotificationFixed(instruction: Instruction.FixedInstruction) {
         notificationBuilder.setContentText(
             "lat(y): ${instruction.location!!.latitude.roundTo(6)}\n" +
                     "lon(x): ${instruction.location.longitude.roundTo(6)}"
@@ -166,7 +168,11 @@ class ForegroundService : Service() {
             .setSmallIcon(R.drawable.move_location)
             .setContentIntent(pendingIntent)
             .setOnlyAlertOnce(true)
-            .setOngoing(true)
+            .setOngoing(true).also {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    it.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+                }
+            }
     }
 
     private fun createNotificationChannel(notificationManager: NotificationManager) {

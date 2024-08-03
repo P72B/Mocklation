@@ -8,6 +8,7 @@ import de.p72b.mocklation.data.Node
 import de.p72b.mocklation.data.util.Status
 import de.p72b.mocklation.usecase.MapBoundsUseCase
 import de.p72b.mocklation.usecase.SetFeatureUseCase
+import de.p72b.mocklation.util.Logger
 import de.p72b.mocklation.util.StatisticsCalculator
 import de.p72b.mocklation.util.TWO_DIGITS_COUNTRY_CODE_LOCATION_LIST
 import de.p72b.mocklation.util.roundTo
@@ -21,27 +22,28 @@ class MapViewModel(
     private val mapBoundsUseCase: MapBoundsUseCase
 ) : ViewModel() {
 
-    private val pointOnly = false
     private val feature = MockFeature()
     private val stats = StatisticsCalculator(feature)
     private var savedAt: Long? = null
 
     private val _uiState = MutableStateFlow<MapUIState>(MapUIState.Loading)
     val uiState: StateFlow<MapUIState> = _uiState
+    private var selectedId: Int? = null
 
     init {
+        Logger.d(msg = "MapViewModel init")
         viewModelScope.launch {
             val result = mapBoundsUseCase.invoke()
             when (result.status) {
                 Status.SUCCESS -> {
                     result.data?.let {
-                        val update = MapUIState.CameraUpdate()
+                        val update = MapUIState.CameraUpdate(animate = false)
                         if (it.coordinates.size == 1) {
                             update.point = MapUIState.Point(
                                 centerLatitude = it.coordinates[0].x,
                                 centerLongitude = it.coordinates[0].y
                             )
-                        } else {
+                        } else if (it.coordinates.isNotEmpty()) {
                             update.bounds = MapUIState.Bounds(
                                 southWestLatitude = it.coordinates[0].x,
                                 southWestLongitude = it.coordinates[0].y,
@@ -49,7 +51,13 @@ class MapViewModel(
                                 northEastLongitude = it.coordinates[2].y,
                             )
                         }
-                        _uiState.value = update
+                        _uiState.value = MapUIState.FeatureDataUpdate(
+                            cameraUpdate = update,
+                            selectedId = selectedId,
+                            feature = feature,
+                            tstamp = Date().time,
+                            statisticsViewData = getViewData()
+                        )
                     }
                 }
 
@@ -61,6 +69,7 @@ class MapViewModel(
     }
 
     fun onMarkerDragEnd(node: Node, newLatitude: Double, newLongitude: Double) {
+        Logger.d(msg = "MapViewModel onMarkerDragEnd")
         if (feature.nodes.contains(node).not()) {
             return
         }
@@ -70,29 +79,51 @@ class MapViewModel(
         }
 
         stats.setFeature(feature)
+        selectedId = node.id
         _uiState.value = MapUIState.FeatureDataUpdate(
-            selectedId = node.id,
+            selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
             statisticsViewData = getViewData()
         )
     }
 
-    fun onMapLongClick(lat: Double, lng: Double) {
-        if (pointOnly && feature.nodes.isEmpty().not()) {
-            return
+    fun onMapClick(lat: Double, lng: Double) {
+        Logger.d(msg = "MapViewModel onMapClick")
+        selectedId = null
+        val targetCoords: LatLng = createLatLng(lat, lng)
+        feature.nodes.find {
+            it.geometry.latitude == targetCoords.latitude
+                    && it.geometry.longitude == targetCoords.longitude
+        }?.let {
+            selectedId = it.id
         }
+        _uiState.value = MapUIState.FeatureDataUpdate(
+            selectedId = selectedId,
+            feature = feature,
+            tstamp = Date().time,
+            statisticsViewData = getViewData()
+        )
+    }
+
+    private fun createLatLng(lat: Double, lng: Double): LatLng {
+        return LatLng(lat.roundTo(6), lng.roundTo(6))
+    }
+
+    fun onMapLongClick(lat: Double, lng: Double) {
+        Logger.d(msg = "MapViewModel onMapLongClick")
         val currentId = determineNextNodeId(feature.nodes)
         val node = Node(
             id = currentId,
             accuracyInMeter = 6.0f,
-            geometry = LatLng(lat.roundTo(6), lng.roundTo(6))
+            geometry = createLatLng(lat, lng)
         )
         feature.nodes.add(node)
         stats.setFeature(feature)
+        selectedId = node.id
 
         _uiState.value = MapUIState.FeatureDataUpdate(
-            selectedId = currentId,
+            selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
             statisticsViewData = getViewData()
@@ -108,9 +139,41 @@ class MapViewModel(
         return LatLng(1.3588227, 103.8742114)
     }
 
-    fun onNodeClicked(node: Node) {
+    fun onNodeListItemClicked(node: Node) {
+        Logger.d(msg = "MapViewModel onNodeListItemClicked")
+        selectedId = node.id
         _uiState.value = MapUIState.FeatureDataUpdate(
-            selectedId = node.id,
+            cameraUpdate = MapUIState.CameraUpdate(
+                point = MapUIState.Point(node.geometry.latitude, node.geometry.longitude)
+            ),
+            selectedId = selectedId,
+            feature = feature,
+            tstamp = Date().time,
+            statisticsViewData = getViewData()
+        )
+    }
+
+    fun onNodeClicked(node: Node) {
+        Logger.d(msg = "MapViewModel onNodeClicked")
+        selectedId = node.id
+        _uiState.value = MapUIState.FeatureDataUpdate(
+            selectedId = selectedId,
+            feature = feature,
+            tstamp = Date().time,
+            statisticsViewData = getViewData()
+        )
+    }
+
+    fun onDeleteClicked(node: Node) {
+        Logger.d(msg = "MapViewModel onDeleteClicked")
+        if (node.id == selectedId) {
+            selectedId = null
+        }
+        feature.nodes.remove(node)
+        stats.setFeature(feature)
+
+        _uiState.value = MapUIState.FeatureDataUpdate(
+            selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
             statisticsViewData = getViewData()
@@ -118,6 +181,7 @@ class MapViewModel(
     }
 
     fun onSaveClicked() {
+        Logger.d(msg = "MapViewModel onSaveClicked")
         viewModelScope.launch {
             val previousLastModified = feature.lastModified
             feature.lastModified = Date().time
@@ -160,6 +224,7 @@ class MapViewModel(
 sealed interface MapUIState {
     data object Loading : MapUIState
     data class FeatureDataUpdate(
+        val cameraUpdate: CameraUpdate = CameraUpdate(),
         val selectedId: Int? = null,
         val feature: MockFeature,
         val tstamp: Long? = null,
@@ -168,8 +233,9 @@ sealed interface MapUIState {
 
     data class CameraUpdate(
         var point: Point? = null,
-        var bounds: Bounds? = null
-    ) : MapUIState
+        var bounds: Bounds? = null,
+        var animate: Boolean = true,
+    )
 
     data class Point(
         val centerLatitude: Double,

@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.p72b.mocklation.ui.theme.AppTheme
+import de.p72b.mocklation.util.Logger
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MapActivity : ComponentActivity() {
@@ -36,7 +37,8 @@ class MapActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val sheetState = rememberStandardBottomSheetState(
-                initialValue = SheetValue.PartiallyExpanded
+                initialValue = SheetValue.PartiallyExpanded,
+                skipHiddenState = false,
             )
             val scaffoldState = rememberBottomSheetScaffoldState(
                 bottomSheetState = sheetState
@@ -54,6 +56,8 @@ class MapActivity : ComponentActivity() {
                     Box(
                         Modifier.fillMaxSize()
                     ) {
+
+                        Logger.d(msg = "New Box")
                         GoogleMapView(
                             onMapLoaded = {
                                 isMapLoaded = true

@@ -24,8 +24,11 @@ class StatisticsCalculator(private var feature: MockFeature) {
         doCalculation()
     }
 
-    fun doCalculation() {
+    private fun doCalculation() {
         if (feature.nodes.size <= 1) {
+            totalTravelTimeInSeconds = 0.0
+            avgSpeedInKmh = 0.0
+            pathLengthInMeter = 0.0
             return
         }
         val newPath = feature.nodes.convertToLineString()
