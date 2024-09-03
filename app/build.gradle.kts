@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.jetbrains.kotlinx.json)
+    alias(libs.plugins.compose.compiler)
 }
 
 val androidMinSdk: Int by rootProject.extra
