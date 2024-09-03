@@ -4,6 +4,7 @@ import de.p72b.mocklation.data.MockFeature
 import org.locationtech.jts.geom.LineString
 import org.locationtech.jts.linearref.LengthLocationMap
 import org.locationtech.jts.linearref.LocationIndexedLine
+import java.util.Locale
 
 class StatisticsCalculator(private var feature: MockFeature) {
     private lateinit var path: LineString
@@ -22,6 +23,19 @@ class StatisticsCalculator(private var feature: MockFeature) {
     fun setFeature(value: MockFeature) {
         feature = value
         doCalculation()
+    }
+
+    fun getViewData(): StatisticsViewData {
+        var time = "0 s"
+        if (pathLengthInMeter > 0) {
+            time = getHumanReadableRepresentationOfTimeInMilliseconds(totalTravelTimeInSeconds)
+        }
+
+        return StatisticsViewData(
+            pathLength = getHumanReadableRepresentationOfDistanceMeters(pathLengthInMeter),
+            totalTravelTime = time,
+            avgSpeed = "Ø ${(avgSpeedInKmh * 3.6).toInt()} km/h"
+        )
     }
 
     private fun doCalculation() {
@@ -50,3 +64,9 @@ class StatisticsCalculator(private var feature: MockFeature) {
         avgSpeedInKmh = pathLengthInMeter / totalTravelTimeInSeconds
     }
 }
+
+data class StatisticsViewData(
+    val pathLength: String,
+    val totalTravelTime: String,
+    val avgSpeed: String
+)

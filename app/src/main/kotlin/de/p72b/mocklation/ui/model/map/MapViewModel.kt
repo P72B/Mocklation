@@ -10,6 +10,7 @@ import de.p72b.mocklation.usecase.MapBoundsUseCase
 import de.p72b.mocklation.usecase.SetFeatureUseCase
 import de.p72b.mocklation.util.Logger
 import de.p72b.mocklation.util.StatisticsCalculator
+import de.p72b.mocklation.util.StatisticsViewData
 import de.p72b.mocklation.util.TWO_DIGITS_COUNTRY_CODE_LOCATION_LIST
 import de.p72b.mocklation.util.roundTo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +57,7 @@ class MapViewModel(
                             selectedId = selectedId,
                             feature = feature,
                             tstamp = Date().time,
-                            statisticsViewData = getViewData()
+                            statisticsViewData = stats.getViewData()
                         )
                     }
                 }
@@ -84,7 +85,7 @@ class MapViewModel(
             selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
-            statisticsViewData = getViewData()
+            statisticsViewData = stats.getViewData()
         )
     }
 
@@ -102,7 +103,7 @@ class MapViewModel(
             selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
-            statisticsViewData = getViewData()
+            statisticsViewData = stats.getViewData()
         )
     }
 
@@ -126,7 +127,7 @@ class MapViewModel(
             selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
-            statisticsViewData = getViewData()
+            statisticsViewData = stats.getViewData()
         )
     }
 
@@ -149,7 +150,7 @@ class MapViewModel(
             selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
-            statisticsViewData = getViewData()
+            statisticsViewData = stats.getViewData()
         )
     }
 
@@ -160,7 +161,7 @@ class MapViewModel(
             selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
-            statisticsViewData = getViewData()
+            statisticsViewData = stats.getViewData()
         )
     }
 
@@ -176,7 +177,7 @@ class MapViewModel(
             selectedId = selectedId,
             feature = feature,
             tstamp = Date().time,
-            statisticsViewData = getViewData()
+            statisticsViewData = stats.getViewData()
         )
     }
 
@@ -211,14 +212,6 @@ class MapViewModel(
         }
         return resultId
     }
-
-    private fun getViewData(): MapUIState.StatisticsViewData {
-        return MapUIState.StatisticsViewData(
-            pathLength = "${stats.pathLengthInMeter.roundTo(2)} m",
-            totalTravelTime = "${stats.totalTravelTimeInSeconds.roundTo(1)} s",
-            avgSpeed = "Ø ${(stats.avgSpeedInKmh * 3.6).toInt()} km/h"
-        )
-    }
 }
 
 sealed interface MapUIState {
@@ -247,11 +240,5 @@ sealed interface MapUIState {
         val southWestLongitude: Double,
         val northEastLatitude: Double,
         val northEastLongitude: Double
-    )
-
-    data class StatisticsViewData(
-        val pathLength: String,
-        val totalTravelTime: String,
-        val avgSpeed: String
     )
 }

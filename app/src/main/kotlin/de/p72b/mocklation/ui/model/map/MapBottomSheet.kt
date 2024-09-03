@@ -32,6 +32,7 @@ import de.p72b.mocklation.ui.model.collection.ButtonBar
 import de.p72b.mocklation.ui.model.collection.CheckableProfileCircle
 import de.p72b.mocklation.ui.model.collection.PointCard
 import de.p72b.mocklation.ui.model.collection.RouteCard
+import de.p72b.mocklation.util.StatisticsViewData
 import de.p72b.mocklation.util.roundTo
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KFunction1
@@ -63,7 +64,7 @@ fun MapBottomSheet(
 @Composable
 fun DetailsView(
     modifier: Modifier = Modifier,
-    statisticsViewData: MapUIState.StatisticsViewData,
+    statisticsViewData: StatisticsViewData,
     nodes: List<Node>,
     selectedNodeId: Int? = null,
     onSaveClicked: () -> Unit,
@@ -99,7 +100,7 @@ fun DetailsView(
 
 @Composable
 fun StatisticsView(
-    statisticsViewData: MapUIState.StatisticsViewData,
+    statisticsViewData: StatisticsViewData,
 ) {
     Text(
         text = "${statisticsViewData.totalTravelTime} (${statisticsViewData.pathLength}) ${statisticsViewData.avgSpeed}"
