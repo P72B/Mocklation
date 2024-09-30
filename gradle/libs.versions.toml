@@ -1,9 +1,9 @@
 [versions]
-androidx-activity-compose = "1.9.1"
-androidx-compose-bom = "2024.08.00"
+androidx-activity-compose = "1.9.2"
+androidx-compose-bom = "2024.09.02"
 androidx-core-ktx = "1.13.1"
-androidx-lifecycle-runtime-compose = "2.8.4"
-androidx-navigation = "2.7.7"
+androidx-lifecycle-runtime-compose = "2.8.6"
+androidx-navigation = "2.8.1"
 koin = "3.5.6"
 room = "2.6.1"
 play-services-location = "21.3.0"
