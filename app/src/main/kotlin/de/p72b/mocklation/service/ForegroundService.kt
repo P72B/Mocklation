@@ -11,7 +11,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import de.p72b.mocklation.MainActivity
 import de.p72b.mocklation.R
@@ -47,18 +46,20 @@ class ForegroundService : Service() {
 
     override fun onCreate() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        cmdReceiver = ServiceCmdReceiver {
-            when (it) {
-                "pause" -> {
-                    simulation.pause()
-                }
+        cmdReceiver = ServiceCmdReceiver().also { serviceCmdReceiver ->
+            serviceCmdReceiver.setOnSimulationExtraEventListener {
+                when (it) {
+                    "pause" -> {
+                        simulation.pause()
+                    }
 
-                "resume" -> {
-                    simulation.resume()
-                }
+                    "resume" -> {
+                        simulation.resume()
+                    }
 
-                else -> {
-                    Logger.d(msg = "ForegroundService unknown simulation command")
+                    else -> {
+                        Logger.d(msg = "ForegroundService unknown simulation command")
+                    }
                 }
             }
         }
@@ -184,11 +185,16 @@ class ForegroundService : Service() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    class ServiceCmdReceiver(val onSimulationExtraEventListener: (String) -> Unit) :
-        BroadcastReceiver() {
+    class ServiceCmdReceiver: BroadcastReceiver() {
+
+        lateinit var listener: (String) -> Unit
+        fun setOnSimulationExtraEventListener(listener: (String) -> Unit) {
+            this.listener = listener
+        }
+
         override fun onReceive(context: Context, intent: Intent) {
             intent.extras?.getString("simulation")?.let {
-                onSimulationExtraEventListener(it)
+                listener(it)
             }
             context.sendBroadcast(Intent("cmd_pong"))
         }

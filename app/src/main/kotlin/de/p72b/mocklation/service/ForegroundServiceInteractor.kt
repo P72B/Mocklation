@@ -99,7 +99,7 @@ class ForegroundServiceInteractor(private val applicationContext: Context) {
 
     inner class CmdPong : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
-            isServiceRunning = true;
+            // TODO what shoul happen then?
         }
     }
 }
