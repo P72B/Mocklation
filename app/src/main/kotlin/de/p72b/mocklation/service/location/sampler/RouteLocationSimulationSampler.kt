@@ -1,5 +1,7 @@
 package de.p72b.mocklation.service.location.sampler
 
+import android.location.Location
+import android.location.LocationManager
 import de.p72b.mocklation.data.MockFeature
 import de.p72b.mocklation.util.StatisticsCalculator
 import de.p72b.mocklation.util.applyRandomGpsNoice
@@ -33,6 +35,10 @@ class RouteLocationSimulationSampler(
         mockLocation.apply {
             this.latitude = forwardShiftedCoordinate.x
             this.longitude = forwardShiftedCoordinate.y
+            this.bearing = Location(LocationManager.GPS_PROVIDER).apply {
+                latitude = currentSectionStartWayPoint.geometry.latitude
+                longitude = currentSectionStartWayPoint.geometry.longitude
+            }.bearingTo(this)
         }
 
         if (mockLocation.accuracy != 0.0f) {

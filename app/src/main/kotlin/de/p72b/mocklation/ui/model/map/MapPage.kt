@@ -22,7 +22,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -30,7 +29,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
+import com.google.maps.android.compose.rememberUpdatedMarkerState
 import de.p72b.mocklation.data.Node
 import de.p72b.mocklation.util.Logger
 import kotlinx.coroutines.launch
@@ -61,20 +60,21 @@ fun GoogleMapView(
     when (items) {
         is MapUIState.FeatureDataUpdate -> {
             val status = items as MapUIState.FeatureDataUpdate
+
             //markerData.clear()
             status.feature.nodes.forEach {
                 val latLng = LatLng(it.geometry.latitude, it.geometry.longitude)
-                val state = rememberMarkerState(
-                    key = it.id.toString(),
+                val state = rememberUpdatedMarkerState(
                     position = latLng
                 )
                 LaunchedEffect(key1 = state.position) {
-                    if (state.dragState == DragState.END) {
+                    if (state.isDragging.not()) {
                         viewModel.onMarkerDragEnd(it, state.position.latitude, state.position.longitude)
                     }
                 }
                 markerData.add(Pair(it, state))
             }
+
             status.selectedId.let {
                 scope.launch {
                     if (it == null) {
