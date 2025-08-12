@@ -20,7 +20,7 @@ data class MockFeature(
 @Serializable
 data class Node(
     val id: Int,
-    val isTunnel: Boolean = false,
+    var isTunnel: Boolean = false,
     var speedInKmh: Double = 60.0,
     val accuracyInMeter: Float = 0f,
     val geometry: LatLng

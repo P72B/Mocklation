@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -52,6 +53,7 @@ fun MapBottomSheet(
                 selectedNodeId = status.selectedId,
                 onItemClicked = viewModel::onNodeListItemClicked,
                 onDelete = viewModel::onDeleteClicked,
+                onIsTunnelCheckedChange = viewModel::onIsTunnelCheckedChange,
             )
         }
 
@@ -70,6 +72,7 @@ fun DetailsView(
     onSaveClicked: () -> Unit,
     onItemClicked: KFunction1<Node, Unit>,
     onDelete: KFunction1<Node, Unit>,
+    onIsTunnelCheckedChange : KFunction1<Pair<Node, Boolean>, Unit>,
 ) {
     Column(
         modifier = Modifier
@@ -84,6 +87,7 @@ fun DetailsView(
             selectedNodeId = selectedNodeId,
             onItemClicked = onItemClicked,
             onDelete = onDelete,
+            onIsTunnelCheckedChange = onIsTunnelCheckedChange,
         )
         Button(
             onClick = {
@@ -114,6 +118,7 @@ fun NodeListView(
     selectedNodeId: Int? = null,
     onItemClicked: KFunction1<Node, Unit>,
     onDelete: KFunction1<Node, Unit>,
+    onIsTunnelCheckedChange : KFunction1<Pair<Node, Boolean>, Unit>,
 ) {
     Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
         nodes.forEach { node ->
@@ -122,7 +127,8 @@ fun NodeListView(
                 node = node,
                 isSelected = selectedNodeId == node.id,
                 onItemClicked = onItemClicked,
-                onDelete = onDelete
+                onDelete = onDelete,
+                onIsTunnelCheckedChange = onIsTunnelCheckedChange,
             )
         }
         Spacer(Modifier.size(16.dp))
@@ -136,6 +142,7 @@ internal fun NodeCard(
     isSelected: Boolean = false,
     onItemClicked: KFunction1<Node, Unit>,
     onDelete: KFunction1<Node, Unit>,
+    onIsTunnelCheckedChange : KFunction1<Pair<Node, Boolean>, Unit>,
 ) {
     Card(
         modifier = modifier
@@ -153,6 +160,12 @@ internal fun NodeCard(
                 text = "${node.geometry.latitude.roundTo(6)} / ${
                     node.geometry.longitude.roundTo(6)
                 }"
+            )
+            Checkbox(
+                checked = node.isTunnel,
+                onCheckedChange = {
+                    onIsTunnelCheckedChange(Pair(node, it))
+                }
             )
             NodeButtonBar(
                 node = node,

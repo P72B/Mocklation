@@ -84,16 +84,22 @@ class LocationSimulation(
         return CoroutineScope(Dispatchers.Default).launch {
             while (true) {
                 val instruction: Instruction = sampler.getNextInstruction()
+                var isInsideTunnel = false
                 val location: Location? = when (instruction) {
                     is Instruction.FixedInstruction -> instruction.location
-                    is Instruction.RouteInstruction -> instruction.location
+                    is Instruction.RouteInstruction -> {
+                        isInsideTunnel = instruction.node.isTunnel
+                        instruction.location
+                    }
                 }
                 if (instruction is Instruction.RouteInstruction && instruction.isLast) {
                     listener(SimulationState.Finished)
                     return@launch
                 }
-                location?.let {
-                    publishMockLocation(it)
+                if (isInsideTunnel.not()) {
+                    location?.let {
+                        publishMockLocation(it)
+                    }
                 }
                 listener(SimulationState.Status(instruction))
                 delay(timeIntervalInMillis)

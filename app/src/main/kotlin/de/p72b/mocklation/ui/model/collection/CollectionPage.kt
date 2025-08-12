@@ -211,7 +211,11 @@ internal fun RouteCard(
         Column {
             CheckableProfileCircle(feature.uuid.substring(0, 2), isSelected)
             feature.nodes.forEach {
-                Text(text = "${it.geometry.latitude} / ${it.geometry.longitude}")
+                if (it.isTunnel) {
+                    Text(text = "${it.geometry.latitude} / ${it.geometry.longitude} (T)")
+                } else {
+                    Text(text = "${it.geometry.latitude} / ${it.geometry.longitude}")
+                }
             }
             ButtonBar(
                 modifier = modifier,

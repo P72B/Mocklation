@@ -181,6 +181,19 @@ class MapViewModel(
         )
     }
 
+    fun onIsTunnelCheckedChange(checkboxState: Pair<Node, Boolean>) {
+        Logger.d(msg = "Is ${checkboxState.first.id} checked: ${checkboxState.second}")
+        feature.nodes.find { checkboxState.first.id == it.id }?.let {
+            it.isTunnel = checkboxState.second
+        }
+        _uiState.value = MapUIState.FeatureDataUpdate(
+            selectedId = selectedId,
+            feature = feature,
+            tstamp = Date().time,
+            statisticsViewData = stats.getViewData()
+        )
+    }
+
     fun onSaveClicked() {
         Logger.d(msg = "MapViewModel onSaveClicked")
         viewModelScope.launch {
