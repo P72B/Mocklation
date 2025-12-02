@@ -161,12 +161,19 @@ internal fun NodeCard(
                     node.geometry.longitude.roundTo(6)
                 }"
             )
-            Checkbox(
-                checked = node.isTunnel,
-                onCheckedChange = {
-                    onIsTunnelCheckedChange(Pair(node, it))
-                }
-            )
+            Row(
+                    verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(id = R.string.checkbox_tunnel)
+                )
+                Checkbox(
+                    checked = node.isTunnel,
+                    onCheckedChange = {
+                        onIsTunnelCheckedChange(Pair(node, it))
+                    }
+                )
+            }
             NodeButtonBar(
                 node = node,
                 onDelete = onDelete,

@@ -46,4 +46,5 @@
     <string name="cta_cancel">cancel</string>
     <string name="checkbox_dont_warn_me_again">Don\'t warn me again</string>
     <string name="placeholder_empty_list">No items found</string>
+    <string name="checkbox_tunnel">Tunnel</string>
 </resources>
